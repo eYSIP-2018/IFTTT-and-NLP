@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "eyantra-iot-f2fbc",
+  "private_key_id": "2bd3f85676c00390cbc463f484d888a9ed0fd43c",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCYi2MuxovSxr1/\n4IqSxu7mQzQn6Hao+kgpgI26jDTb+qdq78AHCM+hVHaBQxbbZJQxupSUA1xbrSo/\nD4JbIs/VWBBvRZPiZ2qJSL0dup4C0q5aiFUI8ZuLkJlntiuXv3rSwLjIMWbd95BJ\nKhZ2rjiZFR+eAexiJ+1pUQLFtbYPZIYMk1lcGwbqBNSmmcVNVBse9dkEwWt/uz2e\nPIy/0vSgSb/SfSJueiuNNCy7YsJs+Wzo2vTM1JlGiRdQxkWTwPCiIA3GUEwR011s\n3XhCHHOOpN7zOQ5TxSvdPEanIbcvm34MR/whWKE79dYySGDHUQBX3mxNmf3srPts\nODOr5q7XAgMBAAECggEAGdefRVjYbixCBSxmfWgbJ8Ihz1L36zd/SxyepghDmjKz\n8w9LskVhW1ziOJLDiAZZfrUzn4GUP2muGwHHHSZgHC3vltIsM/I+H6TFeQhY5XSI\nmgi3kyzPI40rF+FKMEp9hb+lbjDEUv0yIdrx9EgeiXyFHzEHOTe3ZhyVwiW/AotL\nmNceXiAbhMLxAGji0ZYnhzwp779Zn82ORt/OhQ6Xdn3JLNzIX3dMQ94RAfyXTBZg\nc5hrPioo3BI22bcHnDvM69h+4CuTB7cbTBZEGq37BWUNMM7c47lvkRtr7ypRhiI7\nikfOlWMNFF+vB3TWU2YPTD1EZ52SBAiQLH/uNh05tQKBgQDLO/8Y4oCc0AXWXb78\nGbVtYVrQTd3/oQHoTHLIT7yGia000+HGGW4aDd31TOwqAhPdJyrqGJHdFsz8Nxpj\nID9ahpHlCKPqfVTB2X6zfrjW4hISkN+UanvX+vyXZ9xtcU0g+uLkvTyJmgPxdUhB\nlZsI0QAkVC0RmXrtbZbKLOBuuwKBgQDAJke9tUzyvtlnJMh+691HNHEB0nhyhMhX\nlK1W5J6ZCxC3V8uyMakw3SPca7168gviATEoeE0KmdhsODD3k+GqOOX7QWSBUvYA\nRsU+sctDl8j7fqD2a/iPjnrTuQKocXLElgEUvCQ+ea4GYGFN5Hg2oRtM7EWDo83U\nL+ccdXT0lQKBgBIzPEQRPK1OX8dzu7+92aaC+mv/HStgUthnyDuyEFMID0/Uzbo8\n2sRQi5kFG30jlH3QnSI7swxWl2La2G0aHTJRLM2S+YLtWGLHxHX0mj78Hdw1xx/2\nbULJQkeY0H+ojtyuOxV68Onttf6wnxjoeerPNLEMLMEPupd6oe9XF34zAoGAHMGd\n2vZXHb0SLC2FE/mYlB91CiDFhd35XaISjv6H/b96MPYitfhYqcdupn45TT0MKjaj\ndLsMTJnZmdiO+35WN3Nsd73BnNkdl8z/l/JjySneGkVJMZfXCyT3nNgDXdIcqu8I\nGmJNykvLj4i9Bzs6AnL58vkpLhpFo4vHuqqZZkECgYEAoyIYoqiPbND/vnd+tGyn\ndwfAFTTdsUjA0SQ9rmWZCVG57JLsCwEbEodWWEMCbG8YdIvAeWEucBdx5D0wqKbr\n+G2iE8oQnbsG4gHjytBLlVS7V0ZSZLjiDzBbSd1HESUw7IDLVx8trg0P6ylGFVe7\n9bezL+gGzj66GeUYGeuYE1Q=\n-----END PRIVATE KEY-----\n",
+  "client_email": "eyantra-iotiam@eyantra-iot-f2fbc.iam.gserviceaccount.com",
+  "client_id": "107407602745207407012",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://accounts.google.com/o/oauth2/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/eyantra-iotiam%40eyantra-iot-f2fbc.iam.gserviceaccount.com"
+}
