@@ -5,20 +5,11 @@
     <div>
         <section class="container">
             <section class="login-form">
-                <form class="form-signin" method="post" action="" role="login">
-                    <div id="app" v-if="error" class="alert alert-danger">
-                        {{ message }}
-                    </div>
-                    <div style="text-align: center;font-size: 30px;"><a style="text-decoration: none;" href="#">IoT Platform</a></div>
-                    <input type="email" name="email" id="inputEmail" class="form-control" placeholder="Email address" required="" autofocus="" autocomplete="off" />
-                    <input type="password" name="password" id="inputPassword" class="form-control" placeholder="Password" required="" autocomplete="off" />
-                    <div style="text-align: left" class="checkbox">
-                            <input type="checkbox" value="remember-me"> Remember me
-                    </div>
-                    <button v-on:click.prevent="login" id="submit" class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
-                    <div>
-                        <p>Don't have userid?&nbsp;<a href="signup">Signup</a></p>
-                    </div>
+                <input type="text" id="reply"/>
+                <br><br>
+                <form class="form" method="post" action="/eyiot">
+                    <input type="text" name="str"/>
+                    <button id="submit" type="submit">Send</button>
                 </form>
             </section>
         </section>
@@ -46,13 +37,15 @@
                             "My-Second-Header":"second value"
                         },
                         success: function(data){
-                            $.cookie('authorization', data.token);
-                            window.location.replace(JSON.parse(JSON.stringify(data))["url"]);
-                        },
-                        error: function (jqXHR, exception) {
-                            $.removeCookie('name');
-                            that.error = true;
-                            that.message = "Could not authenticate you. Please check email/password."
+                            if(!data){
+                                $.removeCookie('name');
+                                that.error = true;
+                                that.message = "Could not authenticate you. Please check email/password."
+
+                            }else{
+                                $.cookie('authorization', data.token);
+                                window.location.replace(JSON.parse(JSON.stringify(data))["url"]);
+                            }
                         }
                     });
                 }

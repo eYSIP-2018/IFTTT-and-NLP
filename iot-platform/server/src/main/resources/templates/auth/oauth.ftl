@@ -46,15 +46,13 @@
                             "My-Second-Header":"second value"
                         },
                         success: function(data){
-                            if(!data){
-                                $.removeCookie('name');
-                                that.error = true;
-                                that.message = "Could not authenticate you. Please check email/password."
-
-                            }else{
-                                $.cookie('authorization', data.token);
-                                window.location.replace(JSON.parse(JSON.stringify(data))["url"]);
-                            }
+                            $.cookie('authorization', data.token);
+                            window.location.replace(JSON.parse(JSON.stringify(data))["url"]);
+                        },
+                        error: function (jqXHR, exception) {
+                            $.removeCookie('name');
+                            that.error = true;
+                            that.message = "Could not authenticate you. Please check email/password."
                         }
                     });
                 }

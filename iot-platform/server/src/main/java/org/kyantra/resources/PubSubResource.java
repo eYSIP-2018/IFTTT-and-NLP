@@ -25,8 +25,10 @@ import javax.ws.rs.core.MediaType;
 import java.util.Deque;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import io.swagger.annotations.Api;
 
 @Path("/pubsub")
+@Api(value="pubsub")
 public class PubSubResource extends BaseResource {
 
     static AWSIotMqttClient client;

@@ -88,26 +88,27 @@ public class HomeResource extends BaseResource {
     @POST
     @Path("/eyiot")
     @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response eyIOT(@CookieParam("authorization") String token, @FormParam("str") String str){
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response eyIOT(JsonNode data, @CookieParam("authorization") String token){
         if(token == null || token == "" || token.length()==0) {
-            Response res = Response.status(Response.Status.OK).entity("{response : 'sign in required' }").build();
+            Response res = Response.status(Response.Status.OK).entity("{\"response\" : \"sign in required\" }").build();
             return res;
         }
-
+        String str = data.get("str").asText();
         try(SessionsClient sessionsClient = SessionsClient.create()) {
-            SessionName session = SessionName.of("eyantra-iot-f2fbc", token);
+            SessionName session = SessionName.of("eyantra-iot-f0957", token);
             Builder textInput = TextInput.newBuilder().setText(str).setLanguageCode("en-US");
             QueryInput queryInput = QueryInput.newBuilder().setText(textInput).build();
 
             DetectIntentResponse response = sessionsClient.detectIntent(session, queryInput);
             QueryResult queryResult = response.getQueryResult();
 
-            Response res = Response.status(Response.Status.OK).entity("{response : "+queryResult.getFulfillmentText()+"}").build();
+            Response res = Response.status(Response.Status.OK).entity("{\"response\" : \""+queryResult.getFulfillmentText()+"\"}").build();
             return res;
         }
         catch(Exception e) {
-            Response res = Response.status(Response.Status.OK).entity("{response : 'i didn't get that !' }").build();
+            System.out.println("error: "+e);
+            Response res = Response.status(Response.Status.OK).entity("{\"response\" : \"i didn't get that !\" }").build();
             return res;
         }
     }
