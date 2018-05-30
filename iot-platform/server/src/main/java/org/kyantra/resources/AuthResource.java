@@ -9,6 +9,7 @@ import org.kyantra.beans.UserBean;
 import org.kyantra.dao.SessionDAO;
 import org.kyantra.dao.UserDAO;
 
+import javax.ws.rs.core.Response;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
@@ -21,11 +22,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import java.net.URI;
-import javax.ws.rs.core.Response;
+import com.google.gson.JsonElement;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 
 @Path("auth")
 @Api("auth")
@@ -76,7 +77,6 @@ public class AuthResource extends BaseResource {
         return gson.toJson(map); //suggests failed authentication.
     }
 
-    /*change*/
     @POST
     @Path("oAuthToken")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -119,15 +119,12 @@ public class AuthResource extends BaseResource {
                         Object json = mapper.readValue(reply.toString(), Object.class);
                         Response response = Response.status(Response.Status.OK).entity(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(json)).header("statusCode","200").build();
                         return response;
-                        //return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(json);
-                        //return gson.toJson(reply.toString());
                     }
                     catch(Exception e)
                     {
-                        return null;
+                        Response response = Response.status(Response.Status.OK).entity("{'Error occured in oAuthToken': "+e+"}").header("statusCode","200").build();
+                        return response;
                     }
-                    //return Response.seeOther(new URI(redirect_uri+"#access_token="+token+"&token_type=bearer&state="+state)).header("Access-Control-Allow-Origin", "*").header("Access-Control-Allow-Methods","GET, POST, PATCH, PUT, DELETE, OPTIONS").header("Access-Control-Allow-Headers","Origin, Content-Type, X-Auth-Token").build();
-                    //return gson.toJson(resultBean);
                 }
 
             }
@@ -140,15 +137,16 @@ public class AuthResource extends BaseResource {
         return null; //suggests failed authentication.
     }
 
+
     @POST
     @Path("signup")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     public String signup(@FormParam("name") String name,
                          @FormParam("email") String email,
-                               @FormParam("password") String password,
-                               @Context HttpServletRequest request,
-                               @Context ContainerRequest containerRequest) throws Exception {
+                         @FormParam("password") String password,
+                         @Context HttpServletRequest request,
+                         @Context ContainerRequest containerRequest) throws Exception {
 
         UserBean userBean = UserDAO.getInstance().getByEmail(email.toLowerCase());
         if(userBean!=null){

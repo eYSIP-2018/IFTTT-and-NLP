@@ -5,7 +5,9 @@
     <div>
         <section class="container">
             <section class="login-form">
-                <form class="form" method="post" action="/eyIOT">
+                <input type="text" id="reply"/>
+                <br><br>
+                <form class="form" method="post" action="/eyiot">
                     <input type="text" name="str"/>
                     <button id="submit" type="submit">Send</button>
                 </form>

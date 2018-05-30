@@ -39,77 +39,6 @@ public class HomeResource extends BaseResource {
         return gson.toJson(getSecurityContext().getUserPrincipal());
     }
 
-    /*
-    @POST
-    @Path("/webhook")
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response webhook(JsonNode data){
-        String intentType = data.get("queryResult").get("intent").get("displayName").asText();
-        String email = data.get("queryResult").get("parameters").get("email").asText();
-        String password = data.get("queryResult").get("parameters").get("password").asText();
-
-        String output = "";
-
-        if(intentType.equals("auth_token"))
-        {
-            try
-            {
-                ObjectMapper mapper = new ObjectMapper();
-                mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
-                JsonNode reply = mapper.readTree("{\"fulfillmentText\": \"This is a text response from iot-platform -> "+output+"\",\"fulfillmentMessages\": [],\"source\": \"https://j8n707ap66.execute-api.us-east-1.amazonaws.com/beta/eYantraWebHook\",\"payload\": {},\"outputContexts\": [],\"followupEventInput\": {}}");
-                Object json = mapper.readValue(reply.toString(), Object.class);
-                Response response = Response.status(Response.Status.OK).entity(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(json)).header("statusCode","200").build();
-                return response;
-                //return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(json);
-                //return gson.toJson(reply.toString());
-            }
-            catch(Exception e)
-            {
-                return null;
-            }
-        }
-        Response response = Response.status(Response.Status.OK).entity("{a:1}").build();
-        return response;
-    }*/
-
-    @GET
-    @Path("/chatbot")
-    @Template(name = "/chatbot/chatbot.ftl")
-    public Map<String, Object> chatbot() {
-        final Map<String, Object> map = new HashMap<String, Object>();
-        return map;
-    }
-
-    @POST
-    @Path("/eyIOT")
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response eyIOT(@CookieParam("authorization") String token, @FormParam("str") String str){
-        System.out.println("==============================>"+token+"============"+str);
-        String stringInput = str;
-        String stringOutput = "";
-
-        try(SessionsClient sessionsClient = SessionsClient.create()) {
-           SessionName session = SessionName.of("eyantra-iot-f2fbc", token);
-           System.out.println("Session Path: " + session.toString());
-
-           Builder textInput = TextInput.newBuilder().setText(stringInput).setLanguageCode("en-US");
-           QueryInput queryInput = QueryInput.newBuilder().setText(textInput).build();
-
-           DetectIntentResponse response = sessionsClient.detectIntent(session, queryInput);
-           QueryResult queryResult = response.getQueryResult();
-
-            System.out.println("====================");
-            System.out.format("Query Text: '%s'\n", queryResult.getQueryText());
-            System.out.format("Detected Intent: %s (confidence: %f)\n",
-            queryResult.getIntent().getDisplayName(), queryResult.getIntentDetectionConfidence());
-            System.out.format("Fulfillment Text: '%s'\n", queryResult.getFulfillmentText());
-         }
-         catch(Exception e){ System.out.println("======="+e); return null; }
-        return null;
-    }
-
     @GET
     @Template(name = "/index.ftl")
     @Session
@@ -146,6 +75,41 @@ public class HomeResource extends BaseResource {
     public Map<String, Object> oauth() {
         final Map<String, Object> map = new HashMap<String, Object>();
         return map;
+    }
+
+    @GET
+    @Path("/chatbot")
+    @Template(name = "/chatbot/chatbot.ftl")
+    public Map<String, Object> chatbot() {
+        final Map<String, Object> map = new HashMap<String, Object>();
+        return map;
+    }
+
+    @POST
+    @Path("/eyiot")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public Response eyIOT(@CookieParam("authorization") String token, @FormParam("str") String str){
+        if(token == null || token == "" || token.length()==0) {
+            Response res = Response.status(Response.Status.OK).entity("{response : 'sign in required' }").build();
+            return res;
+        }
+
+        try(SessionsClient sessionsClient = SessionsClient.create()) {
+            SessionName session = SessionName.of("eyantra-iot-f2fbc", token);
+            Builder textInput = TextInput.newBuilder().setText(str).setLanguageCode("en-US");
+            QueryInput queryInput = QueryInput.newBuilder().setText(textInput).build();
+
+            DetectIntentResponse response = sessionsClient.detectIntent(session, queryInput);
+            QueryResult queryResult = response.getQueryResult();
+
+            Response res = Response.status(Response.Status.OK).entity("{response : "+queryResult.getFulfillmentText()+"}").build();
+            return res;
+        }
+        catch(Exception e) {
+            Response res = Response.status(Response.Status.OK).entity("{response : 'i didn't get that !' }").build();
+            return res;
+        }
     }
 
     @GET
