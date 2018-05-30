@@ -122,7 +122,7 @@ public class AuthResource extends BaseResource {
                     }
                     catch(Exception e)
                     {
-                        Response response = Response.status(Response.Status.OK).entity("{'Error occured in oAuthToken': "+e+"}").header("statusCode","200").build();
+                        Response response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{'Error occured in oAuthToken': "+e+"}").header("statusCode","500").build();
                         return response;
                     }
                 }
