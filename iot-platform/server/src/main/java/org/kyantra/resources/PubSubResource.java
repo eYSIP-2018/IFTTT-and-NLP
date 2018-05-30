@@ -22,10 +22,12 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import io.swagger.annotations.Api;
 import java.util.Deque;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Api(value="pubsub")
 @Path("/pubsub")
 public class PubSubResource extends BaseResource {
 

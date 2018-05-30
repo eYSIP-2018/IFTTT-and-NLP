@@ -7,7 +7,7 @@
             <section class="login-form">
                 <input type="text" id="reply"/>
                 <br><br>
-                <form class="form" method="post" action="/eyiot">
+                <form class="form" method="post" action="/eyIOT">
                     <input type="text" name="str"/>
                     <button id="submit" type="submit">Send</button>
                 </form>
