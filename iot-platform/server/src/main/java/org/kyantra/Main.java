@@ -1,7 +1,6 @@
 package org.kyantra;
 
 import io.swagger.jaxrs.config.BeanConfig;
-import io.swagger.models.Info;
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -16,7 +15,7 @@ import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.mvc.freemarker.FreemarkerMvcFeature;
 import org.kyantra.filters.AuthorizationFilter;
 import org.kyantra.filters.SessionFilter;
-import org.kyantra.resources.AppExceptionMapper;
+import org.kyantra.exceptionhandling.AppExceptionMapper;
 import org.kyantra.resources.AuthResource;
 import org.kyantra.services.HibernateService;
 
@@ -42,9 +41,9 @@ public class Main {
         rc.register(io.swagger.jaxrs.listing.ApiListingResource.class);
         rc.register(io.swagger.jaxrs.listing.SwaggerSerializers.class);
         rc.register(JacksonFeature.class);
+        rc.register(AppExceptionMapper.class);
         rc.register(SessionFilter.class);
         rc.register(AuthorizationFilter.class);
-        rc.register(AppExceptionMapper.class);
         rc.register(AuthResource.class);
 
         ClassLoader loader = Main.class.getClassLoader();
@@ -57,6 +56,7 @@ public class Main {
         server = GrizzlyHttpServerFactory.createHttpServer(URI.create("http://0.0.0.0:"+port+"/"), rc);
         ServerConfiguration cfg = server.getServerConfiguration();
         cfg.addHttpHandler(docsHandler, "/docs/");
+        // TODO: 5/30/18 Enter to submit form in modals and other places
         cfg.addHttpHandler(staticHttpHandler,"/static/");
         return server;
     }

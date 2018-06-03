@@ -1,18 +1,26 @@
 package org.kyantra.resources;
 
+import net.lingala.zip4j.core.ZipFile;
+import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.model.ZipParameters;
+import net.lingala.zip4j.util.Zip4jConstants;
+
 import com.amazonaws.services.iot.AWSIot;
-import com.amazonaws.services.iot.client.AWSIotException;
 import com.amazonaws.services.iot.model.*;
 import com.amazonaws.services.iotdata.AWSIotData;
 import com.amazonaws.services.iotdata.model.GetThingShadowRequest;
 import com.amazonaws.services.iotdata.model.GetThingShadowResult;
 import io.swagger.annotations.Api;
+
 import org.kyantra.beans.RoleEnum;
 import org.kyantra.beans.ThingBean;
+import org.kyantra.beans.UnitBean;
 import org.kyantra.beans.UserBean;
-import org.kyantra.dao.AuthorizationDAO;
 import org.kyantra.dao.ThingDAO;
 import org.kyantra.dao.UnitDAO;
+import org.kyantra.exceptionhandling.DataNotFoundException;
+import org.kyantra.exceptionhandling.ExceptionMessage;
+import org.kyantra.helper.AuthorizationHelper;
 import org.kyantra.interfaces.Secure;
 import org.kyantra.interfaces.Session;
 import org.kyantra.utils.AwsIotHelper;
@@ -23,7 +31,6 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.io.File;
 import java.io.PrintWriter;
-import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -38,74 +45,112 @@ public class ThingResource extends BaseResource {
 
     int limit = 10;
 
+
     @GET
+    @Session
+    @Secure(roles = {RoleEnum.ALL, RoleEnum.WRITE, RoleEnum.READ})
     @Path("get/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public String get(@PathParam("id") Integer id){
-        ThingBean bean = ThingDAO.getInstance().get(id);
-        return gson.toJson(bean);
+    public String get(@PathParam("id") Integer id) throws  ForbiddenException {
+        ThingBean thingBean = ThingDAO.getInstance().get(id);
+
+        // check if thingBean is not null
+        if (thingBean == null)
+            throw new DataNotFoundException(ExceptionMessage.DATA_NOT_FOUND);
+
+        // if this is done before null check, it'll throw a NullPointerException
+        // but we want DataNotFoundException
+        UserBean userBean = (UserBean)getSecurityContext().getUserPrincipal();
+
+        if (!AuthorizationHelper.getInstance().checkAccess(userBean, thingBean))
+            throw new  ForbiddenException(ExceptionMessage.FORBIDDEN);
+            
+        return gson.toJson(thingBean);
     }
+
 
     @GET
+    @Session
     @Path("list/page/{page}")
     @Produces(MediaType.APPLICATION_JSON)
-    public String list(@PathParam("page") Integer page){
-        Principal principal = getSecurityContext().getUserPrincipal();
-        UserBean currentUser = (UserBean) principal;
-        List<ThingBean> users = ThingDAO.getInstance().list(page,limit);
-        return gson.toJson(users);
+    public String list(@PathParam("page") Integer page) {
+        List<ThingBean> things= ThingDAO.getInstance().list(page,limit);
+        return gson.toJson(things);
     }
 
-    @POST
+
+    @PUT
+    @Session
+    @Secure(roles = {RoleEnum.ALL,RoleEnum.WRITE}, subjectType = "thing", subjectField = "parentId")
     @Path("update/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Secure(roles = {RoleEnum.ALL,RoleEnum.WRITE}, subjectType = "thing", subjectField = "parentId")
     public String update(@PathParam("id") Integer id,
                          @FormParam("name") String name,
                          @FormParam("description") String description,
-                         @FormParam("ip") String ip) throws AccessDeniedException{
+                         @FormParam("ip") String ip) {
         //TODO: create/update will only add/edit current entity values and not its parent/children attributes
-        if (AuthorizationDAO.getInstance().ownsThing((UserBean)getSecurityContext().getUserPrincipal(),ThingDAO.getInstance().get(id))) {
-            ThingDAO.getInstance().update(id, name, description, ip);
-            ThingBean bean = ThingDAO.getInstance().get(id);
-            return gson.toJson(bean);
-        }
-        else {
-            throw new AccessDeniedException();
-        }
+        ThingBean bean = ThingDAO.getInstance().get(id);
+
+        if (bean == null)
+            throw new DataNotFoundException(ExceptionMessage.DATA_NOT_FOUND);
+
+        UserBean userBean = (UserBean)getSecurityContext().getUserPrincipal();
+
+        if (!AuthorizationHelper.getInstance().checkAccess(userBean, bean))
+            throw new  ForbiddenException(ExceptionMessage.FORBIDDEN);
+
+        ThingDAO.getInstance().update(id, name, description, ip);
+        return gson.toJson(bean);
     }
+
 
     @DELETE
+    @Session
+    @Secure(roles = {RoleEnum.ALL,RoleEnum.WRITE}, subjectType = "thing", subjectField = "parentId")
     @Path("delete/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    @Secure(roles = {RoleEnum.ALL,RoleEnum.WRITE}, subjectType = "thing", subjectField = "parentId")
-    public String delete(@PathParam("id") Integer id) throws AccessDeniedException{
-        if (AuthorizationDAO.getInstance().ownsThing((UserBean)getSecurityContext().getUserPrincipal(),ThingDAO.getInstance().get(id))) {
-            try {
-                ThingDAO.getInstance().delete(id);
-                return "{}";
-            } catch (Throwable t) {
-                t.printStackTrace();
-            }
+    public String delete(@PathParam("id") Integer id)  {
+        ThingBean bean = ThingDAO.getInstance().get(id);
+
+        if (bean == null)
+            throw new DataNotFoundException(ExceptionMessage.DATA_NOT_FOUND);
+
+        UserBean userBean = (UserBean)getSecurityContext().getUserPrincipal();
+
+        if (!AuthorizationHelper.getInstance().checkAccess(userBean, bean))
+            throw new  ForbiddenException(ExceptionMessage.FORBIDDEN);
+
+        try {
+            ThingDAO.getInstance().delete(id);
+            // TODO: 5/24/18 return proper response
             return "{}";
+        } catch (Throwable t) {
+            t.printStackTrace();
         }
-        else{
-            throw new AccessDeniedException();
-        }
+        return "{}";
     }
 
+
+    // TODO: 5/24/18 Zip the certificates
     @POST
     @Session
+    @Secure(roles = {RoleEnum.ALL,RoleEnum.WRITE}, subjectType = "thing", subjectField = "parentId")
     @Path("create")
     @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED) //unit_id
-    @Secure(roles = {RoleEnum.ALL,RoleEnum.WRITE}, subjectType = "thing", subjectField = "parentId")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public String create(@FormParam("name") String name,
                          @FormParam("description") String description,
                          @FormParam("ip") String ip,
-                         @FormParam("parentUnitId") Integer parentUnitId) throws AccessDeniedException{
-        if (AuthorizationDAO.getInstance().ownsUnit((UserBean)getSecurityContext().getUserPrincipal(),UnitDAO.getInstance().get(parentUnitId))) {
+                         @FormParam("parentUnitId") Integer parentUnitId) {
+
+        UnitBean targetUnit = UnitDAO.getInstance().get(parentUnitId);
+        UserBean userBean = (UserBean)getSecurityContext().getUserPrincipal();
+
+        if (targetUnit == null)
+            throw new DataNotFoundException(ExceptionMessage.DATA_NOT_FOUND);
+
+        if(AuthorizationHelper.getInstance().checkAccess(userBean, targetUnit)) {
             try {
                 String s = "Create thing";
                 //System.out.println(gson.toJson(bean));
@@ -146,6 +191,24 @@ public class ThingResource extends BaseResource {
                             file = new PrintWriter(certificateDir.getAbsolutePath() + "/public.key.pem");
                             file.write(publicKey);
                             file.close();
+
+                            ZipFile zipFile = new ZipFile(certificateDir.getAbsolutePath()+".zip");
+
+                            // Folder to add
+                            String folderToAdd = certificateDir.getAbsolutePath();
+
+                            // Initiate Zip Parameters which define various properties such
+                            // as compression method, etc.
+                            ZipParameters parameters = new ZipParameters();
+
+                            // set compression method to store compression
+                            parameters.setCompressionMethod(Zip4jConstants.COMP_DEFLATE);
+
+                            // Set the compression level
+                            parameters.setCompressionLevel(Zip4jConstants.DEFLATE_LEVEL_NORMAL);
+
+                            // Add folder to the zip file
+                            zipFile.addFolder(folderToAdd, parameters);
                         }
 
                     }
@@ -186,25 +249,49 @@ public class ThingResource extends BaseResource {
 
             return "{\"success\":false}";
 
-        } else {
-            throw new AccessDeniedException();
         }
+        else throw new  ForbiddenException(ExceptionMessage.FORBIDDEN);
     }
 
+
     @GET
+    @Session
+    @Secure(roles = {RoleEnum.READ, RoleEnum.WRITE, RoleEnum.ALL})
     @Path("unit/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public String getByUnit(@PathParam("id") Integer id) {
-        Set<ThingBean> things = ThingDAO.getInstance().getByUnitId(id);
-        return gson.toJson(things);
+    public String getByUnit(@PathParam("id") Integer id)   {
+        // should have access to read parent units details
+        UserBean userBean = (UserBean)getSecurityContext().getUserPrincipal();
+        UnitBean targetUnit = UnitDAO.getInstance().get(id);
+
+        if (targetUnit == null)
+            throw new DataNotFoundException(ExceptionMessage.DATA_NOT_FOUND);
+
+        if (AuthorizationHelper.getInstance().checkAccess(userBean, targetUnit)) {
+            Set<ThingBean> things = ThingDAO.getInstance().getByUnitId(id);
+            return gson.toJson(things);
+        }
+        else throw new  ForbiddenException(ExceptionMessage.FORBIDDEN);
     }
 
+
+    // TODO: 5/24/18 Debug this resource method: Gives NPE always
     @GET
     @Path("shadow/{id}")
+    @Session
+    @Secure(roles = {RoleEnum.READ, RoleEnum.WRITE, RoleEnum.ALL})
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public String getThingShadow(@PathParam("id") Integer thingId) throws AWSIotException {
+    public String getThingShadow(@PathParam("id") Integer thingId) {
         ThingBean thingBean = ThingDAO.getInstance().get(thingId);
+        UserBean userBean = (UserBean)getSecurityContext().getUserPrincipal();
+
+        if (thingBean == null)
+            throw new DataNotFoundException(ExceptionMessage.DATA_NOT_FOUND);
+
+        if (!AuthorizationHelper.getInstance().checkAccess(userBean, thingBean))
+            throw new ForbiddenException(ExceptionMessage.FORBIDDEN);
+
         String shadowName = "thing"+thingBean.getId();
 
         AWSIotData client1 = AwsIotHelper.getIotDataClient();
@@ -218,9 +305,9 @@ public class ThingResource extends BaseResource {
         return resultString;
     }
 
+
     @Path("/certificate")
     public CertificateResource getCertificateResource() {
-        return new CertificateResource();
+        return new CertificateResource(sc, request);
     }
-
 }

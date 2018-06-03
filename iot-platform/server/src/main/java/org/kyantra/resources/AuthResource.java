@@ -9,7 +9,6 @@ import org.kyantra.beans.UserBean;
 import org.kyantra.dao.SessionDAO;
 import org.kyantra.dao.UserDAO;
 
-import javax.ws.rs.core.Response;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
@@ -22,6 +21,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+//chat bot imports
+import javax.ws.rs.core.Response;
 import com.google.gson.JsonElement;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.core.JsonParser;
@@ -77,6 +78,7 @@ public class AuthResource extends BaseResource {
         return gson.toJson(map); //suggests failed authentication.
     }
 
+    // for web-chatbot authentication
     @POST
     @Path("oAuthToken")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
