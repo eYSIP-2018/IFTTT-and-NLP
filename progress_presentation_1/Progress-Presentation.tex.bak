@@ -1,0 +1,71 @@
+\documentclass[10pt, a4paper]{beamer}
+
+\usetheme{Berkeley}
+\usecolortheme{sidebartab}
+
+\begin{document}
+	\setbeamertemplate{sidebar left}{}
+	\title{Progress Presentation-I}
+	\subtitle{e-Yantra Summer Internship-2018
+	\newline
+	\\ NLP-Smart Assistant for eYantra IOT
+	\\\&
+	\\IFTTT for IOT}
+	\author{
+	Team:
+	\\Onkar J. Sathe
+	\\Rohit G. Rathi
+	\\Mentors:
+	\\Omkar Manjrekar
+	\\Vikrant Fernandes}
+	\institute{IIT Bombay}
+	\date{\today}
+	%\addtobeamertemplate{sidebar left}{}{\includegraphics[scale = 0.3]{logowithtext.png}}
+	\frame{\titlepage}
+
+\setbeamertemplate{sidebar left}[sidebar theme]
+\section{Overview of Project}
+\begin{frame}{Overview of Project}
+	Give following details: \\
+	\begin{itemize}
+		\item Project Name
+		\item Objective
+		\item Deliverables
+	\end{itemize}
+\end{frame}
+
+\section{Overview of Task}
+\begin{frame}{Overview of Task}
+	\begin{itemize}
+		\item List key tasks with deadlines. Use table for better representation
+	\end{itemize}
+\end{frame}
+
+\section{Task Accomplished}
+\begin{frame}{Task Accomplished}
+	\begin{itemize}
+		\item List all tasks that have been accomplished with details of completion viz., What has been proposed, what is accomplished and what is remaining  
+		\item Include images/demo of accomplished work
+	\end{itemize}
+\end{frame}
+
+\section{Challenges Faced}
+\begin{frame}{Challenges Faced}
+	\begin{itemize}
+		\item List challenges faced while accomplishing the task.  
+	\end{itemize}
+\end{frame}
+
+\section{Future Plans}
+\begin{frame}{Future Plans}
+	\begin{itemize}
+		\item List deliverables for next progress presentation  
+	\end{itemize}
+\end{frame}
+
+
+\section{Thank You}
+\begin{frame}{Thank You}
+	\centering THANK YOU !!!
+\end{frame}
+\end{document}
