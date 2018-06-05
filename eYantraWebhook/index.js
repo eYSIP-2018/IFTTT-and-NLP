@@ -1,5 +1,3 @@
-//Auther: Rohit Rathi
-console.log("==============Auther: Rohit Rathi==============");
 var fulfillment = {
     "project": {
         "projectID": "eyantra-iot-f0957"
@@ -14,7 +12,7 @@ var fulfillment = {
     },
     "server" : {
         "protocol" : "https",
-        "hostname" : "b3810d1c.ngrok.io",
+        "hostname" : "ce0d3d32.ngrok.io",
         "port" : null
     },
     "object.create": {
@@ -154,9 +152,9 @@ var fulfillment = {
             }
         }
     },
-    "object.get-id": {
+    "object.action-id-by-name": {
         "thing" : {
-            "endpoint" : "/thing/get/",
+            "endpoint" : "",
             "type" : "GET",
             "content_type" : "application/x-www-form-urlencoded",
             "response_type" : "application/json",
@@ -166,7 +164,7 @@ var fulfillment = {
             }
         },
         "unit" : {
-            "endpoint" : "/unit/get/",
+            "endpoint" : "",
             "type" : "GET",
             "content_type" : "application/x-www-form-urlencoded",
             "response_type" : "application/json",
@@ -176,12 +174,33 @@ var fulfillment = {
             }
         },
         "user" : {
-            "endpoint" : "/user/get/",
+            "endpoint" : "",
             "type" : "GET",
             "content_type" : "application/x-www-form-urlencoded",
             "response_type" : "application/json",
             "url_parameter" : true,
             "apiInput" : {
+                "id" : ""
+            }
+        },
+        "pubsubShadow": {
+            "endpoint" : "/pubsub/shadow/",
+            "type" : "GET",
+            "content_type" : "application/x-www-form-urlencoded",
+            "response_type" : "application/json",
+            "url_parameter" : true,
+            "apiInput" : {
+                "id" : ""
+            }
+        },
+        "pubsubValue": {
+            "endpoint" : "/pubsub/value/",
+            "type" : "POST",
+            "content_type" : "application/x-www-form-urlencoded",
+            "response_type" : "application/json",
+            "url_parameter" : true,
+            "apiInput" : {
+                "value" : "",
                 "id" : ""
             }
         }
@@ -218,7 +237,7 @@ var fulfillment = {
             }
         }
     },
-    "object.delete-name-id": {
+    "object.delete": {
         "thing" : {
             "endpoint" : "/thing/delete/",
             "type" : "DELETE",
@@ -250,6 +269,31 @@ var fulfillment = {
             }
         }
     },
+    "pubsub.get-shadow-by-name" : {
+        "pubsubShadow": {
+            "endpoint" : "/thing/list/page/0",
+            "type" : "GET",
+            "content_type" : "application/x-www-form-urlencoded",
+            "response_type" : "application/json",
+            "url_parameter" : true,
+            "apiInput" : {
+                "id" : ""
+            }
+        }
+    },
+    "pubsub.set-value-by-name" : {
+        "pubsubValue": {
+            "endpoint" : "/thing/list/page/0",
+            "type" : "GET",
+            "content_type" : "application/x-www-form-urlencoded",
+            "response_type" : "application/json",
+            "url_parameter" : true,
+            "apiInput" : {
+                "id" : "",
+                "value" : ""
+            }
+        }
+    }
 };
 
 const http = require('http');
@@ -284,7 +328,6 @@ function sendRequest(options, apiInput, callback) {
         });
 
         response.on("end", function () {
-            console.log(chunks);
             reply = JSON.parse(chunks);
             callback(reply,this.statusCode);
         });
@@ -297,11 +340,17 @@ function sendRequest(options, apiInput, callback) {
 exports.eYantraWebhook = (req, res) => {
     if(req.hasOwnProperty("body") && req.body.hasOwnProperty("queryResult") && req.body.queryResult.hasOwnProperty("intent") && req.body.queryResult.intent.hasOwnProperty("displayName")) {
         queryResult = req.body.queryResult;
-        console.log("====> intent : "+ queryResult.intent.displayName);
+        console.log("Intent : "+ queryResult.intent.displayName);
         intent = queryResult.intent.displayName;
-        objectType = findKey("object", queryResult);
+        if(intent == "pubsub.get-shadow-by-name") {
+            objectType = "pubsubShadow";
+        } else if(intent == "pubsub.set-value-by-name") {
+            objectType = "pubsubValue";
+        } else {
+            objectType = findKey("object", queryResult);
+        }
+
         token = findKey("accessToken", req.body);
-        console.log(token);
         if(token == null) {
             responseText.fulfillmentText = "not authenticated!";
             res.status(200).send(JSON.stringify(responseText));
@@ -310,7 +359,7 @@ exports.eYantraWebhook = (req, res) => {
             "method": fulfillment[intent][objectType]["type"],
             "hostname": fulfillment["server"]["hostname"],
             "port": fulfillment["server"]["port"],
-            "path": fulfillment[intent][objectType]["endpoint"],
+            "path":  fulfillment[intent][objectType]["endpoint"],
             "headers": {
                 "content-type": fulfillment[intent][objectType]["content_type"],
                 "cache-control": "no-cache",
@@ -380,16 +429,23 @@ exports.eYantraWebhook = (req, res) => {
                     case "thing" : {
                         sendRequest(options,null,function(reply,statusCode){
                             var response;
-                            console.log('in case of thing.list' + JSON.stringify(reply));
+                            //console.log('in case of thing.list');
                             if(reply.length > 0) {
                                 for(var i = 0;i<reply.length;i++) {
                                     responseText.payload.google.systemIntent.data.listSelect.items.push({"optionInfo": {"key": ""+objectType+": "+reply[i].id+reply[i].name},"title": ""+objectType+" "+reply[i].id+" "+reply[i].name});
+                                }
+                                if(responseText.payload.google.systemIntent.data.listSelect.items.length == 1) {
+                                    let tmp = {"payload": {"google": {"expectUserResponse": true,"richResponse": {"items": [{"simpleResponse": {"textToSpeech": ""}},{"simpleResponse": {"textToSpeech": ""}}]}}}};
+                                    tmp.payload.google.richResponse.items[1].simpleResponse.textToSpeech = responseText.payload.google.systemIntent.data.listSelect.items[0].title;
+                                    tmp.payload.google.richResponse.items[0].simpleResponse.textToSpeech = "found only one "+objectType +" : ";
+                                    responseText = tmp;
                                 }
                             }
                             else {
                                 responseText = fulfillment["basic_response"];
                                 responseText.fulfillmentText = "No "+objectType+"s found! Try adding some...";
                             }
+
                             res.status(200).send(JSON.stringify(responseText));
                         });
                     }
@@ -397,10 +453,16 @@ exports.eYantraWebhook = (req, res) => {
                     case "unit" : {
                         sendRequest(options,null,function(reply,statusCode){
                             var response;
-                            console.log('in case of unit.list' + JSON.stringify(reply));
+                            //console.log('in case of unit.list');
                             if(reply.length > 0) {
                                 for(var i = 0;i<reply.length;i++) {
                                     responseText.payload.google.systemIntent.data.listSelect.items.push({"optionInfo": {"key": ""+objectType+": "+reply[i].id+reply[i].unitName},"title": ""+objectType+" "+reply[i].id+" "+reply[i].unitName});
+                                }
+                                if(responseText.payload.google.systemIntent.data.listSelect.items.length == 1) {
+                                    let tmp = {"payload": {"google": {"expectUserResponse": true,"richResponse": {"items": [{"simpleResponse": {"textToSpeech": ""}},{"simpleResponse": {"textToSpeech": ""}}]}}}};
+                                    tmp.payload.google.richResponse.items[1].simpleResponse.textToSpeech = responseText.payload.google.systemIntent.data.listSelect.items[0].title;
+                                    tmp.payload.google.richResponse.items[0].simpleResponse.textToSpeech = "found only one "+objectType +" : ";
+                                    responseText = tmp;
                                 }
                             }
                             else {
@@ -414,10 +476,16 @@ exports.eYantraWebhook = (req, res) => {
                     case "user" : {
                         sendRequest(options,null,function(reply,statusCode){
                             var response;
-                            console.log('in case of user.list' + JSON.stringify(reply));
+                            //console.log('in case of user.list');
                             if(reply.length > 0) {
                                 for(var i = 0;i<reply.length;i++) {
                                     responseText.payload.google.systemIntent.data.listSelect.items.push({"optionInfo": {"key": ""+objectType+": "+reply[i].id+reply[i].name},"description": ""+reply[i].email,"title": ""+objectType+" "+reply[i].id+" "+reply[i].name});
+                                }
+                                if(responseText.payload.google.systemIntent.data.listSelect.items.length == 1) {
+                                    let tmp = {"payload": {"google": {"expectUserResponse": true,"richResponse": {"items": [{"simpleResponse": {"textToSpeech": ""}},{"simpleResponse": {"textToSpeech": ""}}]}}}};
+                                    tmp.payload.google.richResponse.items[1].simpleResponse.textToSpeech = responseText.payload.google.systemIntent.data.listSelect.items[0].title;
+                                    tmp.payload.google.richResponse.items[0].simpleResponse.textToSpeech = "found only one "+objectType +" : ";
+                                    responseText = tmp;
                                 }
                             }
                             else {
@@ -437,7 +505,7 @@ exports.eYantraWebhook = (req, res) => {
                     case "thing" : {
                         sendRequest(options,null,function(reply,statusCode){
                             var response;
-                            console.log('in case of thing.get-id' + JSON.stringify(reply));
+                            //console.log('in case of thing.get-id');
                             if(reply.hasOwnProperty('id')) {
                                 response = "id : "+reply.id+" name : "+reply.name + " description : " + reply.description + " parent Id : "+ reply.parentUnit.id+ " parent Name : " + reply.parentUnit.name;
                             }
@@ -452,7 +520,7 @@ exports.eYantraWebhook = (req, res) => {
                     case "unit" : {
                         sendRequest(options,null,function(reply,statusCode){
                             var response;
-                            console.log('in case of unit.get-id' + JSON.stringify(reply));
+                            //console.log('in case of unit.get-id');
                             if(reply.hasOwnProperty('id')) {
                                 response = "id : " +reply.id+" name : "+reply.name  + " description : " + reply.description;
                             }
@@ -467,7 +535,7 @@ exports.eYantraWebhook = (req, res) => {
                     case "cron" : {
                         sendRequest(options,null,function(reply,statusCode){
                             var response;
-                            console.log('in case of cron.get-id' + JSON.stringify(reply));
+                            //console.log('in case of cron.get-id');
                             if(reply.hasOwnProperty('id')) {
                                 response = "id : "+ reply.id+" name : "+reply.name;
                             }
@@ -482,7 +550,7 @@ exports.eYantraWebhook = (req, res) => {
                     case "user" : {
                         sendRequest(options,null,function(reply,statusCode){
                             var response;
-                            console.log('in case of user.get-id' + JSON.stringify(reply));
+                            //console.log('in case of user.get-id');
                             if(reply.hasOwnProperty('id')) {
                                 response = "id :" +reply.id+" name : "+reply.name + " email : "+reply.email ;
                             }
@@ -498,8 +566,10 @@ exports.eYantraWebhook = (req, res) => {
             }
             break;
             case "object.delete - yes" : {
+                console.log("inside " + intent);
                 let name = findKey("name.original", req.body);
                 let conversationId = findKey("conversationId", req.body);
+                console.log("object name :" +  name);
                 switch(objectType) {
                     case "thing" : {
                         sendRequest(options,null,function(reply,statusCode){
@@ -512,7 +582,9 @@ exports.eYantraWebhook = (req, res) => {
                                     if(reply[i].name == name)
                                         tempIdList.push(reply[i].id);
                                 }
+                                console.log(tempIdList);
                                 if(tempIdList.length > 1) {
+                                    //console.log("list found for delete");
                                     responseText.fulfillmentText = "Found multiple "+objectType+"s with name: "+name+"; [";
                                     for(let i=0;i<tempIdList.length;i++) {
                                         if(i==0)
@@ -522,23 +594,26 @@ exports.eYantraWebhook = (req, res) => {
                                     }
                                     responseText.fulfillmentText += "], please choose an ID to delete:";
                                     responseText.outputContexts = [{
-                                        "name": "projects/"+fulfillment.project.projectID+"/agent/sessions/"+conversationId+"/contexts/object-delete-name-id",
+                                        "name": "projects/"+fulfillment.project.projectID+"/agent/sessions/"+conversationId+"/contexts/action-id-by-name",
                                         "lifespanCount": 5,
                                         "parameters": {
-                                          "object": "thing"
+                                          "object" : "thing",
+                                          "futureAction" : "delete",
+                                          "objectName" : name
                                         }
                                     }];
-                                    console.log("in greater than 1 == "+responseText.fulfillmentText);
+                                    //console.log("in greater than 1 == "+responseText.fulfillmentText);
                                     res.status(200).send(JSON.stringify(responseText));
                                 }
                                 else if(tempIdList.length == 1){
+                                    //console.log("list not found for delete");
                                     options = {
-                                        "method": fulfillment["object.delete-name-id"][objectType]["type"],
+                                        "method": fulfillment["object.delete"][objectType]["type"],
                                         "hostname": fulfillment["server"]["hostname"],
                                         "port": fulfillment["server"]["port"],
-                                        "path": fulfillment["object.delete-name-id"][objectType]["endpoint"],
+                                        "path": fulfillment["object.delete"][objectType]["endpoint"],
                                         "headers": {
-                                            "content-type": fulfillment["object.delete-name-id"][objectType]["content_type"],
+                                            "content-type": fulfillment["object.delete"][objectType]["content_type"],
                                             "cache-control": "no-cache",
                                             "Cookie": "authorization=; authorization="+token
                                         }
@@ -553,14 +628,14 @@ exports.eYantraWebhook = (req, res) => {
                                             responseText = fulfillment["basic_response"];
                                             responseText.fulfillmentText = "Done! "+objectType+" deleted!";
                                         }
-                                        console.log("in 1 == "+responseText.fulfillmentText);
+                                        //console.log("in 1 == "+responseText.fulfillmentText);
                                         res.status(200).send(JSON.stringify(responseText));
                                     });
                                 }
                                 else {
                                     responseText = fulfillment.basic_response;
                                     responseText.fulfillmentText = "No "+objectType+" found with name: "+name;
-                                    console.log("in other == "+responseText.fulfillmentText);
+                                    //console.log("in other == "+responseText.fulfillmentText);
                                     res.status(200).send(JSON.stringify(responseText));
                                 }
                             }
@@ -574,11 +649,15 @@ exports.eYantraWebhook = (req, res) => {
                             }
                             else {
                                 let tempIdList = [];
+                                console.log(616);
                                 for(let i=0;i<reply.length;i++) {
+                                    console.log(reply[i].unitName+" "+name);
                                     if(reply[i].unitName == name)
                                         tempIdList.push(reply[i].id);
                                 }
+                                console.log("Matching "+tempIdList);
                                 if(tempIdList.length > 1) {
+                                    responseText = fulfillment.basic_response;
                                     responseText.fulfillmentText = "Found multiple "+objectType+"s with name: "+name+"; [";
                                     for(let i=0;i<tempIdList.length;i++) {
                                         if(i==0)
@@ -588,22 +667,24 @@ exports.eYantraWebhook = (req, res) => {
                                     }
                                     responseText.fulfillmentText += "], please choose an ID to delete:";
                                     responseText.outputContexts = [{
-                                        "name": "projects/"+fulfillment.project.projectID+"/agent/sessions/"+conversationId+"/contexts/object-delete-name-id",
+                                        "name": "projects/"+fulfillment.project.projectID+"/agent/sessions/"+conversationId+"/contexts/action-id-by-name",
                                         "lifespanCount": 5,
                                         "parameters": {
-                                          "object": "unit"
+                                          "object" : "unit",
+                                          "futureAction" : "delete",
+                                          "objectName" : name
                                         }
                                     }];
                                     res.status(200).send(JSON.stringify(responseText));
                                 }
                                 else if(tempIdList.length == 1){
                                     options = {
-                                        "method": fulfillment["object.delete-name-id"][objectType]["type"],
+                                        "method": fulfillment["object.delete"][objectType]["type"],
                                         "hostname": fulfillment["server"]["hostname"],
                                         "port": fulfillment["server"]["port"],
-                                        "path": fulfillment["object.delete-name-id"][objectType]["endpoint"],
+                                        "path": fulfillment["object.delete"][objectType]["endpoint"],
                                         "headers": {
-                                            "content-type": fulfillment["object.delete-name-id"][objectType]["content_type"],
+                                            "content-type": fulfillment["object.delete"][objectType]["content_type"],
                                             "cache-control": "no-cache",
                                             "Cookie": "authorization=; authorization="+token
                                         }
@@ -651,22 +732,24 @@ exports.eYantraWebhook = (req, res) => {
                                     }
                                     responseText.fulfillmentText += "], please choose an ID to delete:";
                                     responseText.outputContexts = [{
-                                        "name": "projects/"+fulfillment.project.projectID+"/agent/sessions/"+conversationId+"/contexts/object-delete-name-id",
+                                        "name": "projects/"+fulfillment.project.projectID+"/agent/sessions/"+conversationId+"/contexts/action-id-by-name",
                                         "lifespanCount": 5,
                                         "parameters": {
-                                          "object": "user"
+                                          "object" : "user",
+                                          "futureAction" : "delete",
+                                          "objectName" : name
                                         }
                                     }];
                                     res.status(200).send(JSON.stringify(responseText));
                                 }
                                 else if(tempIdList.length == 1){
                                     options = {
-                                        "method": fulfillment["object.delete-name-id"][objectType]["type"],
+                                        "method": fulfillment["object.delete"][objectType]["type"],
                                         "hostname": fulfillment["server"]["hostname"],
                                         "port": fulfillment["server"]["port"],
-                                        "path": fulfillment["object.delete-name-id"][objectType]["endpoint"],
+                                        "path": fulfillment["object.delete"][objectType]["endpoint"],
                                         "headers": {
-                                            "content-type": fulfillment["object.delete-name-id"][objectType]["content_type"],
+                                            "content-type": fulfillment["object.delete"][objectType]["content_type"],
                                             "cache-control": "no-cache",
                                             "Cookie": "authorization=; authorization="+token
                                         }
@@ -696,54 +779,364 @@ exports.eYantraWebhook = (req, res) => {
                 }
             }
             break;
-            case "object.delete-name-id" : {
-                let id = findKey("id", req.body);
+            case "pubsub.get-shadow-by-name" : {
+                console.log("inside " + intent);
+                let name = findKey("device", queryResult.parameters);
+                let attribute = findKey("attribute", queryResult.parameters);
+                console.log("object name :" +  name +" attribute: "+attribute);
+                sendRequest(options,null,function(reply,statusCode){
+                    if(statusCode!= "200") {
+                        responseText.fulfillmentText = "not authenticated !";
+                    }
+                    else {
+                        let tempAttributeList = [];
+                        for(let i=0; i<reply.length; i++) {
+                            for(let j=0; j<reply[i].devices.length; j++) {
+                                if(reply[i].devices[j].name == name) {
+                                    for(let k=0; k<reply[i].devices[j].deviceAttributes.length; k++) {
+                                        if(reply[i].devices[j].deviceAttributes[k].name == attribute) {
+                                            tempAttributeList.push({"attributeID":reply[i].devices[j].deviceAttributes[k].id, "deviceID":reply[i].devices[j].id, "deviceName":reply[i].devices[j].name, "thingID":reply[i].id, "thingName":reply[i].name});
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        if(tempAttributeList.length > 1) {
+                            responseText = fulfillment.basic_response;
+                            let tmpPayload = {"google": {"expectUserResponse": true,"richResponse": {"items": [{"simpleResponse": {"textToSpeech": "Found more than one devices with that name... Choose one of these IDs..."}}]},"systemIntent": {"intent": "actions.intent.OPTION","data": {"@type": "type.googleapis.com/google.actions.v2.OptionValueSpec","listSelect": {"items": []}}}}};
+                            for(let i=0; i<tempAttributeList.length; i++) {
+                                tmpPayload.payload.google.systemIntent.data.listSelect.items.push({"optionInfo": {"key": ""+tempAttributeList[i].deviceID+""+tempAttributeList[i].deviceName+""+tempAttributeList[i].thingID+""+tempAttributeList[i].attributeID},"title": ""+tempAttributeList[i].deviceName+" (ID:"+tempAttributeList[i].deviceID+")", "description":"ParentThing: "+tempAttributeList[i].thingName});
+                            }
+                            responseText.outputContexts = [{
+                                "name": "projects/"+fulfillment.project.projectID+"/agent/sessions/"+conversationId+"/contexts/action-id-by-name",
+                                "lifespanCount": 5,
+                                "parameters": {
+                                  "object" : "device",
+                                  "futureAction" : "pubsubShadow",
+                                  "objectName" : name
+                                }
+                            }];
+                            responseText.payload = tmpPayload;
+                            res.status(200).send(JSON.stringify(responseText));
+                        }
+                        else if(tempAttributeList.length == 1) {
+                            let id = tempAttributeList[0].thingID;
+                            console.log("pubsub id "+ id);
+                            options.method = fulfillment["object.action-id-by-name"]["pubsubShadow"]["type"];
+                            options.path = fulfillment["object.action-id-by-name"]["pubsubShadow"]["endpoint"];
+                            options.path += ""+id;
+                            console.log(options.path);
+                            sendRequest(options,null,function(reply,statusCode){
+                                if(statusCode != "200") {
+                                    responseText = fulfillment["basic_response"];
+                                    responseText.fulfillmentText = "Failed to get shadow ! Make sure you are authenticated or check if the device specified exsists or not";
+                                }
+                                else {
+                                    responseText = fulfillment["basic_response"];
+                                    if(reply.state.reported.hasOwnProperty("device"+tempAttributeList[0].deviceID+"."+tempAttributeList[0].attributeID))
+                                        responseText.fulfillmentText = "The "+attribute+" is "+reply.state.reported["device"+tempAttributeList[0].deviceID+"."+tempAttributeList[0].attributeID];
+                                    else
+                                        responseText.fulfillmentText = "Oops! I can't find the "+attribute+"! Check if the device is on and connected.";
+                                }
+                                res.status(200).send(JSON.stringify(responseText));
+                            });
+                        }
+                        else {
+                            responseText = fulfillment.basic_response;
+                            responseText.fulfillmentText = "Required device/attribute not found";
+                            res.status(200).send(JSON.stringify(responseText));
+                        }
+                    }
+                });
+            }
+            break;
+            case "pubsub.set-value-by-name" : {
+                console.log("inside " + intent);
+                let name = findKey("device", queryResult.parameters);
+                let attribute = findKey("attribute", queryResult.parameters);
+                let value = findKey("value",queryResult.parameters);
+                console.log("object name :" +  name +" attribute: "+attribute + " value : " + value);
+                sendRequest(options,null,function(reply,statusCode){
+                    if(statusCode!= "200") {
+                        responseText.fulfillmentText = "not authenticated !";
+                    }
+                    else {
+                        let tempAttributeList = [];
+                        for(let i=0; i<reply.length; i++) {
+                            for(let j=0; j<reply[i].devices.length; j++) {
+                                if(reply[i].devices[j].name == name) {
+                                    for(let k=0; k<reply[i].devices[j].deviceAttributes.length; k++) {
+                                        if(reply[i].devices[j].deviceAttributes[k].name == attribute) {
+                                            tempAttributeList.push({"attributeID":reply[i].devices[j].deviceAttributes[k].id, "deviceID":reply[i].devices[j].id, "deviceName":reply[i].devices[j].name, "thingID":reply[i].id, "thingName":reply[i].name});
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        if(tempAttributeList.length > 1) {
+                            responseText = fulfillment.basic_response;
+                            let tmpPayload = {"google": {"expectUserResponse": true,"richResponse": {"items": [{"simpleResponse": {"textToSpeech": "Found more than one devices with that name... Choose one of these IDs..."}}]},"systemIntent": {"intent": "actions.intent.OPTION","data": {"@type": "type.googleapis.com/google.actions.v2.OptionValueSpec","listSelect": {"items": []}}}}};
+                            for(let i=0; i<tempAttributeList.length; i++) {
+                                tmpPayload.payload.google.systemIntent.data.listSelect.items.push({"optionInfo": {"key": ""+tempAttributeList[i].deviceID+""+tempAttributeList[i].deviceName+""+tempAttributeList[i].thingID+""+tempAttributeList[i].attributeID},"title": ""+tempAttributeList[i].deviceName+" (ID:"+tempAttributeList[i].deviceID+")", "description":"ParentThing: "+tempAttributeList[i].thingName});
+                            }
+                            responseText.outputContexts = [{
+                                "name": "projects/"+fulfillment.project.projectID+"/agent/sessions/"+conversationId+"/contexts/action-id-by-name",
+                                "lifespanCount": 5,
+                                "parameters": {
+                                  "object" : "device",
+                                  "futureAction" : "pubsubValue",
+                                  "objectName" : name,
+                                  "attributeName" : attribute
+                                }
+                            }];
+                            responseText.payload = tmpPayload;
+                            res.status(200).send(JSON.stringify(responseText));
+                        }
+                        else if(tempAttributeList.length == 1) {
+                            let id = tempAttributeList[0].attributeID;
+                            console.log("pubsub id "+ id);
+                            options.method = fulfillment["object.action-id-by-name"]["pubsubValue"]["type"];
+                            options.path = fulfillment["object.action-id-by-name"]["pubsubValue"]["endpoint"];
+                            options.path += ""+id;
+                            console.log(options.path);
+                            sendRequest(options,{"value" : value},function(reply,statusCode){
+                                if(statusCode != "200") {
+                                    responseText = fulfillment["basic_response"];
+                                    responseText.fulfillmentText = "Failed to get shadow ! Make sure you are authenticated or check if the device specified exsists or not";
+                                }
+                                else {
+                                    responseText = fulfillment["basic_response"];
+                                    if(reply.state.desired.hasOwnProperty("device"+tempAttributeList[0].deviceID+"."+tempAttributeList[0].attributeID))
+                                        responseText.fulfillmentText = "The "+attribute+" is "+reply.state.desired["device"+tempAttributeList[0].deviceID+"."+tempAttributeList[0].attributeID];
+                                    else
+                                        responseText.fulfillmentText = "Oops! I can't find the "+attribute+"! Check if the device is on and connected.";
+                                }
+                                res.status(200).send(JSON.stringify(responseText));
+                            });
+                        }
+                        else {
+                            responseText = fulfillment.basic_response;
+                            responseText.fulfillmentText = "Required device/attribute not found";
+                            res.status(200).send(JSON.stringify(responseText));
+                        }
+                    }
+                });
+            }
+            break;
+            case "object.action-id-by-name" : {
+                //console.log("inside " + intent);
+                let id = findKey("id", queryResult.parameters);
+                let futureAction = findKey("futureAction",queryResult.outputContexts);
+                let objectName = findKey("objectName",queryResult.outputContexts);
+                objectType = findKey("object",queryResult.outputContexts);
+                console.log(id +" " + futureAction + " " + objectName + " " + objectType);
                 switch(objectType) {
                     case "thing" : {
-                        options.path += ""+id;
-                        sendRequest(options,null,function(reply,statusCode){
-                            if(statusCode != "200") {
-                                responseText = fulfillment["basic_response"];
-                                responseText.fulfillmentText = "Failed to delete! Make sure you are authenticated or check if the "+objectType+" specified exsists or not";
+                        switch(futureAction) {
+                            case "delete" : {
+                                //console.log("deleting id " + id);
+                                options.path = fulfillment["object.delete"]["thing"]["endpoint"];
+                                options.method = fulfillment["object.delete"]["thing"]["type"];
+                                options.path += ""+id;
+                                console.log(options.path);
+                                //console.log(JSON.stringify(options));
+                                sendRequest(options,null,function(reply,statusCode){
+                                    if(statusCode != "200") {
+                                        responseText = fulfillment["basic_response"];
+                                        responseText.fulfillmentText = "Failed to delete! Make sure you are authenticated or check if the "+objectType+" specified exsists or not";
+                                    }
+                                    else {
+                                        responseText = fulfillment["basic_response"];
+                                        responseText.fulfillmentText = "Done! "+objectType+" deleted!";
+                                    }
+                                    res.status(200).send(JSON.stringify(responseText));
+                                });
                             }
-                            else {
-                                responseText = fulfillment["basic_response"];
-                                responseText.fulfillmentText = "Done! "+objectType+" deleted!";
+                            break;
+                            case "update" : {
+                                //console.log("deleting id " + id);
+                                options.path = fulfillment["object.delete"]["thing"]["endpoint"];
+                                options.method = fulfillment["object.delete"]["thing"]["type"];
+                                options.path += ""+id;
+                                console.log(options.path);
+                                //console.log(JSON.stringify(options));
+                                sendRequest(options,null,function(reply,statusCode){
+                                    if(statusCode != "200") {
+                                        responseText = fulfillment["basic_response"];
+                                        responseText.fulfillmentText = "Failed to delete! Make sure you are authenticated or check if the "+objectType+" specified exsists or not";
+                                    }
+                                    else {
+                                        responseText = fulfillment["basic_response"];
+                                        responseText.fulfillmentText = "Done! "+objectType+" deleted!";
+                                    }
+                                    res.status(200).send(JSON.stringify(responseText));
+                                });
                             }
-                            res.status(200).send(JSON.stringify(responseText));
-                        });
+                            break;
+                        }
                     }
                     break;
                     case "unit" : {
-                        options.path += ""+id;
-                        sendRequest(options,null,function(reply,statusCode){
-                            if(statusCode != "200") {
-                                responseText = fulfillment["basic_response"];
-                                responseText.fulfillmentText = "Failed to delete! Make sure you are authenticated or check if the "+objectType+" specified exsists or not";
+                        switch(futureAction) {
+                            case "delete" : {
+                                //console.log("deleting id " + id);
+                                options.path = fulfillment["object.delete"]["unit"]["endpoint"];
+                                options.method = fulfillment["object.delete"]["unit"]["type"];
+                                options.path += ""+id;
+                                console.log(options.path);
+                                //console.log(JSON.stringify(options));
+                                sendRequest(options,null,function(reply,statusCode){
+                                    if(statusCode != "200") {
+                                        responseText = fulfillment["basic_response"];
+                                        responseText.fulfillmentText = "Failed to delete! Make sure you are authenticated or check if the "+objectType+" specified exsists or not";
+                                    }
+                                    else {
+                                        responseText = fulfillment["basic_response"];
+                                        responseText.fulfillmentText = "Done! "+objectType+" deleted!";
+                                    }
+                                    res.status(200).send(JSON.stringify(responseText));
+                                });
                             }
-                            else {
-                                responseText = fulfillment["basic_response"];
-                                responseText.fulfillmentText = "Done! "+objectType+" deleted!";
+                            break;
+                            case "update" : {
+
                             }
-                            res.status(200).send(JSON.stringify(responseText));
-                        });
+                            break;
+                        }
                     }
                     break;
-                    case "unit" : {
-                        options.path += ""+id;
-                        sendRequest(options,null,function(reply,statusCode){
-                            if(statusCode != "200") {
-                                responseText = fulfillment["basic_response"];
-                                responseText.fulfillmentText = "Failed to delete! Make sure you are authenticated or check if the "+objectType+" specified exsists or not";
+                    case "device" : {
+                        switch(futureAction) {
+                            case "delete" : {
+                                //console.log("deleting id " + id);
+                                options.path = fulfillment["object.delete"]["thing"]["endpoint"];
+                                options.method = fulfillment["object.delete"]["thing"]["type"];
+                                options.path += ""+id;
+                                console.log(options.path);
+                                //console.log(JSON.stringify(options));
+                                sendRequest(options,null,function(reply,statusCode){
+                                    if(statusCode != "200") {
+                                        responseText = fulfillment["basic_response"];
+                                        responseText.fulfillmentText = "Failed to delete! Make sure you are authenticated or check if the "+objectType+" specified exsists or not";
+                                    }
+                                    else {
+                                        responseText = fulfillment["basic_response"];
+                                        responseText.fulfillmentText = "Done! "+objectType+" deleted!";
+                                    }
+                                    res.status(200).send(JSON.stringify(responseText));
+                                });
                             }
-                            else {
-                                responseText = fulfillment["basic_response"];
-                                responseText.fulfillmentText = "Done! "+objectType+" deleted!";
+                            break;
+                            case "pubsubShadow" : {
+                                let attribute = findKey("attributeName",req.body);
+                                options.method = fulfillment["pubsub.get-shadow-by-name"]["pubsubShadow"]["type"];
+                                options.path = fulfillment["pubsub.get-shadow-by-name"]["pubsubShadow"]["endpoint"];
+                                sendRequest(options,null,function(reply,statusCode){
+                                    if(statusCode!= "200") {
+                                        responseText.fulfillmentText = "not authenticated !";
+                                    }
+                                    else {
+                                        let tempAttributeList = [];
+                                        for(let i=0; i<reply.length; i++) {
+                                            for(let j=0; j<reply[i].devices.length; j++) {
+                                                if(reply[i].devices[j].id == id) {
+                                                    for(let k=0; k<reply[i].devices[j].deviceAttributes.length; k++) {
+                                                        if(reply[i].devices[j].deviceAttributes[k].name == attribute) {
+                                                            tempAttributeList.push({"attributeID":reply[i].devices[j].deviceAttributes[k].id, "deviceID":reply[i].devices[j].id, "deviceName":reply[i].devices[j].name, "thingID":reply[i].id, "thingName":reply[i].name});
+                                                            break;
+                                                        }
+                                                    }
+                                                }
+                                                if(tempAttributeList.length != 0)
+                                                    break;
+                                            }
+                                            if(tempAttributeList.length != 0)
+                                                break;
+                                        }
+                                    }
+                                    id = tempAttributeList[0].thingID;
+                                    console.log("pubsub id "+ id);
+                                    options.method = fulfillment["object.action-id-by-name"]["pubsubShadow"]["type"];
+                                    options.path = fulfillment["object.action-id-by-name"]["pubsubShadow"]["endpoint"];
+                                    options.path += ""+id;
+                                    console.log(options.path);
+                                    sendRequest(options,null,function(reply,statusCode){
+                                        if(statusCode != "200") {
+                                            responseText = fulfillment["basic_response"];
+                                            responseText.fulfillmentText = "Failed to get shadow ! Make sure you are authenticated or check if the device specified exsists or not";
+                                        }
+                                        else {
+                                            responseText = fulfillment["basic_response"];
+                                            if(reply.state.reported.hasOwnProperty("device"+tempAttributeList[0].deviceID+"."+tempAttributeList[0].attributeID))
+                                                responseText.fulfillmentText = "The "+attribute+" is "+reply.state.reported["device"+tempAttributeList[0].deviceID+"."+tempAttributeList[0].attributeID];
+                                            else
+                                                responseText.fulfillmentText = "Oops! I can't find the "+attribute+"! Check if the device is on and connected.";
+                                        }
+                                        res.status(200).send(JSON.stringify(responseText));
+                                    });
+                                });
                             }
-                            res.status(200).send(JSON.stringify(responseText));
-                        });
+                            break;
+                            case "pubsubValue" : {
+                                let attribute = findKey("attributeName",req.body);
+                                options.method = fulfillment["pubsub.get-shadow-by-name"]["pubsubValue"]["type"];
+                                options.path = fulfillment["pubsub.get-shadow-by-name"]["pubsubValue"]["endpoint"];
+                                sendRequest(options,null,function(reply,statusCode){
+                                    if(statusCode!= "200") {
+                                        responseText.fulfillmentText = "not authenticated !";
+                                    }
+                                    else {
+                                        let tempAttributeList = [];
+                                        for(let i=0; i<reply.length; i++) {
+                                            for(let j=0; j<reply[i].devices.length; j++) {
+                                                if(reply[i].devices[j].id == id) {
+                                                    for(let k=0; k<reply[i].devices[j].deviceAttributes.length; k++) {
+                                                        if(reply[i].devices[j].deviceAttributes[k].name == attribute) {
+                                                            tempAttributeList.push({"attributeID":reply[i].devices[j].deviceAttributes[k].id, "deviceID":reply[i].devices[j].id, "deviceName":reply[i].devices[j].name, "thingID":reply[i].id, "thingName":reply[i].name});
+                                                            break;
+                                                        }
+                                                    }
+                                                }
+                                                if(tempAttributeList.length != 0)
+                                                    break;
+                                            }
+                                            if(tempAttributeList.length != 0)
+                                                break;
+                                        }
+                                    }
+                                    id = tempAttributeList[0].attributeID;
+                                    let value = findKey("value",queryResult.outputContexts);
+                                    console.log("pubsub id "+ id);
+                                    options.method = fulfillment["object.action-id-by-name"]["pubsubValue"]["type"];
+                                    options.path = fulfillment["object.action-id-by-name"]["pubsubValue"]["endpoint"];
+                                    options.path += ""+id;
+                                    console.log(options.path);
+                                    sendRequest(options,{"value" : value},function(reply,statusCode){
+                                        if(statusCode != "200") {
+                                            responseText = fulfillment["basic_response"];
+                                            responseText.fulfillmentText = "Failed to set atrribute ! Make sure you are authenticated or check if the device specified exsists or not";
+                                        }
+                                        else {
+                                            responseText = fulfillment["basic_response"];
+                                            if(reply.state.desired.hasOwnProperty("device"+tempAttributeList[0].deviceID+"."+tempAttributeList[0].attributeID))
+                                                responseText.fulfillmentText = "The "+attribute+" is "+reply.state.desired["device"+tempAttributeList[0].deviceID+"."+tempAttributeList[0].attributeID];
+                                            else
+                                                responseText.fulfillmentText = "Oops! I can't find the "+attribute+"! Check if the device is on and connected.";
+                                        }
+                                        res.status(200).send(JSON.stringify(responseText));
+                                    });
+                                });
+                            }
+                            break;
+                            case "update" : {
+
+                            }
+                            break;
+                        }
+                        break;
                     }
-                    break;
                 }
             }
             break;
@@ -828,4 +1221,3 @@ exports.eYantraWebhook = (req, res) => {
         res.status(200).send(JSON.stringify(responseText));
     }
 };
-

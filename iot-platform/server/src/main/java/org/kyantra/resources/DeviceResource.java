@@ -22,6 +22,8 @@ import java.util.Set;
 @Api(value="device")
 public class DeviceResource extends BaseResource {
 
+    int limit = 10;
+
     @GET
     @Path("get/{id}")
     @Session
@@ -35,6 +37,14 @@ public class DeviceResource extends BaseResource {
         else throw new AccessDeniedException();
     }
 
+    @GET
+    @Session
+    @Path("list/page/{page}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String list(@PathParam("page") Integer page) {
+        List<DeviceBean> devices= DeviceDAO.getInstance().list(page,limit);
+        return gson.toJson(devices);
+    }
 
     @GET
     @Path("thing/{id}")
