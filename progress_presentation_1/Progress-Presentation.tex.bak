@@ -14,14 +14,25 @@
 	\\\&
 	\\IFTTT for IOT}
 	\author{
-	Team:
-	\\Onkar J. Sathe
-	\\Rohit G. Rathi
-	\vspace{0.2cm}
-	\\Mentors:
-	\\Omkar Manjrekar
-	\\Vikrant Fernandes
-	\\Deepa Avudiappan}
+		\begin{minipage}[b]{0.40\textwidth}
+			\raggedleft
+			\hspace{2.2cm}
+			Team:
+			\newline
+			\vspace{0.28cm}
+			\\\hspace{1.95cm}Mentors:
+			\newline\\\vspace{0.45cm}
+		\end{minipage}%
+		\begin{minipage}[b]{0.60\textwidth}
+			\raggedright
+			Onkar J. Sathe
+			\\Rohit G. Rathi			
+			\vspace{0.3cm}
+			\\Omkar Manjrekar
+			\\Vikrant Fernandes
+			\\Deepa Avudiappan
+		\end{minipage}%
+	}
 	\institute{IIT Bombay}
 	\date{\today}
 	%\addtobeamertemplate{sidebar left}{}{\includegraphics[scale = 0.3]{logowithtext.png}}
@@ -35,12 +46,15 @@
 		\item Objective
 		\begin{enumerate}	
 			\item Building a NLP based assistant to access eYantra IOT platform  through text and voice control over the Web portal and through Google Assistant!
+			\item Devloping flexible block based GUI for IFTTT rules as an alternative to conventional ways of writing rules using code/SQL.
 		\end{enumerate}
 		\item Deliverables 
 		\begin{enumerate}
 			\item The assistant should at least be able to perform all the frequent queries that take place on IoT platform.
 			\item User should see device data in the chat interface itself.
 			\item A web chatbot interface to be integrated with IoT Platform
+			\item Validations of IFTTT rules with minimization of Lambda functions.
+			\item Final application should show CRON rules being implemented for irrigation.
 		\end{enumerate}
 	\end{itemize}
 \end{frame}
@@ -163,6 +177,8 @@ Documentation
 		\item Making the assistant dynamic enough to handle variety of devices \& sensors with their properties
 		\newline\\
 		\item Assistant will be able to handle other complex commands on IoT platform like Crons from natural language and generating Rules.
+		\newline\\
+		\item Creating block based GUI 
 	\end{itemize}
 \end{frame}
 

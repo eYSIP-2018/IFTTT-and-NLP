@@ -40,10 +40,7 @@ function botResponse(msgText) {
         },
         success: function(data){
             var res = JSON.parse(data['response']);
-            if(res.payload.hasOwnProperty('google'))
-                appendMessage(BOT_NAME, BOT_IMG, "left", JSON.stringify(res.payload.google));
-            if(res.hasOwnProperty('fulfillmentText'))
-                appendMessage(BOT_NAME, BOT_IMG, "left", res.fulfillmentText);
+            appendMessage(BOT_NAME, BOT_IMG, "left", res.fulfillmentText);
         }
     });
 }

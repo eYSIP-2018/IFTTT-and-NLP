@@ -15,7 +15,7 @@ var fulfillment = {
         "hostname" : "cd8e9a8c.ngrok.io",
         "port" : null
     },
-    "object.create": {
+    "thing.create": {
         "thing" : {
             "endpoint" : "/thing/create",
             "type" : "POST",
@@ -28,7 +28,9 @@ var fulfillment = {
                 "ip" : "",
                 "parentUnitId" : 1
             }
-        },
+        }
+    },
+    "unit.create" : {
         "unit" : {
             "endpoint" : "/unit/create",
             "type" : "POST",
@@ -41,9 +43,11 @@ var fulfillment = {
                 "photo" : "",
                 "parentUnitId" : 1
             }
-        },
+        }
+    },
+    "cron.create" : {
         "cron" : {
-            "endpoint" : "/unit/create",
+            "endpoint" : "/cron/create",
             "type" : "POST",
             "content_type" : "application/x-www-form-urlencoded",
             "response_type" : "application/json",
@@ -53,6 +57,45 @@ var fulfillment = {
                 "name" : "",
                 "cronExpression" : "",
                 "desiredState" : ""
+            }
+        }
+    },
+    "object.set-param" : {
+        "thing" : {
+            "endpoint" : "/thing/update/",
+            "type" : "PUT",
+            "content_type" : "application/x-www-form-urlencoded",
+            "response_type" : "application/json",
+            "url_parameter" : true,
+            "apiInput" : {
+                "name" : "",
+                "description" : "",
+                "ip" : "",
+                "parentUnitId" : 1
+            }
+        },
+        "unit" : {
+            "endpoint" : "/unit/update/",
+            "type" : "PUT",
+            "content_type" : "application/x-www-form-urlencoded",
+            "response_type" : "application/json",
+            "url_parameter" : true,
+            "apiInput" : {
+                "name" : "",
+                "description" : "",
+                "ip" : "",
+                "parentUnitId" : 1
+            }
+        },
+        "device" : {
+            "endpoint" : "/device/update/",
+            "type" : "PUT",
+            "content_type" : "application/x-www-form-urlencoded",
+            "response_type" : "application/json",
+            "url_parameter" : true,
+            "apiInput" : {
+                "name" : "",
+                "description" : "",
             }
         }
     },
@@ -346,6 +389,12 @@ exports.eYantraWebhook = (req, res) => {
             objectType = "pubsubShadow";
         } else if(intent == "pubsub.set-value-by-name") {
             objectType = "pubsubValue";
+        } else if(intent == "thing.create") {
+            objectType = "thing";
+        } else if(intent == "cron.create") {
+            objectType = "cron";
+        } else if(intent == "unit.create") {
+            objectType = "unit";
         } else {
             objectType = findKey("object", queryResult);
         }
@@ -374,62 +423,64 @@ exports.eYantraWebhook = (req, res) => {
         };
 
         switch(intent) {
-            case "object.create" : {
-                switch(objectType) {
-                    case "thing" : {
-                        let apiInput = fulfillment[intent][objectType]["apiInput"];
-                        apiInput.name = queryResult.parameters.name;
-                        console.log(options.hostname+options.path);
-                        sendRequest(options,{name:apiInput.name,description:"",ip:"",parentUnitId:1},function(reply,statusCode){
-                            console.log("inside " + statusCode);
-                            if(statusCode!= "200") {
-                                responseText.fulfillmentText = "not authenticated !";
-                            }
-                            else {
-                                responseText.fulfillmentText = "by default thing is added in main unit if you want to change you can change also !"//with id :"+reply.id + " name : "+reply.name;
-                                responseText.followupEventInput = {
-                                    "name": "askforthing",
-                                    "languageCode": "en-US",
-                                    "parameters": {
-                                      "object": "thing",
-                                      "thingname" : apiInput.name
-                                    }
-                                };
-                            }
-                            res.status(200).send(JSON.stringify(responseText));
-                        });
+            case "thing.create" : {
+                let apiInput = fulfillment[intent][objectType]["apiInput"];
+                apiInput.name = queryResult.parameters.name;
+                if(queryResult.parameters.hasOwnProperty("description"))
+                    apiInput.description = queryResult.parameters.description;
+                if(queryResult.parameters.hasOwnProperty("ip"))
+                    apiInput.description = queryResult.parameters.ip;
+                apiInput.parentUnitId = queryResult.parameters.parentUnitId;
+                console.log("inside thing.create "+options.hostname+options.path);
+                sendRequest(options,apiInput,function(reply,statusCode){
+                    console.log("inside created " + statusCode);
+                    if(statusCode!= "200") {
+                        responseText.fulfillmentText = "not authenticated !";
                     }
-                    console.log("object.create + thing + ended !");
-                    break;
-                    case "unit" : {
-                        let apiInput = fulfillment[intent][objectType]["apiInput"];
-                        apiInput.unitName = queryResult.parameters.name;
-                        sendRequest(options,apiInput,function(reply,statusCode){
-                            if(statusCode!= "200") {
-                                responseText.fulfillmentText = "not authenticated !";
-                            }
-                            else {
-                                responseText.fulfillmentText = ""+ objectType + " created with id :"+reply.id + " name : "+reply.unitName;
-                            }
-                            res.status(200).send(JSON.stringify(responseText));
-                        });
+                    else {
+                        responseText.fulfillmentText = "Thing created with Name : " + reply.name + " parentUnit : " + reply.parentUnit.id + " "+reply.parentUnit.unitName;
                     }
-                    break;
-                    case "cron" : {
-                        let apiInput = fulfillment[intent][objectType]["apiInput"];
-                        apiInput.name = queryResult.parameters.name;
-                        sendRequest(options,apiInput,function(reply,statusCode){
-                            if(statusCode!= "200") {
-                                responseText.fulfillmentText = "not authenticated !";
-                            }
-                            else {
-                                responseText.fulfillmentText = ""+ objectType + " created with id :"+reply.id + " name : "+reply.name;
-                            }
-                            res.status(200).send(JSON.stringify(responseText));
-                        });
+                    res.status(200).send(JSON.stringify(responseText));
+                });
+            }
+            break;
+            case "unit.create" : {
+                let apiInput = fulfillment[intent][objectType]["apiInput"];
+                apiInput.unitName = queryResult.parameters.name;
+                if(queryResult.parameters.hasOwnProperty("description"))
+                    apiInput.description = queryResult.parameters.description;
+                apiInput.parentUnitId = queryResult.parameters.parentUnitId;
+                console.log("inside unit.create "+options.hostname+options.path);
+                sendRequest(options,apiInput,function(reply,statusCode){
+                    console.log("inside created " + statusCode);
+                    if(statusCode!= "200") {
+                        responseText.fulfillmentText = "not authenticated !";
                     }
-                    break;
-                }
+                    else {
+                        responseText.fulfillmentText = "Unit created with Name : " + reply.name + " parentUnit : " + reply.parentUnit.id + " "+reply.parentUnit.unitName;
+                    }
+                    res.status(200).send(JSON.stringify(responseText));
+                });
+            }
+            break;
+            case "cron.create" : {
+                let apiInput = fulfillment[intent][objectType]["apiInput"];
+                apiInput.name = queryResult.parameters.name;
+                apiInput.thingId = queryResult.parameters.thingId;
+                apiInput.desiredstate = queryResult.parameters.desiredstate;
+                apiInput.cronExpression = queryResult.parameters.cronExpression;
+
+                //console.log("inside cron.create "+options.hostname+options.path);
+                sendRequest(options,apiInput,function(reply,statusCode){
+                    console.log("inside created " + statusCode);
+                    if(statusCode!= "200") {
+                        responseText.fulfillmentText = "not authenticated !";
+                    }
+                    else {
+                        responseText.fulfillmentText = "Thing created with Name : " + reply.name + " parentUnit : " + reply.parentUnit.id + " "+reply.parentUnit.unitName;
+                    }
+                    res.status(200).send(JSON.stringify(responseText));
+                });
             }
             break;
             case "object.list-it":
@@ -1224,9 +1275,21 @@ exports.eYantraWebhook = (req, res) => {
                 }
             }
             break;
+            case "object.set-param" : {
+                switch (objectType) {
+                    case "thing":
+                    break;
+                    case "unit":
+                    break;
+                    case "device":
+                    break;
+                    default:
+
+                }
+            }
         }
     } else {
-        responseText.fulfillmentText = "error in json";
+        responseText.fulfillmentText = "";
         res.status(200).send(JSON.stringify(responseText));
     }
 };
