@@ -12,7 +12,7 @@ var fulfillment = {
     },
     "server" : {
         "protocol" : "https",
-        "hostname" : "1e207fad.ngrok.io",
+        "hostname" : "cd8e9a8c.ngrok.io",
         "port" : null
     },
     "object.create": {
@@ -379,23 +379,27 @@ exports.eYantraWebhook = (req, res) => {
                     case "thing" : {
                         let apiInput = fulfillment[intent][objectType]["apiInput"];
                         apiInput.name = queryResult.parameters.name;
-                        sendRequest(options,apiInput,function(reply,statusCode){
+                        console.log(options.hostname+options.path);
+                        sendRequest(options,{name:apiInput.name,description:"",ip:"",parentUnitId:1},function(reply,statusCode){
+                            console.log("inside " + statusCode);
                             if(statusCode!= "200") {
                                 responseText.fulfillmentText = "not authenticated !";
                             }
                             else {
-                                responseText.fulfillmentText = ""+ objectType + " created !"//with id :"+reply.id + " name : "+reply.name;
+                                responseText.fulfillmentText = "by default thing is added in main unit if you want to change you can change also !"//with id :"+reply.id + " name : "+reply.name;
                                 responseText.followupEventInput = {
-                                    "name": "object_list",
+                                    "name": "askforthing",
                                     "languageCode": "en-US",
                                     "parameters": {
-                                      "myObject": "thing"
+                                      "object": "thing",
+                                      "thingname" : apiInput.name
                                     }
                                 };
                             }
                             res.status(200).send(JSON.stringify(responseText));
                         });
                     }
+                    console.log("object.create + thing + ended !");
                     break;
                     case "unit" : {
                         let apiInput = fulfillment[intent][objectType]["apiInput"];

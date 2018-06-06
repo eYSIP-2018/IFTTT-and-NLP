@@ -9,7 +9,7 @@
 	\setbeamertemplate{sidebar left}{}
 	\title{Progress Presentation-I}
 	\subtitle{e-Yantra Summer Internship-2018
-	\newline
+	\vspace{0.1cm}
 	\\ NLP-Smart Assistant for eYantra IOT
 	\\\&
 	\\IFTTT for IOT}
@@ -17,9 +17,11 @@
 	Team:
 	\\Onkar J. Sathe
 	\\Rohit G. Rathi
+	\vspace{0.2cm}
 	\\Mentors:
 	\\Omkar Manjrekar
-	\\Vikrant Fernandes}
+	\\Vikrant Fernandes
+	\\Deepa Avudiappan}
 	\institute{IIT Bombay}
 	\date{\today}
 	%\addtobeamertemplate{sidebar left}{}{\includegraphics[scale = 0.3]{logowithtext.png}}
@@ -54,11 +56,11 @@
 Task.no & Task & Deadline \\ \hline
 1 & Understanding e-Yantra IoT Platform and its APIs & 2 days \\ \hline
 2 & \begin{tabular}[c]{@{}c@{}}
-Getting familiar with Dialogflow and \\ required programming languages\end{tabular} & 3 day \\ \hline
+Getting familiar with Dialogflow and \\ required programming languages\end{tabular} & 3 days \\ \hline
 3 & \begin{tabular}[c]{@{}c@{}}Gathering phrases to train the agent.
 \end{tabular} & 3 days \\ \hline
 4 & \begin{tabular}[c]{@{}c@{}}Adding entities and intents 
-\end{tabular} & 4 days \\ \hline
+\end{tabular} & 3 days \\ \hline
 5 & \begin{tabular}[c]{@{}c@{}}
 Take actions on the output of phrases\\ returned by API properly and ask for\\ missing information if any
 \end{tabular} & 2 day \\ \hline
@@ -80,22 +82,19 @@ Testing this and the speech interface\\ and retraing on more examples if require
 Task.no & Task & Deadline \\ \hline
 7 & \begin{tabular}[c]{@{}c@{}}
 Develop a proper web interface to \\
-be integrable with IoT platform \\ designing throughout the website.\end{tabular} & 4 days \\ \hline
+be integrable with IoT platform \\ designing throughout the website.\end{tabular} & 2 days \\ \hline
 8 & \begin{tabular}[c]{@{}c@{}}
 Integration with E-Yantra platform \\
-and a demo application \\ \end{tabular} & 2 day \\ \hline
-10 & \begin{tabular}[c]{@{}c@{}}
+and a demo application \\ \end{tabular} & 1 day \\ \hline
+9 & \begin{tabular}[c]{@{}c@{}}
 Learning VueJs and component designing \end{tabular} & 4 day \\ \hline
-11 & \begin{tabular}[c]{@{}c@{}}
-Learning Blockly \& other alternatives
-\end{tabular} & 3 days \\ \hline
-12 & \begin{tabular}[c]{@{}c@{}}
+10 & \begin{tabular}[c]{@{}c@{}}
 Designing algorithm for converting UI bloks\\ to lambda code with loose coupling
 \end{tabular} & 4 days \\ \hline
-13 & \begin{tabular}[c]{@{}c@{}}
+11 & \begin{tabular}[c]{@{}c@{}}
 Testing and improving efficiency
 \end{tabular} & 1 days \\ \hline
-14 & \begin{tabular}[c]{@{}c@{}}
+12 & \begin{tabular}[c]{@{}c@{}}
 Documentation
 \end{tabular} & 2 days \\ \hline
 \end{tabular}%
