@@ -12,7 +12,7 @@ var fulfillment = {
     },
     "server" : {
         "protocol" : "https",
-        "hostname" : "ce0d3d32.ngrok.io",
+        "hostname" : "1e207fad.ngrok.io",
         "port" : null
     },
     "object.create": {
@@ -352,9 +352,15 @@ exports.eYantraWebhook = (req, res) => {
 
         token = findKey("accessToken", req.body);
         if(token == null) {
+            token = findKey("session",req.body);
+            if(token != null)
+                token = token.split('/').pop();
+        }
+        if(token == null) {
             responseText.fulfillmentText = "not authenticated!";
             res.status(200).send(JSON.stringify(responseText));
         }
+        console.log("Token: "+token);
         options = {
             "method": fulfillment[intent][objectType]["type"],
             "hostname": fulfillment["server"]["hostname"],
@@ -445,7 +451,6 @@ exports.eYantraWebhook = (req, res) => {
                                 responseText = fulfillment["basic_response"];
                                 responseText.fulfillmentText = "No "+objectType+"s found! Try adding some...";
                             }
-
                             res.status(200).send(JSON.stringify(responseText));
                         });
                     }

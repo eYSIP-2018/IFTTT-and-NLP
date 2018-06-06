@@ -91,7 +91,12 @@ public class HomeResource extends BaseResource {
             DetectIntentResponse response = sessionsClient.detectIntent(session, queryInput);
             QueryResult queryResult = response.getQueryResult();
 
-            Response res = Response.status(Response.Status.OK).entity("{\"response\" : \""+queryResult.getFulfillmentText()+"\"}").build();
+            System.out.println(response.toString());
+            if(queryResult.hasWebhookPayload() == true) {
+                    Response res = Response.status(Response.Status.OK).entity("{\"response\" : "+queryResult.toString()+"}").build();
+            }
+            Response res = Response.status(Response.Status.OK).entity("{\"response\" : "+queryResult.toString()+"}").build();
+
             return res;
         }
         catch(Exception e) {
