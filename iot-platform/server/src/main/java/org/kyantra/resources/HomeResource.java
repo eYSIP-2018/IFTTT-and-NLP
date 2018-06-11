@@ -29,7 +29,9 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.cloud.dialogflow.v2.*;
 import com.google.cloud.dialogflow.v2.TextInput.Builder;
-
+import com.google.protobuf.*;
+import com.google.protobuf.util.*;
+import com.google.protobuf.util.JsonFormat.*;
 
 @Path("/")
 public class HomeResource extends BaseResource {
@@ -90,8 +92,8 @@ public class HomeResource extends BaseResource {
 
             DetectIntentResponse response = sessionsClient.detectIntent(session, queryInput);
             QueryResult queryResult = response.getQueryResult();
-
-            Response res = Response.status(Response.Status.OK).entity("{\"response\" : "+queryResult.getFulfillmentText()+"}").build();
+            String jsonString = JsonFormat.printer().print(queryResult);
+            Response res = Response.status(Response.Status.OK).entity("{\"response\" : "+jsonString+"}").build();
             return res;
         }
         catch(Exception e) {

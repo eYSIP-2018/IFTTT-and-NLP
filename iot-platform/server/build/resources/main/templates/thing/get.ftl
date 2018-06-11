@@ -1,6 +1,7 @@
 <#include "../common/header.ftl">
 <body>
 <#include "../common/navbar.ftl"/>
+<#include "../common/chatbot.ftl"/>
 <div class="container-fluid" id="container-main">
 <#if user??>
     <#include "../common/sidenavbar.ftl"/>
