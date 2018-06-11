@@ -70,8 +70,8 @@ public class PubSubResource extends BaseResource {
         if (thingBean == null)
             throw new DataNotFoundException(ExceptionMessage.DATA_NOT_FOUND);
 
-        if (!AuthorizationHelper.getInstance().checkAccess(userBean, thingBean))
-            throw new ForbiddenException(ExceptionMessage.FORBIDDEN);
+        //if (!AuthorizationHelper.getInstance().checkAccess(userBean, thingBean))
+            //throw new ForbiddenException(ExceptionMessage.FORBIDDEN);
 
         String shadowName = "thing" + thingBean.getId();
 
@@ -100,8 +100,8 @@ public class PubSubResource extends BaseResource {
         if (att == null)
             throw new DataNotFoundException(ExceptionMessage.DATA_NOT_FOUND);
 
-        if (!AuthorizationHelper.getInstance().checkAccess(userBean, att))
-            throw new ForbiddenException(ExceptionMessage.FORBIDDEN);
+        //if (!AuthorizationHelper.getInstance().checkAccess(userBean, att))
+            //throw new ForbiddenException(ExceptionMessage.FORBIDDEN);
 
         ShadowBean bean = new ShadowBean();
         bean.setThingBean(att.getParentDevice().getParentThing());

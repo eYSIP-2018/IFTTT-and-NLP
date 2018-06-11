@@ -91,7 +91,7 @@ public class HomeResource extends BaseResource {
             DetectIntentResponse response = sessionsClient.detectIntent(session, queryInput);
             QueryResult queryResult = response.getQueryResult();
 
-            Response res = Response.status(Response.Status.OK).entity("{\"response\" : \""+queryResult.getFulfillmentText()+"\"}").build();
+            Response res = Response.status(Response.Status.OK).entity("{\"response\" : "+queryResult.getFulfillmentText()+"}").build();
             return res;
         }
         catch(Exception e) {

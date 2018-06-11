@@ -12,34 +12,10 @@ var fulfillment = {
     },
     "server" : {
         "protocol" : "https",
-        "hostname" : "f65ce924.ngrok.io",
+        "hostname" : "cd8e9a8c.ngrok.io",
         "port" : null
     },
-    "v2AgentAPI" : {
-        "createEntity" : {
-            "hostname" : "https://dialogflow.googleapis.com",
-            "endpoint" : "/v2/projects/eyantra-iot-f0957/agent/entityTypes",
-            "type" : "POST",
-            "content_type" : "application/x-www-form-urlencoded",
-            "response_type" : "application/json",
-            "url_parameter" : false,
-            "apiInput" : {
-                "name": "",
-                "displayName": "trialEntity",
-                "kind": "KIND_MAP",
-                "autoExpansionMode": "AUTO_EXPANSION_MODE_UNSPECIFIED",
-                "entities": [
-                    {
-                        "value": "trialEntity",
-                        "synonyms": [
-                            "trialEntity"
-                        ]
-                    }
-                ]
-            }
-        }
-    },
-    "create.thing": {
+    "thing.create": {
         "thing" : {
             "endpoint" : "/thing/create",
             "type" : "POST",
@@ -121,7 +97,8 @@ var fulfillment = {
             "apiInput" : {
                 "name" : "",
                 "description" : "",
-                "ip" : ""
+                "ip" : "",
+                "parentUnitId" : 1
             }
         },
         "unit" : {
@@ -652,36 +629,15 @@ exports.eYantraWebhook = (req, res) => {
                 token = token.split('/').pop();
         }
         if(token == null) {
+            token = findKey("session",req.body);
+            if(token != null)
+                token = token.split('/').pop();
+        }
+        if(token == null) {
             responseText.fulfillmentText = "not authenticated!";
             res.status(200).send(JSON.stringify(responseText));
         }
         console.log("Token: "+token);
-
-        options = {
-            "method": fulfillment[intent][objectType]["type"],
-            "hostname": fulfillment["server"]["hostname"],
-            "port": fulfillment["server"]["port"],
-            "path":  fulfillment[intent][objectType]["endpoint"],
-            "headers": {
-                "content-type": fulfillment[intent][objectType]["content_type"],
-                "cache-control": "no-cache",
-                "Cookie": "authorization=; authorization="+token
-            }
-        };
-        options = {
-            "method": fulfillment["v2AgentAPI"]["createEntity"]["type"],
-            "hostname": fulfillment["v2AgentAPI"]["createEntity"]["hostname"],
-            "port": fulfillment["server"]["port"],
-            "path":  fulfillment["v2AgentAPI"]["createEntity"]["endpoint"],
-            "headers": {
-                "content-type": fulfillment["v2AgentAPI"]["createEntity"]["content_type"],
-                "cache-control": "no-cache"
-            }
-        };
-        console.log("here");
-        sendRequest(options,fulfillment["v2AgentAPI"]["createEntity"]["apiInput"],function(reply,statusCode) {
-            console.log("Done with api call ===== "+reply+statusCode)
-        });
         options = {
             "method": fulfillment[intent][objectType]["type"],
             "hostname": fulfillment["server"]["hostname"],

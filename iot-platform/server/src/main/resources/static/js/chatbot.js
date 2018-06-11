@@ -39,8 +39,8 @@ function botResponse(msgText) {
             "My-Second-Header":"second value"
         },
         success: function(data){
-            var res = data['response'];
-            appendMessage(BOT_NAME, BOT_IMG, "left", res);
+            var res = JSON.parse(data['response']);
+            appendMessage(BOT_NAME, BOT_IMG, "left", res.fulfillmentText);
         }
     });
 }
