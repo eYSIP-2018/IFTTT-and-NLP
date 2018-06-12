@@ -36,6 +36,8 @@ html {
   border-bottom: var(--border);
   background: #579ffb;
   color: #ffffff;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
 }
 
 .msger-chat {
@@ -111,6 +113,8 @@ html {
   padding: 5px;
   border-top: var(--border);
   background: #eee;
+  border-bottom-right-radius: 5px;
+  border-bottom-left-radius: 5px;
 }
 .msger-inputarea * {
   padding: 5px;
@@ -123,20 +127,39 @@ html {
   background: #ddd;
 }
 .msger-send-btn {
-  margin-left: 5px;
-  outline:none;
-  background: rgb(0, 196, 65);
-  color: #fff;
-  font-weight: bold;
-  cursor: pointer;
-  border-radius:100px;
-  transition: background 0.23s;
+  outline: none;
 }
 .msger-send-btn:hover {
   background: rgb(0, 180, 50);
 }
 
 .msger-chat {
-  background-color: #fcfcfe;
-  background-image: url("/static/img/chatbot_back.jpg");
+  background-color: #d9d9d9;
+}
+
+.msger-suggestions {
+    height: 38px;
+    padding: 4px;
+    padding-left: 10px;
+    padding-right: 10px;
+    overflow-y: auto;
+    background-color: #d9d9d9;
+}
+
+.msger-suggestion-chip {
+    background-color: #f2f2f2;
+    color: #000000;
+    padding: 4px;
+    border-radius: 4px;
+    cursor: pointer;
+    opacity: 0.9;
+    margin: 4px;
+}
+
+.msger-suggestion-chip:hover {
+    opacity: 1;
+}
+
+.audio-button {
+    outline: none;
 }

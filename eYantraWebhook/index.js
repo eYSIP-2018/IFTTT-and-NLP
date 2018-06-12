@@ -12,10 +12,10 @@ var fulfillment = {
     },
     "server" : {
         "protocol" : "https",
-        "hostname" : "cd8e9a8c.ngrok.io",
+        "hostname" : "e7903a5d.ngrok.io",
         "port" : null
     },
-    "thing.create": {
+    "create.thing": {
         "thing" : {
             "endpoint" : "/thing/create",
             "type" : "POST",
@@ -97,8 +97,7 @@ var fulfillment = {
             "apiInput" : {
                 "name" : "",
                 "description" : "",
-                "ip" : "",
-                "parentUnitId" : 1
+                "ip" : ""
             }
         },
         "unit" : {
@@ -629,15 +628,11 @@ exports.eYantraWebhook = (req, res) => {
                 token = token.split('/').pop();
         }
         if(token == null) {
-            token = findKey("session",req.body);
-            if(token != null)
-                token = token.split('/').pop();
-        }
-        if(token == null) {
             responseText.fulfillmentText = "not authenticated!";
             res.status(200).send(JSON.stringify(responseText));
         }
         console.log("Token: "+token);
+
         options = {
             "method": fulfillment[intent][objectType]["type"],
             "hostname": fulfillment["server"]["hostname"],
@@ -742,6 +737,7 @@ exports.eYantraWebhook = (req, res) => {
                 });
             }
             break;
+
             /*Pending*/
             case "create.cron" : {
                 let apiInput = fulfillment[intent][objectType]["apiInput"];
@@ -836,22 +832,24 @@ exports.eYantraWebhook = (req, res) => {
             case "object.list-it":
             /*Done*/
             case "object.list" : {
-                responseText = {"payload": {"google": {"expectUserResponse": true,"richResponse": {"items": [{"simpleResponse": {"textToSpeech": "Here is the list:"}}]},"systemIntent": {"intent": "actions.intent.OPTION","data": {"@type": "type.googleapis.com/google.actions.v2.OptionValueSpec","listSelect": {"items": []}}}}}};
+                responseText = {"payload": {"google": {"expectUserResponse": true,"richResponse": {"items": [{"simpleResponse": {"textToSpeech": "Here is the list:"}}],"suggestions": []},"systemIntent": {"intent": "actions.intent.OPTION","data": {"@type": "type.googleapis.com/google.actions.v2.OptionValueSpec","listSelect": {"items": []}}}}}};
                 switch(objectType) {
                     case "thing" : {
                         sendRequest(options,null,function(reply,statusCode){
                             var response;
-                            //console.log('in case of thing.list');
                             if(reply.length > 0) {
                                 for(var i = 0;i<reply.length;i++) {
                                     responseText.payload.google.systemIntent.data.listSelect.items.push({"optionInfo": {"key": ""+objectType+": "+reply[i].id+reply[i].name},"title": ""+objectType+" "+reply[i].id+" "+reply[i].name});
                                 }
                                 if(responseText.payload.google.systemIntent.data.listSelect.items.length == 1) {
-                                    let tmp = {"payload": {"google": {"expectUserResponse": true,"richResponse": {"items": [{"simpleResponse": {"textToSpeech": ""}},{"simpleResponse": {"textToSpeech": ""}}]}}}};
+                                    let tmp = {"payload": {"google": {"expectUserResponse": true,"richResponse": {"items": [{"simpleResponse": {"textToSpeech": ""}},{"simpleResponse": {"textToSpeech": ""}}],"suggestions": []}}}};
                                     tmp.payload.google.richResponse.items[1].simpleResponse.textToSpeech = responseText.payload.google.systemIntent.data.listSelect.items[0].title;
                                     tmp.payload.google.richResponse.items[0].simpleResponse.textToSpeech = "found only one "+objectType +" : ";
                                     responseText = tmp;
                                 }
+                                //add suggestions
+                                responseText.payload.google.richResponse.suggestions.push({"title":"add new thing"});
+                                responseText.payload.google.richResponse.suggestions.push({"title":"list users"});
                             }
                             else {
                                 responseText = fulfillment["basic_response"];
@@ -1967,7 +1965,7 @@ exports.eYantraWebhook = (req, res) => {
             }
             break;
 
-            /*Pending*/
+            /*Done*/
             case "unit.subunits" : {
                 let name = queryResult.parameters.name;
                 let conversationId = findKey("conversationId", req.body);
@@ -1997,7 +1995,7 @@ exports.eYantraWebhook = (req, res) => {
                                 "lifespanCount": 5,
                                 "parameters": {
                                   "object" : "unit",
-                                  "futureAction" : "subunits",
+                                  "futureAction" : "unit-subunits",
                                   "objectName" : name
                                 }
                             }];

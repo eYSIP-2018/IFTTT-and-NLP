@@ -2,7 +2,6 @@ var msgerForm = get(".msger-inputarea");
 var msgerInput = get(".msger-input");
 var msgerChat = get(".msger-chat");
 
-var BOT_MSGS = ["Hi, how are you?", "Ohh... I can't understand what you trying to say. Sorry!", "I like to play games... But I don't know how to play!", "Sorry if my answers are not relevant. :))", "I feel sleepy! :("];
 var BOT_IMG = "/static/img/eYantra_logo.png";
 var PERSON_IMG = "/static/img/user_icon.svg";
 var BOT_NAME = "eYantra IOT";
@@ -11,41 +10,116 @@ var PERSON_NAME = "user_name";
 msgerForm.addEventListener("submit", function (event) {
   event.preventDefault();
 
+  document.getElementById("audioButton").disabled = false;
+  if(typeof someUndefVar != 'undefined') {
+      recognition.stop();
+  }
+
   var msgText = msgerInput.value;
   if (!msgText) return;
 
   appendMessage(PERSON_NAME, PERSON_IMG, "right", msgText);
   msgerInput.value = "";
-
+  document.getElementById("suggestions").style.display = "none";
   botResponse(msgText);
 });
 
-function appendMessage(name, img, side, text) {
-  //   Simple solution for small apps
-  var msgHTML = "\n    <div class=\"msg " + side + "-msg\">\n      <div class=\"msg-img\" style=\"background-image: url(" + img + ")\"></div>\n\n      <div class=\"msg-bubble\">\n        <div class=\"msg-text\">" + text + "</div>\n      </div>\n    </div>\n  ";
+function addSuggestion(msgText) {
+    appendMessage(PERSON_NAME, PERSON_IMG, "right", msgText);
+    document.getElementById("suggestions").style.display = "none";
+    botResponse(msgText);
+}
 
+function appendMessage(name, img, side, text) {
+  var msgHTML = "\n    <div class=\"msg " + side + "-msg\">\n      <div class=\"msg-img\" style=\"background-image: url(" + img + ")\"></div>\n\n      <div class=\"msg-bubble\">\n        <div class=\"msg-text\">" + text + "</div>\n      </div>\n    </div>\n  ";
   msgerChat.insertAdjacentHTML("beforeend", msgHTML);
   msgerChat.scrollTop += 500;
 }
 
+function appendSpinner(img, side) {
+    var msgHTML = "\n    <div id=\"tempSpinner\" class=\"msg " + side + "-msg\">\n      <div class=\"msg-img\" style=\"background-image: url(" + img + ")\"></div>\n\n      <div class=\"msg-bubble\">\n        <div class=\"msg-text\">" + '<i class="fa fa-spinner fa-pulse fa-fw"></i>' + "</div>\n      </div>\n    </div>\n  ";
+    msgerChat.insertAdjacentHTML("beforeend", msgHTML);
+    msgerChat.scrollTop += 500;
+}
+
+function removeSpinner() {
+    let element = document.getElementById('tempSpinner');
+    element.parentNode.removeChild(element);
+}
+
 function botResponse(msgText) {
+    //add temporary loading spinner
+    appendSpinner(BOT_IMG, 'left');
+
     $.ajax({
         type: 'POST',
         url: "/eyiot",
         data: JSON.stringify({'str':msgText}),
+        dataType: "text",
         contentType:"application/json; charset=utf-8",
         headers: {
             "Authorization":"Basic grtrthj45h45h4j5h4kj5k45hjk4kh5j",
             "My-Second-Header":"second value"
         },
         success: function(data){
-            var res = JSON.parse(data['response']);
-            appendMessage(BOT_NAME, BOT_IMG, "left", res.fulfillmentText);
+            //remove temporary spinner
+            removeSpinner();
+
+            let speechText = "";
+            data = JSON.parse(data);
+            data = data.response;
+            if(data.hasOwnProperty("webhookPayload") && data.webhookPayload.hasOwnProperty('google')) {
+                data = data.webhookPayload;
+                let msg = "";
+                console.log(JSON.stringify(data));
+                for(let i=0;i<data.google.richResponse.items.length;i++) {
+                    msg += data.google.richResponse.items[i].simpleResponse.textToSpeech;
+                    if(i < data.google.richResponse.items.length-1)
+                        msg += "<br/>";
+                    if(i==0)
+                        speechText = data.google.richResponse.items[i].simpleResponse.textToSpeech;
+                }
+                appendMessage(BOT_NAME, BOT_IMG, "left", msg);
+
+                if(data.google.hasOwnProperty("systemIntent")) {
+                    msg = "";
+                    for(let i=0;i<data.google.systemIntent.data.listSelect.items.length;i++) {
+                        msg += "<strong>"+data.google.systemIntent.data.listSelect.items[i].title+"</strong>";
+                        if(data.google.systemIntent.data.listSelect.items[i].hasOwnProperty('description'))
+                            msg += "<br/>"+data.google.systemIntent.data.listSelect.items[i].description;
+                        if(i < data.google.systemIntent.data.listSelect.items.length-1)
+                            msg += "<hr/>";
+                    }
+                    appendMessage(BOT_NAME, BOT_IMG, "left", msg);
+                }
+
+                document.getElementById("suggestions").style.display = "none";
+                //Add suggestion chips
+                if(data.google.richResponse.hasOwnProperty("suggestions")) {
+                    let suggestionChips = "";
+                    for(let i=0;i<data.google.richResponse.suggestions.length;i++) {
+                        suggestionChips += '<span class="msger-suggestion-chip" onclick="addSuggestion(\''+data.google.richResponse.suggestions[i].title+'\')">'+data.google.richResponse.suggestions[i].title+'</span>';
+                    }
+                    document.getElementById("suggestions").innerHTML = suggestionChips;
+                    if(suggestionChips == "")
+                        document.getElementById("suggestions").style.display = "none";
+                    else
+                        document.getElementById("suggestions").style.display = "block";
+                }
+            }
+            else {
+                appendMessage(BOT_NAME, BOT_IMG, "left", data.fulfillmentText);
+                document.getElementById("suggestions").style.display = "none";
+                speechText = data.fulfillmentText;
+            }
+            if ('speechSynthesis' in window) {
+                let msg = new SpeechSynthesisUtterance(speechText);
+                window.speechSynthesis.speak(msg);
+            }
         }
     });
 }
 
-// Utils
 function get(selector) {
   var root = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : document;
 
@@ -75,5 +149,51 @@ function showHide() {
     {
         chatbot.style.display = "block";
         chatbotPanel.style.display = "none";
+    }
+}
+
+function startRecording() {
+    if (!('webkitSpeechRecognition' in window)) {
+        alert("Please upgrade your browser to support speech to text");
+    }
+    else {
+        var recognition = new webkitSpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+
+        recognition.onstart = function() {
+            document.getElementById("audioButton").disabled = true;
+        };
+
+        recognition.onresult = function(event) {
+            var interim_transcript = '';
+
+            for(let i=event.resultIndex; i<event.results.length; i++) {
+                if(event.results[i].isFinal) {
+                  final_transcript += event.results[i][0].transcript;
+                }
+            }
+            msgerInput.value = final_transcript;
+        };
+
+        recognition.onerror = function(event) {
+            alert("Oops! Something went wrong! Error: "+error);
+            document.getElementById("audioButton").disabled = false;
+        };
+
+        recognition.onend = function() {
+            document.getElementById("audioButton").disabled = false;
+            var msgText = msgerInput.value;
+            if (!msgText) return;
+
+            appendMessage(PERSON_NAME, PERSON_IMG, "right", msgText);
+            msgerInput.value = "";
+            document.getElementById("suggestions").style.display = "none";
+            botResponse(msgText);
+        };
+
+        final_transcript = '';
+        recognition.lang = 'en-US';
+        recognition.start();
     }
 }
