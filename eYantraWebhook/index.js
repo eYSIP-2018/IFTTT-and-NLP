@@ -12,7 +12,7 @@ var fulfillment = {
     },
     "server" : {
         "protocol" : "https",
-        "hostname" : "b9ad80db.ngrok.io",
+        "hostname" : "e7903a5d.ngrok.io",
         "port" : null
     },
     "create.thing": {
@@ -737,6 +737,7 @@ exports.eYantraWebhook = (req, res) => {
                 });
             }
             break;
+
             /*Pending*/
             case "create.cron" : {
                 let apiInput = fulfillment[intent][objectType]["apiInput"];
@@ -1964,7 +1965,7 @@ exports.eYantraWebhook = (req, res) => {
             }
             break;
 
-            /*Pending*/
+            /*Done*/
             case "unit.subunits" : {
                 let name = queryResult.parameters.name;
                 let conversationId = findKey("conversationId", req.body);
@@ -1994,7 +1995,7 @@ exports.eYantraWebhook = (req, res) => {
                                 "lifespanCount": 5,
                                 "parameters": {
                                   "object" : "unit",
-                                  "futureAction" : "subunits",
+                                  "futureAction" : "unit-subunits",
                                   "objectName" : name
                                 }
                             }];

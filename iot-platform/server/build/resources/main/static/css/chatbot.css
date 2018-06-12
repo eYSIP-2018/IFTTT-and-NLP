@@ -127,14 +127,7 @@ html {
   background: #ddd;
 }
 .msger-send-btn {
-  margin-left: 5px;
-  outline:none;
-  background: rgb(0, 196, 65);
-  color: #fff;
-  font-weight: bold;
-  cursor: pointer;
-  border-radius:100px;
-  transition: background 0.23s;
+  outline: none;
 }
 .msger-send-btn:hover {
   background: rgb(0, 180, 50);
