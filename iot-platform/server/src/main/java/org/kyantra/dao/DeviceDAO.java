@@ -10,6 +10,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.kyantra.triggers.EntityHandler;
+
 /**
  * Created by Siddhesh Prabhugaonkar on 13-11-2017.
  */
@@ -28,6 +30,7 @@ public class DeviceDAO extends BaseDAO {
 
         session.getTransaction().commit();
         session.close();
+        EntityHandler.getInstance().triggerAdd(deviceBean);
         return deviceBean;
     }
 
@@ -61,6 +64,7 @@ public class DeviceDAO extends BaseDAO {
         Session session = getService().getSessionFactory().openSession();
         Transaction tx = session.beginTransaction();
         DeviceBean device = session.get(DeviceBean.class, id);
+        EntityHandler.getInstance().triggerDelete(device);
         // required by bidirectional one to many
         device.getParentThing().removeDevice(device);
 //        session.delete(device);
@@ -74,9 +78,11 @@ public class DeviceDAO extends BaseDAO {
         Session session = getService().getSessionFactory().openSession();
         Transaction tx = session.beginTransaction();
         DeviceBean device = session.get(DeviceBean.class, id);
+        String deviceOld = device.getName();
         device.setName(name);
         device.setDescription(description);
         tx.commit();
+        EntityHandler.getInstance().triggerUpdate(deviceOld,device);
         session.close();
     }
 

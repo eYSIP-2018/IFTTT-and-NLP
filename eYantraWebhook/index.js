@@ -15,30 +15,6 @@ var fulfillment = {
         "hostname" : "b9ad80db.ngrok.io",
         "port" : null
     },
-    "v2AgentAPI" : {
-        "createEntity" : {
-            "hostname" : "https://dialogflow.googleapis.com",
-            "endpoint" : "/v2/projects/eyantra-iot-f0957/agent/entityTypes",
-            "type" : "POST",
-            "content_type" : "application/x-www-form-urlencoded",
-            "response_type" : "application/json",
-            "url_parameter" : false,
-            "apiInput" : {
-                "name": "",
-                "displayName": "trialEntity",
-                "kind": "KIND_MAP",
-                "autoExpansionMode": "AUTO_EXPANSION_MODE_UNSPECIFIED",
-                "entities": [
-                    {
-                        "value": "trialEntity",
-                        "synonyms": [
-                            "trialEntity"
-                        ]
-                    }
-                ]
-            }
-        }
-    },
     "create.thing": {
         "thing" : {
             "endpoint" : "/thing/create",

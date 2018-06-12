@@ -15,6 +15,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.kyantra.triggers.EntityHandler;
+
 public class UnitDAO extends BaseDAO{
     static UnitDAO instance = new UnitDAO();
     public static UnitDAO getInstance(){ return instance; }
@@ -57,6 +59,7 @@ public class UnitDAO extends BaseDAO{
         session.save(currentUnit);
         session.getTransaction().commit();
         session.close();
+        EntityHandler.getInstance().triggerAdd(currentUnit);
         return currentUnit;
     }
 
@@ -71,6 +74,7 @@ public class UnitDAO extends BaseDAO{
         Session session = getService().getSessionFactory().openSession();
         Transaction tx = session.beginTransaction();
         UnitBean unit = session.get(UnitBean.class, id);
+        EntityHandler.getInstance().triggerDelete(unit);
         session.delete(unit);
         tx.commit();
         session.close();
@@ -82,11 +86,13 @@ public class UnitDAO extends BaseDAO{
         Session session = getService().getSessionFactory().openSession();
         Transaction tx = session.beginTransaction();
         UnitBean unit = session.get(UnitBean.class, id);
+        String unitOld = unit.getUnitName();
         unit.setUnitName(unitName);
         unit.setDescription(description);
         unit.setPhoto(photo);
         tx.commit();
         session.close();
+        EntityHandler.getInstance().triggerUpdate(unitOld,unit);
         return unit;
     }
 
