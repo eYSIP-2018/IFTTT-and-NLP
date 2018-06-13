@@ -177,7 +177,7 @@ function startRecording() {
         };
 
         recognition.onerror = function(event) {
-            alert("Oops! Something went wrong! Error: "+error);
+            alert("Oops! Something went wrong!");
             document.getElementById("audioButton").disabled = false;
         };
 
