@@ -7,9 +7,11 @@ import java.net.HttpURLConnection;
 import java.io.OutputStream;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import org.hibernate.Session;
 
 import org.kyantra.dao.ThingDAO;
 import org.kyantra.dao.DeviceDAO;
+import org.kyantra.dao.UnitDAO;
 import org.kyantra.beans.ThingBean;
 import org.kyantra.beans.UnitBean;
 import org.kyantra.beans.UserBean;
@@ -76,10 +78,73 @@ public class EntityHandler {
         return ""+content;
     }
 
+    // get list of all objects
+    public Boolean isValid(String objectName,Object o) {
+        if(o instanceof ThingBean) {
+            int count = 0;
+            int page = 0;
+            List <ThingBean> objects = ThingDAO.getInstance().list(page++,10);
+            while(! objects.isEmpty()) {
+                List <ThingBean> objectsPage = ThingDAO.getInstance().list(page,10);
+                if( objectsPage.size() == 0) {
+                    break;
+                }
+                objects.addAll(objectsPage);
+                page++;
+            }
+            for(ThingBean object : objects) {
+                if(object.getName().equals(objectName)) {
+                    count++;
+                }
+            }
+            return count == 1;
+        } else if(o instanceof DeviceBean) {
+            int count = 0;
+            int page = 0;
+            List <DeviceBean> objects = DeviceDAO.getInstance().list(page++,10);
+            while(! objects.isEmpty()) {
+                List <DeviceBean> objectsPage = DeviceDAO.getInstance().list(page,10);
+                if( objectsPage.size() == 0) {
+                    break;
+                }
+                objects.addAll(objectsPage);
+                page++;
+            }
+            for(DeviceBean object : objects) {
+                if(object.getName().equals(objectName)) {
+                    count++;
+                }
+            }
+            return count == 1;
+        } else if(o instanceof UnitBean) {
+            int count = 0;
+            int page = 0;
+            List <UnitBean> objects = UnitDAO.getInstance().list(page++,10);
+            while(! objects.isEmpty()) {
+                List <UnitBean> objectsPage = UnitDAO.getInstance().list(page,10);
+                if( objectsPage.size() == 0) {
+                    break;
+                }
+                objects.addAll(objectsPage);
+                page++;
+            }
+            for(UnitBean object : objects) {
+                if(object.getUnitName().equals(objectName)) {
+                    count++;
+                }
+            }
+            return count == 1;
+        }
+        return false;
+    }
+
     // add new Entity to dialogflow
     public void triggerAdd(Object o) {
         String parameters[] = getParameters(o);
         String objectName = parameters[0];
+        if(!isValid(objectName,o)) {
+            return ;
+        }
         String eid = parameters[1];
         String url = new String("https://api.dialogflow.com/v1/entities/"+eid+"/entries?v=20150910");
         String inputData =  "[{'synonyms': ['" + objectName + "'],'value': '" + objectName + "'}]";
@@ -92,6 +157,9 @@ public class EntityHandler {
     public void triggerDelete(Object o) {
         String parameters[] = getParameters(o);
         String objectName = parameters[0];
+        if(!isValid(objectName,o)) {
+            return ;
+        }
         int id = Integer.parseInt(parameters[2]);
         String eid = parameters[1];
         String url = new String("https://api.dialogflow.com/v1/entities/"+eid+"/entries?v=20150910");
@@ -121,6 +189,9 @@ public class EntityHandler {
     public void triggerUpdate(Object oldO,Object newO) {
         String parameters[] = getParameters(newO);
         String objectName = (String) oldO;
+        if(!isValid(objectName,newO)) {
+            return ;
+        }
         String eid = parameters[1];
         String url = new String("https://api.dialogflow.com/v1/entities/"+eid+"/entries?v=20150910");
         String inputData =  "['" + objectName + "']";
