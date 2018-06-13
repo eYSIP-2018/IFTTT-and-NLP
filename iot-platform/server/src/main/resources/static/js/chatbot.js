@@ -153,7 +153,8 @@ function showHide() {
 }
 
 function startRecording() {
-    if (!('webkitSpeechRecognition' in window)) {
+    var webkitSpeechRecognition = SpeechRecognition || webkitSpeechRecognition
+    if (!webkitSpeechRecognition) {
         alert("Please upgrade your browser to support speech to text");
     }
     else {
