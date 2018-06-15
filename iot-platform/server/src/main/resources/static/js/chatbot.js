@@ -6,6 +6,12 @@ var BOT_IMG = "/static/img/eYantra_logo.png";
 var PERSON_IMG = "/static/img/user_icon.svg";
 var BOT_NAME = "eYantra IOT";
 var PERSON_NAME = "user_name";
+var WELCOME_MSG = " Welcome to eYantra IOT Smart Assistant!\
+                    I can do alot of tasks from adding new devices,\
+                    things & units to Getting the temperature from\
+                    the sensor in your lab.\
+                    Here are some quick suggestions to go...";
+var WELCOME_SUGGESTIONS = ["add new thing","show list of users","delete unit","list things"];
 
 msgerForm.addEventListener("submit", function (event) {
   event.preventDefault();
@@ -198,3 +204,17 @@ function startRecording() {
         recognition.start();
     }
 }
+
+//Initialization of bot
+window.onload = function() {
+    appendMessage(BOT_NAME, BOT_IMG, "left", WELCOME_MSG);
+    let suggestionChips = "";
+    for(let i=0;i<WELCOME_SUGGESTIONS.length;i++) {
+        suggestionChips += '<span class="msger-suggestion-chip" onclick="addSuggestion(\''+WELCOME_SUGGESTIONS[i]+'\')">'+WELCOME_SUGGESTIONS[i]+'</span>';
+    }
+    document.getElementById("suggestions").innerHTML = suggestionChips;
+    if(suggestionChips == "")
+        document.getElementById("suggestions").style.display = "none";
+    else
+        document.getElementById("suggestions").style.display = "block";
+};
