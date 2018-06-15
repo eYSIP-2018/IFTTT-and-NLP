@@ -11,7 +11,7 @@ var WELCOME_MSG = " Welcome to eYantra IOT Smart Assistant!\
                     things & units to Getting the temperature from\
                     the sensor in your lab.\
                     Here are some quick suggestions to go...";
-var WELCOME_SUGGESTIONS = ["add new thing","show list of users","delete unit","list things"];
+var WELCOME_SUGGESTIONS = ["add thing","delete unit","list things"];
 
 msgerForm.addEventListener("submit", function (event) {
   event.preventDefault();
