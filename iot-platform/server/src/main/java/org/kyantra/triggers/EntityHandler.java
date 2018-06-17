@@ -142,14 +142,11 @@ public class EntityHandler {
     public void triggerAdd(Object o) {
         String parameters[] = getParameters(o);
         String objectName = parameters[0];
-        if(!isValid(objectName,o)) {
-            return ;
-        }
         String eid = parameters[1];
         String url = new String("https://api.dialogflow.com/v1/entities/"+eid+"/entries?v=20150910");
         String inputData =  "[{'synonyms': ['" + objectName + "'],'value': '" + objectName + "'}]";
         String output = requestFor(url,"POST",inputData);
-        System.out.println(output);
+        System.out.println(objectName + " added from dialogflow");
     }
 
     // remove entities from dialogflow
@@ -157,46 +154,50 @@ public class EntityHandler {
     public void triggerDelete(Object o) {
         String parameters[] = getParameters(o);
         String objectName = parameters[0];
-        if(!isValid(objectName,o)) {
-            return ;
-        }
-        int id = Integer.parseInt(parameters[2]);
-        String eid = parameters[1];
-        String url = new String("https://api.dialogflow.com/v1/entities/"+eid+"/entries?v=20150910");
-        String inputData =  "['" + objectName + "']";
-        String output = requestFor(url,"DELETE",inputData);
-        if(o instanceof ThingBean) {
-            Set<DeviceBean> devices = DeviceDAO.getInstance().getByThing(id);
-            for(DeviceBean deviceBean : devices){
-               triggerDelete(deviceBean);
-            }
-        } else if (o instanceof UnitBean) {
-            UnitBean unitBean = (UnitBean) o;
-            List<UnitBean> units = unitBean.getSubunits();
-            for(UnitBean unit : units) {
-                triggerDelete(unit);
-                int Uid = unit.getId();
-                Set<ThingBean> things = ThingDAO.getInstance().getByUnitId(Uid);
-                for(ThingBean thingBean : things){
-                   triggerDelete(thingBean);
+        if(isValid(objectName,o)) {
+            int id = Integer.parseInt(parameters[2]);
+            String eid = parameters[1];
+            String url = new String("https://api.dialogflow.com/v1/entities/"+eid+"/entries?v=20150910");
+            String inputData =  "['" + objectName + "']";
+            String output = requestFor(url,"DELETE",inputData);
+            System.out.println(objectName + " deleted from dialogflow");
+            if(o instanceof ThingBean) {
+                Set<DeviceBean> devices = DeviceDAO.getInstance().getByThing(id);
+                for(DeviceBean deviceBean : devices){
+                    triggerDelete(deviceBean);
+                }
+            } else if (o instanceof UnitBean) {
+                UnitBean unitBean = (UnitBean) o;
+                List<UnitBean> units = unitBean.getSubunits();
+                for(UnitBean unit : units) {
+                    triggerDelete(unit);
+                    int Uid = unit.getId();
+                    Set<ThingBean> things = ThingDAO.getInstance().getByUnitId(Uid);
+                    for(ThingBean thingBean : things){
+                        triggerDelete(thingBean);
+                    }
                 }
             }
         }
-        System.out.println(output);
     }
 
     //update entities from dialogflow
-    public void triggerUpdate(Object oldO,Object newO) {
-        String parameters[] = getParameters(newO);
-        String objectName = (String) oldO;
-        if(!isValid(objectName,newO)) {
-            return ;
+    public void triggerUpdate(Object newObjectName,Object object) {
+        String parameters[] = getParameters(object);
+        String objectName = parameters[0];
+        if(isValid(objectName,object)) {
+            String eid = parameters[1];
+            String url = new String("https://api.dialogflow.com/v1/entities/"+eid+"/entries?v=20150910");
+            String inputData =  "['" + objectName + "']";
+            String output = requestFor(url,"DELETE",inputData);
+            System.out.println(objectName + " deleted from dialogflow");
         }
+        // don't check isValid while adding
+        objectName = (String)newObjectName;
         String eid = parameters[1];
         String url = new String("https://api.dialogflow.com/v1/entities/"+eid+"/entries?v=20150910");
-        String inputData =  "['" + objectName + "']";
-        String output = requestFor(url,"DELETE",inputData);
-        System.out.println(output);
-        triggerAdd(newO);
+        String inputData =  "[{'synonyms': ['" + objectName + "'],'value': '" + objectName + "'}]";
+        String output = requestFor(url,"POST",inputData);
+        System.out.println(objectName + " added from dialogflow");
     }
 }

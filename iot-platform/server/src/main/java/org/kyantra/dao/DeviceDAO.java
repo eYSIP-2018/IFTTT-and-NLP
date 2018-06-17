@@ -78,11 +78,11 @@ public class DeviceDAO extends BaseDAO {
         Session session = getService().getSessionFactory().openSession();
         Transaction tx = session.beginTransaction();
         DeviceBean device = session.get(DeviceBean.class, id);
-        String deviceOld = device.getName();
+        String deviceNew = name;
+        EntityHandler.getInstance().triggerUpdate(deviceNew,device);
         device.setName(name);
         device.setDescription(description);
         tx.commit();
-        EntityHandler.getInstance().triggerUpdate(deviceOld,device);
         session.close();
     }
 
