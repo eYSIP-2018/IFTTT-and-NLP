@@ -7,14 +7,6 @@
         </div>
     </header>
     <main class="msger-chat">
-        <div class="msg left-msg">
-            <div class="msg-img" style="background-image: url(/static/img/eYantra_logo.png)"></div>
-            <div class="msg-bubble">
-                <div class="msg-text">
-                    Welcome to eYantra IOT!
-                </div>
-            </div>
-        </div>
     </main>
     <div id="suggestions" class="msger-suggestions">
     </div>

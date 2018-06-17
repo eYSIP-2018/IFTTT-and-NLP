@@ -12,7 +12,7 @@ var fulfillment = {
     },
     "server" : {
         "protocol" : "https",
-        "hostname" : "e7903a5d.ngrok.io",
+        "hostname" : "13.229.202.213",
         "port" : null
     },
     "create.thing": {
