@@ -69,6 +69,7 @@ var regexString = {
         "regexexec" : "(hour|hrs|hours)|(minutes|minute|mins|min)|((months|month)|(((january|february|march|april|may|june|july|august|september|october|november|december|JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEPT|OCT|NOV|DEC)( ?and)?,? ?)+))|[0-9]+(th|nd|rd|st)|(([0-9]+:)?[0-9]+( +)?(AM|PM))|([0-9]+:[0-9]+)|(noon|midnight)|((days|day)|(((monday|tuesday|wednesday|thursday|friday|saturday|sunday|WEEKEND|MON|TUE|WED|THU|FRI|SAT|SUN)( ?and)?,? ?)+))|(([0-9]{4}[0-9]*(( ?and)?,? ?))+)|([0-9]+)|(to|through|ending|end|and)|(between|starting|start)"
     }
 }
+
 var flags = {
     "isRangeForDay" : false,
     "isRangeForMonth" : false,
@@ -86,8 +87,27 @@ var resultCron = {
     "year" : "*"
 };
 
+var defaultMaps = {
+    "flags" : {
+        "isRangeForDay" : false,
+        "isRangeForMonth" : false,
+        "isRangeForYear" : false,
+        "isRangeForHour" : false,
+        "isRangeForMin" : false
+    },
+    "resultCron" : {
+        "min" : "*",
+        "hour" : "*",
+        "day_of_month" : "*",
+        "month" : "*",
+        "day_of_week" : "?",
+        "year" : "*"
+    }
+};
+
 module.exports = {
     regexString ,
     flags ,
-    resultCron
+    resultCron,
+    defaultMaps
 }

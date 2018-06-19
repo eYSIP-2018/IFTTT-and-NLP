@@ -22,6 +22,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.Set;
+import java.util.List;
 
 /**
  * Created by Lenovo on 12-11-2017.
@@ -31,6 +32,7 @@ import java.util.Set;
 @Api(value="cron")
 public class CronResource extends BaseResource {
 
+    int limit = 10;
     @GET
     @Path("get/{id}")
     @Session
@@ -85,6 +87,14 @@ public class CronResource extends BaseResource {
         else throw new AccessDeniedException();
     }
 
+    @GET
+    @Session
+    @Path("list/page/{page}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String list(@PathParam("page") Integer page) {
+        List<CronBean> crons= CronDAO.getInstance().list(page,limit);
+        return gson.toJson(crons);
+    }
 
     @POST
     @Path("create")

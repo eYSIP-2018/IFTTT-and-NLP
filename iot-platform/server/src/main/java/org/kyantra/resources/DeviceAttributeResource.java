@@ -100,6 +100,7 @@ public class DeviceAttributeResource extends BaseResource {
                 deviceAttribute.setName(name);
                 deviceAttribute.setType(type);
                 deviceAttribute.setDef(def);
+                deviceAttribute.setParentDevice(DeviceDAO.getInstance().get(parentDeviceId));
                 deviceAttribute.setOwnerUnit(UnitDAO.getInstance().get(ownerUnitId));
 
                 DeviceAttributeBean deviceAttributeBean = DeviceAttributeDAO.getInstance().add(deviceAttribute);

@@ -2,6 +2,7 @@
 const regexString = require('./maps').regexString;
 var flags = require('./maps').flags;
 var resultCron = require('./maps').resultCron;
+const defaultMaps = require('./maps').defaultMaps;
 
 var readline = require('readline');
 const tokenizeInput  = require('./tokens').tokenizeInput;
@@ -19,7 +20,6 @@ const getYear  = require('./states/year').getYear;
 /*callState function to match and call curresponding state function*/
 function callState(token,stack,error) {
     let stateName = decideState(token);
-    console.log("in "+stateName+" state");
     switch(stateName) {
         case "frequencyWith" : {
             return getFrequencyWith(token,stack,error);
@@ -79,15 +79,33 @@ function decideState(token) {
     return isFound;
 }
 
+/*Function to reset all maps to default*/
+function resetMaps() {
+    flags.isRangeForDay = false;
+    flags.isRangeForMonth = false;
+    flags.isRangeForYear = false;
+    flags.isRangeForHour = false;
+    flags.isRangeForMin = false;
+
+    resultCron.min="*";
+    resultCron.hour = "*";
+    resultCron.day_of_month = "*";
+    resultCron.month = "*";
+    resultCron.day_of_week = "?";
+    resultCron.year = "*";
+}
+
 /*getCronString fucntion to convert human readable input string to cron string*/
 function getCronString(inputString, syntaxString) {
+    //Initialize maps to default
+    resetMaps();
+
     //Set default syntax string
     syntaxString = typeof(syntaxString) !== 'undefined' ? syntaxString : "MIN HOR DOM MON WEK YER";
     //Stack to store temperory states' data
     let stack = [];
     let error = "";
     let tokens = tokenizeInput(inputString);
-    console.log("Tokens detected = [" + tokens+ "]");
     if(tokens == null) {
         error+="Please enter human readable rules !\n";
     }
@@ -103,9 +121,4 @@ function getCronString(inputString, syntaxString) {
     }
 }
 
-/*for debugging purpose*/
-console.log("When do you want to run ? ==>  ");
-var sentence = process.argv.slice(2)[0];
-console.log(sentence);
-console.log(getCronString(sentence));
-
+module.exports = {getCronString};
