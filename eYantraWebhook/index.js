@@ -706,6 +706,7 @@ function findKey(key, data) {
 }
 
 function sendRequest(options, apiInput, callback) {
+    console.log("in send at start");
     var request = http.request(options, function (response) {
         var chunks = "";
 
@@ -715,6 +716,7 @@ function sendRequest(options, apiInput, callback) {
 
         response.on("end", function () {
             reply = JSON.parse(chunks);
+            console.log("in send at end");
             callback(reply,this.statusCode);
         });
     });
