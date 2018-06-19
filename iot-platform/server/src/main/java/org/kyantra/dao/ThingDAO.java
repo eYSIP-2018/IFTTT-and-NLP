@@ -82,8 +82,8 @@ public class ThingDAO extends BaseDAO{
         Session session = getService().getSessionFactory().openSession();
         Transaction tx = session.beginTransaction();
         ThingBean thing = session.get(ThingBean.class, id);
-        thing.getParentUnit().removeThing(thing);
         EntityHandler.getInstance().triggerDelete(thing);
+        thing.getParentUnit().removeThing(thing);
 //        session.delete(thing);
 //        session.flush();
         tx.commit();
@@ -96,12 +96,12 @@ public class ThingDAO extends BaseDAO{
         Session session = getService().getSessionFactory().openSession();
         Transaction tx = session.beginTransaction();
         ThingBean thing = session.get(ThingBean.class, id);
-        String thingOld = thing.getName();
+        String thingNew = name;
+        EntityHandler.getInstance().triggerUpdate(thingNew,thing);
         thing.setName(name);
         thing.setDescription(description);
         thing.setIp(ip);
         tx.commit();
-        EntityHandler.getInstance().triggerUpdate(thingOld,thing);
         session.close();
     }
 

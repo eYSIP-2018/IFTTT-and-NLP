@@ -86,13 +86,13 @@ public class UnitDAO extends BaseDAO{
         Session session = getService().getSessionFactory().openSession();
         Transaction tx = session.beginTransaction();
         UnitBean unit = session.get(UnitBean.class, id);
-        String unitOld = unit.getUnitName();
+        String unitNew = unitName;
+        EntityHandler.getInstance().triggerUpdate(unitNew,unit);
         unit.setUnitName(unitName);
         unit.setDescription(description);
         unit.setPhoto(photo);
         tx.commit();
         session.close();
-        EntityHandler.getInstance().triggerUpdate(unitOld,unit);
         return unit;
     }
 
