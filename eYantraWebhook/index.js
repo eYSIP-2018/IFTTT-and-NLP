@@ -335,6 +335,16 @@ var fulfillment = {
             "apiInput" : {
                 "id" : ""
             }
+        },
+        "cron" : {
+            "endpoint" : "/cron/list/page/0",
+            "type" : "GET",
+            "content_type" : "application/x-www-form-urlencoded",
+            "response_type" : "application/json",
+            "url_parameter" : true,
+            "apiInput" : {
+                "id" : ""
+            }
         }
     },
     "object.list-it": {
@@ -370,6 +380,16 @@ var fulfillment = {
         },
         "device" : {
             "endpoint" : "/device/list/page/0",
+            "type" : "GET",
+            "content_type" : "application/x-www-form-urlencoded",
+            "response_type" : "application/json",
+            "url_parameter" : true,
+            "apiInput" : {
+                "id" : ""
+            }
+        },
+        "cron" : {
+            "endpoint" : "/cron/list/page/0",
             "type" : "GET",
             "content_type" : "application/x-www-form-urlencoded",
             "response_type" : "application/json",
@@ -428,7 +448,7 @@ var fulfillment = {
                 "id" : ""
             }
         },
-        "createAttribute" : {
+        "attribute" : {
             "endpoint" : "/attribute/create",
             "type" : "POST",
             "content_type" : "application/x-www-form-urlencoded",
@@ -497,6 +517,16 @@ var fulfillment = {
         },
         "device" : {
             "endpoint" : "/device/list/page/0",
+            "type" : "GET",
+            "content_type" : "application/x-www-form-urlencoded",
+            "response_type" : "application/json",
+            "url_parameter" : true,
+            "apiInput" : {
+                "id" : ""
+            }
+        },
+        "cron" : {
+            "endpoint" : "/cron/list/page/0",
             "type" : "GET",
             "content_type" : "application/x-www-form-urlencoded",
             "response_type" : "application/json",
@@ -676,6 +706,7 @@ function findKey(key, data) {
 }
 
 function sendRequest(options, apiInput, callback) {
+    console.log("in send at start");
     var request = http.request(options, function (response) {
         var chunks = "";
 
@@ -685,6 +716,7 @@ function sendRequest(options, apiInput, callback) {
 
         response.on("end", function () {
             reply = JSON.parse(chunks);
+            console.log("in send at end");
             callback(reply,this.statusCode);
         });
     });
@@ -826,7 +858,6 @@ exports.eYantraWebhook = (req, res) => {
 
                 sendRequest(options,null,function(reply,statusCode){
                     responseText = {"payload": {"google": {"expectUserResponse": true,"richResponse": {"items": [{"simpleResponse": {"textToSpeech": "Found multiple devices with name "+deviceName+", choose one ID to add "+name+" to it"}}],"suggestions": []},"systemIntent": {"intent": "actions.intent.OPTION","data": {"@type": "type.googleapis.com/google.actions.v2.OptionValueSpec","listSelect": {"items": []}}}}}};
-                    console.log("inside created " + statusCode);
                     if(statusCode!= "200") {
                         responseText.fulfillmentText = "not authenticated !";
                     }
@@ -836,12 +867,16 @@ exports.eYantraWebhook = (req, res) => {
                         let deviceDetails;
                         let deviceData = {};
 
-                        console.log("in crons");
                         for(let i=0;i<reply.length;i++) {
                             for(let j=0;j<reply[i].devices.length;j++) {
                                 // TO DO: change == to strstr
-                                if(reply[i].devices[j].name == deviceName) {
-                                    responseText.payload.google.systemIntent.data.listSelect.items.push({"optionInfo": {"key": ""+reply[i].devices[j].id},"title": ""+reply[i].devices[j].id+": "+reply[i].devices[j].name,"description": "in thing: "+reply[i].name});
+                                if(reply[i].devices[j].name.toUpperCase() == deviceName.toUpperCase()) {
+                                    let attributeList=[];
+                                    for(let itt = 0;itt < reply[i].devices[j].deviceAttributes.length ;itt++) {
+                                        if(reply[i].devices[j].deviceAttributes[itt].actuator)
+                                            attributeList.push(reply[i].devices[j].deviceAttributes[itt].name + "-" + reply[i].devices[j].deviceAttributes[itt].type);
+                                    }
+                                    responseText.payload.google.systemIntent.data.listSelect.items.push({"optionInfo": {"key": ""+reply[i].devices[j].id},"title": ""+reply[i].devices[j].id+": "+reply[i].devices[j].name,"description": "in thing: "+reply[i].name+" with attributes ["+attributeList+"]"});
                                     deviceId = reply[i].devices[j].id;
                                     thingId = reply[i].id;
                                     deviceDetails = reply[i].devices[j];
@@ -899,7 +934,7 @@ exports.eYantraWebhook = (req, res) => {
             case "create.attribute" : {
                 responseText = Object.assign({},fulfillment["basic_response"]);
 
-                let apiInput = fulfillment[intent][objectType]["apiInput"];
+                let conversationId = findKey("conversationId", req.body);
                 let name = queryResult.parameters.name;
                 let type = queryResult.parameters.type;
                 let def = queryResult.parameters.defaultValue;
@@ -908,30 +943,75 @@ exports.eYantraWebhook = (req, res) => {
                 let ownerUnitId;
 
                 sendRequest(options,null,function(reply,statusCode){
-                    responseText = {"payload": {"google": {"expectUserResponse": true,"richResponse": {"items": [{"simpleResponse": {"textToSpeech": "Found multiple devices with name "+deviceName+", choose one ID to add "+name+" to it"}}],"suggestions": []},"systemIntent": {"intent": "actions.intent.OPTION","data": {"@type": "type.googleapis.com/google.actions.v2.OptionValueSpec","listSelect": {"items": []}}}}}};
+                    responseText.payload = {"google": {"expectUserResponse": true,"richResponse": {"items": [{"simpleResponse": {"textToSpeech": "Found multiple devices with name "+deviceName+", choose one ID to add "+name+" to it"}}],"suggestions": []},"systemIntent": {"intent": "actions.intent.OPTION","data": {"@type": "type.googleapis.com/google.actions.v2.OptionValueSpec","listSelect": {"items": []}}}}};
                     if(statusCode!= "200") {
                         responseText.fulfillmentText = "not authenticated !";
                     }
                     else {
+                        let deviceDetails = {};
                         for(let i=0;i<reply.length;i++) {
                             for(let j=0;j<reply[i].devices.length;j++) {
-                                if(reply[i].devices[j].name == deviceName) {
+                                if(reply[i].devices[j].name.toUpperCase() == deviceName.toUpperCase()) {
                                     responseText.payload.google.systemIntent.data.listSelect.items.push({"optionInfo": {"key": ""+reply[i].devices[j].id},"title": ""+reply[i].devices[j].id+": "+reply[i].devices[j].name,"description": "in thing: "+reply[i].name});
+                                    deviceDetails[""+reply[i].devices[j].id] = {"ownerUnitId" : reply[i].parentUnit.id};
+                                    parentDeviceId = reply[i].devices[j];
                                 }
                             }
                         }
+                        if(responseText.payload.google.systemIntent.data.listSelect.items.length > 1) {
+                            responseText.outputContexts = [{
+                                "name": "projects/"+fulfillment.project.projectID+"/agent/sessions/"+conversationId+"/contexts/action-id-by-name",
+                                "lifespanCount": 1,
+                                "parameters": {
+                                  "object" : "attribute",
+                                  "objectType" : "attribute",
+                                  "futureAction" : "createAttribute",
+                                  "attributeName" : name,
+                                  "type" : type,
+                                  "defaultValue" : def,
+                                  "deviceName" : deviceName,
+                                  "objectName" : "cron",
+                                  "deviceDetails" : JSON.stringify(deviceDetails)
+                                }
+                            }];
+                            res.status(200).send(JSON.stringify(responseText));
+                        }
                         if(responseText.payload.google.systemIntent.data.listSelect.items.length == 1) {
-                            let tmp = {"payload": {"google": {"expectUserResponse": true,"richResponse": {"items": [{"simpleResponse": {"textToSpeech": ""}},{"simpleResponse": {"textToSpeech": ""}}],"suggestions": []}}}};
-                            tmp.payload.google.richResponse.items[1].simpleResponse.textToSpeech = responseText.payload.google.systemIntent.data.listSelect.items[0].title;
-                            tmp.payload.google.richResponse.items[0].simpleResponse.textToSpeech = responseText.payload.google.systemIntent.data.listSelect.items[0].description;
-                            responseText = tmp;
+                            options = {
+                                "method": fulfillment["object.action-id-by-name"]["attribute"]["type"],
+                                "hostname": fulfillment["server"]["hostname"],
+                                "port": fulfillment["server"]["port"],
+                                "path":  fulfillment["object.action-id-by-name"]["attribute"]["endpoint"],
+                                "headers": {
+                                    "content-type": fulfillment["object.action-id-by-name"]["attribute"]["content_type"],
+                                    "cache-control": "no-cache",
+                                    "Cookie": "authorization=; authorization="+token
+                                }
+                            };
+                            let apiInput = Object.assign({},fulfillment["object.action-id-by-name"]["attribute"]["apiInput"]);
+                            apiInput.name = name;
+                            apiInput.type = type;
+                            apiInput.def = def;
+                            apiInput.parentDeviceId = parseInt(parentDeviceId);
+                            apiInput.ownerUnitId = parseInt(deviceDetails[""+parentDeviceId].ownerUnitId);
+
+                            sendRequest(options,null,function(reply,statusCode){
+                                responseText = Object.assign({},fulfillment["basic_response"]);
+                                if(statusCode!= "200") {
+                                    responseText.fulfillmentText = "not authenticated !";
+                                }
+                                else {
+                                    responseText.fulfillmentText = "done "+name+" added successfully!";
+                                }
+                                res.status(200).send(JSON.stringify(responseText));
+                            });
                         }
                         else if(responseText.payload.google.systemIntent.data.listSelect.items.length == 0) {
                             responseText = Object.assign({},fulfillment["basic_response"]);
                             responseText.fulfillmentText = "No devices found with name "+deviceName;
+                            res.status(200).send(JSON.stringify(responseText));
                         }
                     }
-                    res.status(200).send(JSON.stringify(responseText));
                 });
             }
             break;
@@ -1104,6 +1184,28 @@ exports.eYantraWebhook = (req, res) => {
                         });
                     }
                     break;
+                    case "cron": {
+                        sendRequest(options,null,function(reply,statusCode){
+                            var response;
+                            if(reply.length > 0) {
+                                for(var i = 0;i<reply.length;i++) {
+                                    responseText.payload.google.systemIntent.data.listSelect.items.push({"optionInfo": {"key": ""+objectType+": "+reply[i].id+reply[i].cronName},"title": reply[i].id + " - " + reply[i].cronName + " "+reply[i].cronExpression});
+                                }
+                                if(responseText.payload.google.systemIntent.data.listSelect.items.length == 1) {
+                                    let tmp = {"payload": {"google": {"expectUserResponse": true,"richResponse": {"items": [{"simpleResponse": {"textToSpeech": ""}},{"simpleResponse": {"textToSpeech": ""}}]}}}};
+                                    tmp.payload.google.richResponse.items[1].simpleResponse.textToSpeech = responseText.payload.google.systemIntent.data.listSelect.items[0].title;
+                                    tmp.payload.google.richResponse.items[0].simpleResponse.textToSpeech = "found only one "+objectType +" : ";
+                                    responseText = tmp;
+                                }
+                            }
+                            else {
+                                responseText = Object.assign({},fulfillment["basic_response"]);
+                                responseText.fulfillmentText = "No "+objectType+"s found! Try adding some...";
+                            }
+                            res.status(200).send(JSON.stringify(responseText));
+                        });
+                    }
+                    break;
                 }
             }
             break;
@@ -1123,7 +1225,7 @@ exports.eYantraWebhook = (req, res) => {
                             else {
                                 let tempIdList = [];
                                 for(let i=0;i<reply.length;i++) {
-                                    if(reply[i].name == name)
+                                    if(reply[i].name.toUpperCase() == name.toUpperCase())
                                         tempIdList.push(reply[i].id);
                                 }
                                 console.log(tempIdList);
@@ -1194,7 +1296,7 @@ exports.eYantraWebhook = (req, res) => {
                             else {
                                 let tempIdList = [];
                                 for(let i=0;i<reply.length;i++) {
-                                    if(reply[i].name == name)
+                                    if(reply[i].name.toUpperCase() == name.toUpperCase())
                                         tempIdList.push(reply[i].id);
                                 }
                                 console.log(tempIdList);
@@ -1267,7 +1369,7 @@ exports.eYantraWebhook = (req, res) => {
                                 console.log(616);
                                 for(let i=0;i<reply.length;i++) {
                                     console.log(reply[i].unitName+" "+name);
-                                    if(reply[i].unitName == name)
+                                    if(reply[i].unitName.toUpperCase() == name.toUpperCase())
                                         tempIdList.push(reply[i].id);
                                 }
                                 console.log("Matching "+tempIdList);
@@ -1334,7 +1436,7 @@ exports.eYantraWebhook = (req, res) => {
                             else {
                                 let tempIdList = [];
                                 for(let i=0;i<reply.length;i++) {
-                                    if(reply[i].name == name)
+                                    if(reply[i].name.toUpperCase() == name.toUpperCase())
                                         tempIdList.push(reply[i].id);
                                 }
                                 if(tempIdList.length > 1) {
@@ -1399,7 +1501,7 @@ exports.eYantraWebhook = (req, res) => {
                             else {
                                 let tempIdList = [];
                                 for(let i=0;i<reply.length;i++) {
-                                    if(reply[i].cronName == name)
+                                    if(reply[i].cronName.toUpperCase() == name.toUpperCase())
                                         tempIdList.push(reply[i].id);
                                 }
                                 console.log(tempIdList);
@@ -1480,9 +1582,9 @@ exports.eYantraWebhook = (req, res) => {
                         let tempAttributeList = [];
                         for(let i=0; i<reply.length; i++) {
                             for(let j=0; j<reply[i].devices.length; j++) {
-                                if(reply[i].devices[j].name == name) {
+                                if(reply[i].devices[j].name.toUpperCase() == name.toUpperCase()) {
                                     for(let k=0; k<reply[i].devices[j].deviceAttributes.length; k++) {
-                                        if(reply[i].devices[j].deviceAttributes[k].name == attribute) {
+                                        if(reply[i].devices[j].deviceAttributes[k].name.toUpperCase() == attribute.toUpperCase()) {
                                             tempAttributeList.push({"attributeID":reply[i].devices[j].deviceAttributes[k].id, "deviceID":reply[i].devices[j].id, "deviceName":reply[i].devices[j].name, "thingID":reply[i].id, "thingName":reply[i].name});
                                             break;
                                         }
@@ -1555,9 +1657,9 @@ exports.eYantraWebhook = (req, res) => {
                         let tempAttributeList = [];
                         for(let i=0; i<reply.length; i++) {
                             for(let j=0; j<reply[i].devices.length; j++) {
-                                if(reply[i].devices[j].name == name) {
+                                if(reply[i].devices[j].name.toUpperCase() == name.toUpperCase()) {
                                     for(let k=0; k<reply[i].devices[j].deviceAttributes.length; k++) {
-                                        if(reply[i].devices[j].deviceAttributes[k].name == attribute) {
+                                        if(reply[i].devices[j].deviceAttributes[k].name.toUpperCase() == attribute.toUpperCase()) {
                                             tempAttributeList.push({"attributeID":reply[i].devices[j].deviceAttributes[k].id, "deviceID":reply[i].devices[j].id, "deviceName":reply[i].devices[j].name, "thingID":reply[i].id, "thingName":reply[i].name});
                                             break;
                                         }
@@ -1774,7 +1876,7 @@ exports.eYantraWebhook = (req, res) => {
                                             for(let j=0; j<reply[i].devices.length; j++) {
                                                 if(reply[i].devices[j].id == id) {
                                                     for(let k=0; k<reply[i].devices[j].deviceAttributes.length; k++) {
-                                                        if(reply[i].devices[j].deviceAttributes[k].name == attribute) {
+                                                        if(reply[i].devices[j].deviceAttributes[k].name.toUpperCase() == attribute.toUpperCase()) {
                                                             tempAttributeList.push({"attributeID":reply[i].devices[j].deviceAttributes[k].id, "deviceID":reply[i].devices[j].id, "deviceName":reply[i].devices[j].name, "thingID":reply[i].id, "thingName":reply[i].name});
                                                             break;
                                                         }
@@ -1824,7 +1926,7 @@ exports.eYantraWebhook = (req, res) => {
                                             for(let j=0; j<reply[i].devices.length; j++) {
                                                 if(reply[i].devices[j].id == id) {
                                                     for(let k=0; k<reply[i].devices[j].deviceAttributes.length; k++) {
-                                                        if(reply[i].devices[j].deviceAttributes[k].name == attribute) {
+                                                        if(reply[i].devices[j].deviceAttributes[k].name.toUpperCase() == attribute.toUpperCase()) {
                                                             tempAttributeList.push({"attributeID":reply[i].devices[j].deviceAttributes[k].id, "deviceID":reply[i].devices[j].id, "deviceName":reply[i].devices[j].name, "thingID":reply[i].id, "thingName":reply[i].name});
                                                             break;
                                                         }
@@ -1922,6 +2024,44 @@ exports.eYantraWebhook = (req, res) => {
                         }
                     }
                     break;
+                    case "attribute" : {
+                        switch (futureAction) {
+                            case "createAttribute" : {
+                                let deviceDetails = JSON.parse(findKey("deviceDetails",queryResult.outputContexts));
+                                if(deviceDetails.hasOwnProperty(""+id)) {
+                                    let name = findKey("attributeName",queryResult.outputContexts);
+                                    let type = findKey("type",queryResult.outputContexts);
+                                    let def = findKey("defaultValue",queryResult.outputContexts);
+                                    let apiInput = Object.assign({},fulfillment[intent][objectType]["apiInput"]);
+                                    apiInput.name = name;
+                                    apiInput.type = type;
+                                    apiInput.def = def;
+                                    apiInput.parentDeviceId = id;
+                                    apiInput.ownerUnitId = parseInt(""+deviceDetails[""+id].ownerUnitId);
+                                    console.log(name + " "+type + " " + def + " " + options.path+ " "+ id+" "+apiInput.ownerUnitId);
+                                    sendRequest(options,apiInput,function(reply,statusCode){
+                                        responseText = Object.assign({},fulfillment["basic_response"]);
+                                        if(statusCode!= "200") {
+                                            console.log("failed");
+                                            responseText.fulfillmentText = "not authenticated !";
+                                        }
+                                        else {
+                                            console.log("success");
+                                            responseText.fulfillmentText = "done "+name+" added successfully!";
+                                        }
+                                        res.status(200).send(JSON.stringify(responseText));
+                                    });
+                                }
+                                else {
+                                    responseText = Object.assign({},fulfillment["basic_response"]);
+                                    responseText.fulfillmentText = "Sorry, that ID didn't match with specified device name!";
+                                    res.status(200).send(JSON.stringify(responseText));
+                                }
+                            }
+                            break;
+                        }
+                    }
+                    break;
                 }
             }
             break;
@@ -1934,7 +2074,7 @@ exports.eYantraWebhook = (req, res) => {
                         let name = queryResult.parameters.name;
                         sendRequest(options,null,function(reply,statusCode){
                             for(let i = 0;i<reply.length;i++) {
-                                if(reply[i].name == name) {
+                                if(reply[i].name.toUpperCase() == name.toUpperCase()) {
                                     let storageEnabled = "and storage not enabled.";
                                     if(reply[i].storageEnabled == true)
                                     storageEnabled = "and storage enabled.";
@@ -1959,7 +2099,7 @@ exports.eYantraWebhook = (req, res) => {
                         let name = queryResult.parameters.name;
                         sendRequest(options,null,function(reply,statusCode){
                             for(let i = 0;i<reply.length;i++) {
-                                if(reply[i].unitName == name) {
+                                if(reply[i].unitName.toUpperCase() == name.toUpperCase()) {
                                     responseText.payload.google.systemIntent.data.listSelect.items.push({"optionInfo": {"key": ""+objectType+": "+reply[i].id+reply[i].unitName},"title": "(ID:"+reply[i].id+")"+reply[i].unitName,"description": ""+reply[i].description});
                                 }
                             }
@@ -1981,7 +2121,7 @@ exports.eYantraWebhook = (req, res) => {
                         let name = queryResult.parameters.name;
                         sendRequest(options,null,function(reply,statusCode){
                             for(let i = 0;i<reply.length;i++) {
-                                if(reply[i].name == name) {
+                                if(reply[i].name.toUpperCase() == name.toUpperCase()) {
                                     responseText.payload.google.systemIntent.data.listSelect.items.push({"optionInfo": {"key": ""+objectType+": "+reply[i].id+reply[i].name},"title": "(ID:"+reply[i].id+")"+reply[i].name,"description": ""+reply[i].email});
                                 }
                             }
@@ -2004,7 +2144,7 @@ exports.eYantraWebhook = (req, res) => {
                         sendRequest(options,null,function(reply,statusCode){
 
                             for(let i = 0;i<reply.length;i++) {
-                                if(reply[i].name == name) {
+                                if(reply[i].name.toUpperCase() == name.toUpperCase()) {
                                     let storageEnabled = "and storage not enabled.";
                                     if(reply[i].storageEnabled == true)
                                         storageEnabled = "and storage enabled.";
@@ -2015,6 +2155,32 @@ exports.eYantraWebhook = (req, res) => {
                                 let tmp = {"payload": {"google": {"expectUserResponse": true,"richResponse": {"items": [{"simpleResponse": {"textToSpeech": ""}},{"simpleResponse": {"textToSpeech": ""}}]}}}};
                                 tmp.payload.google.richResponse.items[0].simpleResponse.textToSpeech = responseText.payload.google.systemIntent.data.listSelect.items[0].title;
                                 tmp.payload.google.richResponse.items[1].simpleResponse.textToSpeech = "Description: "+responseText.payload.google.systemIntent.data.listSelect.items[0].description=="" ? "device does not have description" :responseText.payload.google.systemIntent.data.listSelect.items[0].description;
+                                console.log(JSON.stringify(tmp));
+                                console.log(responseText.payload.google.systemIntent.data.listSelect.items[0].description=="" ? "device does not have description" :responseText.payload.google.systemIntent.data.listSelect.items[0].description);
+                                console.log(tmp.payload.google.richResponse.items[1].simpleResponse.textToSpeech);
+                                responseText = tmp;
+                            }
+                            else if(responseText.payload.google.systemIntent.data.listSelect.items.length == 0) {
+                                responseText = Object.assign({},fulfillment["basic_response"]);
+                                responseText.fulfillmentText = "No "+objectType+"s with name: "+name;
+                            }
+                            res.status(200).send(JSON.stringify(responseText));
+                        });
+                    }
+                    break;
+                    case "cron" :  {
+                        let name = queryResult.parameters.name;
+                        sendRequest(options,null,function(reply,statusCode){
+
+                            for(let i = 0;i<reply.length;i++) {
+                                if(reply[i].cronName.toUpperCase() == name.toUpperCase()) {
+                                    responseText.payload.google.systemIntent.data.listSelect.items.push({"optionInfo": {"key": ""+objectType+": "+reply[i].id+reply[i].name},"title": ""+reply[i].cronName+" (ID:"+reply[i].id+"): ","cronExpression":reply[i].cronExpression});
+                                }
+                            }
+                            if(responseText.payload.google.systemIntent.data.listSelect.items.length == 1) {
+                                let tmp = {"payload": {"google": {"expectUserResponse": true,"richResponse": {"items": [{"simpleResponse": {"textToSpeech": ""}},{"simpleResponse": {"textToSpeech": ""}}]}}}};
+                                tmp.payload.google.richResponse.items[0].simpleResponse.textToSpeech = responseText.payload.google.systemIntent.data.listSelect.items[0].title;
+                                tmp.payload.google.richResponse.items[1].simpleResponse.textToSpeech = "Description: "+responseText.payload.google.systemIntent.data.listSelect.items[0].cronExpression=="" ? "device does not have description" :responseText.payload.google.systemIntent.data.listSelect.items[0].cronExpression;
                                 console.log(JSON.stringify(tmp));
                                 console.log(responseText.payload.google.systemIntent.data.listSelect.items[0].description=="" ? "device does not have description" :responseText.payload.google.systemIntent.data.listSelect.items[0].description);
                                 console.log(tmp.payload.google.richResponse.items[1].simpleResponse.textToSpeech);
@@ -2278,7 +2444,7 @@ exports.eYantraWebhook = (req, res) => {
                     else {
                         let tempIdList = [];
                         for(let i=0;i<reply.length;i++) {
-                            if(reply[i].unitName == name)
+                            if(reply[i].unitName.toUpperCase() == name.toUpperCase())
                                 tempIdList.push(reply[i].id);
                         }
                         if(tempIdList.length > 1) {
@@ -2362,7 +2528,7 @@ exports.eYantraWebhook = (req, res) => {
                 let deviceDetails = JSON.parse(queryResult.parameters.deviceDetails);
                 let attribute = null;
                 for(let i=0;i<deviceDetails.deviceAttributes.length;i++) {
-                    if(deviceDetails.deviceAttributes[i].name == attributeName) {
+                    if(deviceDetails.deviceAttributes[i].name.toUpperCase() == attributeName.toUpperCase()) {
                         attribute = deviceDetails.deviceAttributes[i];
                         break;
                     }
