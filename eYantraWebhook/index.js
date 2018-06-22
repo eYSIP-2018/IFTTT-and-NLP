@@ -13,9 +13,9 @@ var fulfillment = {
         "followupEventInput": {}
     },
     "server" : {
-        "protocol" : "https",
-        "hostname" : "5ce664e9.ngrok.io",
-        "port" : null
+        "protocol" : "http",
+        "hostname" : "127.0.0.1",
+        "port" : 8002
     },
     "create.thing": {
         "thing" : {
@@ -954,7 +954,7 @@ exports.eYantraWebhook = (req, res) => {
                                 if(reply[i].devices[j].name.toUpperCase() == deviceName.toUpperCase()) {
                                     responseText.payload.google.systemIntent.data.listSelect.items.push({"optionInfo": {"key": ""+reply[i].devices[j].id},"title": ""+reply[i].devices[j].id+": "+reply[i].devices[j].name,"description": "in thing: "+reply[i].name});
                                     deviceDetails[""+reply[i].devices[j].id] = {"ownerUnitId" : reply[i].parentUnit.id};
-                                    parentDeviceId = reply[i].devices[j];
+                                    parentDeviceId = reply[i].devices[j].id;
                                 }
                             }
                         }
@@ -993,6 +993,7 @@ exports.eYantraWebhook = (req, res) => {
                             apiInput.type = type;
                             apiInput.def = def;
                             apiInput.parentDeviceId = parseInt(parentDeviceId);
+                            console.log("device Details " + JSON.stringify(deviceDetails )+ " " + JSON.stringify(parentDeviceId));
                             apiInput.ownerUnitId = parseInt(deviceDetails[""+parentDeviceId].ownerUnitId);
 
                             sendRequest(options,null,function(reply,statusCode){
@@ -2072,6 +2073,7 @@ exports.eYantraWebhook = (req, res) => {
                 switch(objectType) {
                     case "thing" : {
                         let name = queryResult.parameters.name;
+                        let thingId;
                         sendRequest(options,null,function(reply,statusCode){
                             for(let i = 0;i<reply.length;i++) {
                                 if(reply[i].name.toUpperCase() == name.toUpperCase()) {
@@ -2079,13 +2081,22 @@ exports.eYantraWebhook = (req, res) => {
                                     if(reply[i].storageEnabled == true)
                                     storageEnabled = "and storage enabled.";
                                     responseText.payload.google.systemIntent.data.listSelect.items.push({"optionInfo": {"key": ""+objectType+": "+reply[i].id+reply[i].name},"title": ""+reply[i].name+" (ID:"+reply[i].id+"): "+reply[i].description,"description": "Unit: "+reply[i].parentUnit.unitName+"(ID:"+reply[i].parentUnit.id+") The thing has "+reply[i].devices.length+" devices, "+reply[i].crons.length+" crons, "+reply[i].rules.length+"rules "+storageEnabled});
+                                    thingId = reply[i].id;
                                 }
                             }
                             if(responseText.payload.google.systemIntent.data.listSelect.items.length == 1) {
                                 let tmp = {"payload": {"google": {"expectUserResponse": true,"richResponse": {"items": [{"simpleResponse": {"textToSpeech": ""}},{"simpleResponse": {"textToSpeech": ""}}]}}}};
                                 tmp.payload.google.richResponse.items[0].simpleResponse.textToSpeech = responseText.payload.google.systemIntent.data.listSelect.items[0].title;
                                 tmp.payload.google.richResponse.items[1].simpleResponse.textToSpeech = responseText.payload.google.systemIntent.data.listSelect.items[0].description;
-                                responseText = tmp;
+                                responseText.payload = tmp.payload;
+                                responseText.outputContexts = [{
+                                    "name": "projects/"+fulfillment.project.projectID+"/agent/sessions/"+conversationId+"/contexts/object",
+                                    "lifespanCount": 5,
+                                    "parameters": {
+                                      "object" : "thing",
+                                      "id" : thingId
+                                    }
+                                }];
                             }
                             else if(responseText.payload.google.systemIntent.data.listSelect.items.length == 0) {
                                 responseText = Object.assign({},fulfillment["basic_response"]);
@@ -2097,17 +2108,27 @@ exports.eYantraWebhook = (req, res) => {
                     break;
                     case "unit" : {
                         let name = queryResult.parameters.name;
+                        let unitId;
                         sendRequest(options,null,function(reply,statusCode){
                             for(let i = 0;i<reply.length;i++) {
                                 if(reply[i].unitName.toUpperCase() == name.toUpperCase()) {
                                     responseText.payload.google.systemIntent.data.listSelect.items.push({"optionInfo": {"key": ""+objectType+": "+reply[i].id+reply[i].unitName},"title": "(ID:"+reply[i].id+")"+reply[i].unitName,"description": ""+reply[i].description});
+                                    unitId = reply[i].id;
                                 }
                             }
                             if(responseText.payload.google.systemIntent.data.listSelect.items.length == 1) {
                                 let tmp = {"payload": {"google": {"expectUserResponse": true,"richResponse": {"items": [{"simpleResponse": {"textToSpeech": ""}},{"simpleResponse": {"textToSpeech": ""}}]}}}};
                                 tmp.payload.google.richResponse.items[0].simpleResponse.textToSpeech = responseText.payload.google.systemIntent.data.listSelect.items[0].title;
                                 tmp.payload.google.richResponse.items[1].simpleResponse.textToSpeech = responseText.payload.google.systemIntent.data.listSelect.items[0].description;
-                                responseText = tmp;
+                                responseText.payload = tmp.payload;
+                                responseText.outputContexts = [{
+                                    "name": "projects/"+fulfillment.project.projectID+"/agent/sessions/"+conversationId+"/contexts/object",
+                                    "lifespanCount": 5,
+                                    "parameters": {
+                                      "object" : "unit",
+                                      "id" : unitId
+                                    }
+                                }];
                             }
                             else if(responseText.payload.google.systemIntent.data.listSelect.items.length == 0) {
                                 responseText = Object.assign({},fulfillment["basic_response"]);
@@ -2119,17 +2140,27 @@ exports.eYantraWebhook = (req, res) => {
                     break;
                     case "user" : {
                         let name = queryResult.parameters.name;
+                        let userId;
                         sendRequest(options,null,function(reply,statusCode){
                             for(let i = 0;i<reply.length;i++) {
                                 if(reply[i].name.toUpperCase() == name.toUpperCase()) {
                                     responseText.payload.google.systemIntent.data.listSelect.items.push({"optionInfo": {"key": ""+objectType+": "+reply[i].id+reply[i].name},"title": "(ID:"+reply[i].id+")"+reply[i].name,"description": ""+reply[i].email});
+                                    userId = reply[i].id;
                                 }
                             }
                             if(responseText.payload.google.systemIntent.data.listSelect.items.length == 1) {
                                 let tmp = {"payload": {"google": {"expectUserResponse": true,"richResponse": {"items": [{"simpleResponse": {"textToSpeech": ""}},{"simpleResponse": {"textToSpeech": ""}}]}}}};
                                 tmp.payload.google.richResponse.items[0].simpleResponse.textToSpeech = responseText.payload.google.systemIntent.data.listSelect.items[0].title;
                                 tmp.payload.google.richResponse.items[1].simpleResponse.textToSpeech = responseText.payload.google.systemIntent.data.listSelect.items[0].description;
-                                responseText = tmp;
+                                responseText.payload = tmp.payload;
+                                responseText.outputContexts = [{
+                                    "name": "projects/"+fulfillment.project.projectID+"/agent/sessions/"+conversationId+"/contexts/object",
+                                    "lifespanCount": 5,
+                                    "parameters": {
+                                      "object" : "user",
+                                      "id" : userId
+                                    }
+                                }];
                             }
                             else if(responseText.payload.google.systemIntent.data.listSelect.items.length == 0) {
                                 responseText = Object.assign({},fulfillment["basic_response"]);
@@ -2141,6 +2172,7 @@ exports.eYantraWebhook = (req, res) => {
                     break;
                     case "device" :  {
                         let name = queryResult.parameters.name;
+                        let deviceId;
                         sendRequest(options,null,function(reply,statusCode){
 
                             for(let i = 0;i<reply.length;i++) {
@@ -2149,16 +2181,25 @@ exports.eYantraWebhook = (req, res) => {
                                     if(reply[i].storageEnabled == true)
                                         storageEnabled = "and storage enabled.";
                                     responseText.payload.google.systemIntent.data.listSelect.items.push({"optionInfo": {"key": ""+objectType+": "+reply[i].id+reply[i].name},"title": ""+reply[i].name+" (ID:"+reply[i].id+"): ","description":reply[i].description});
+                                    deviceId = reply[i].id;
                                 }
                             }
                             if(responseText.payload.google.systemIntent.data.listSelect.items.length == 1) {
                                 let tmp = {"payload": {"google": {"expectUserResponse": true,"richResponse": {"items": [{"simpleResponse": {"textToSpeech": ""}},{"simpleResponse": {"textToSpeech": ""}}]}}}};
                                 tmp.payload.google.richResponse.items[0].simpleResponse.textToSpeech = responseText.payload.google.systemIntent.data.listSelect.items[0].title;
                                 tmp.payload.google.richResponse.items[1].simpleResponse.textToSpeech = "Description: "+responseText.payload.google.systemIntent.data.listSelect.items[0].description=="" ? "device does not have description" :responseText.payload.google.systemIntent.data.listSelect.items[0].description;
-                                console.log(JSON.stringify(tmp));
-                                console.log(responseText.payload.google.systemIntent.data.listSelect.items[0].description=="" ? "device does not have description" :responseText.payload.google.systemIntent.data.listSelect.items[0].description);
-                                console.log(tmp.payload.google.richResponse.items[1].simpleResponse.textToSpeech);
-                                responseText = tmp;
+                                //console.log(JSON.stringify(tmp));
+                                //console.log(responseText.payload.google.systemIntent.data.listSelect.items[0].description=="" ? "device does not have description" :responseText.payload.google.systemIntent.data.listSelect.items[0].description);
+                                //console.log(tmp.payload.google.richResponse.items[1].simpleResponse.textToSpeech);
+                                responseText.payload = tmp.payload;
+                                responseText.outputContexts = [{
+                                    "name": "projects/"+fulfillment.project.projectID+"/agent/sessions/"+conversationId+"/contexts/object",
+                                    "lifespanCount": 5,
+                                    "parameters": {
+                                      "object" : "device",
+                                      "id" : deviceId
+                                    }
+                                }];
                             }
                             else if(responseText.payload.google.systemIntent.data.listSelect.items.length == 0) {
                                 responseText = Object.assign({},fulfillment["basic_response"]);
@@ -2170,21 +2211,31 @@ exports.eYantraWebhook = (req, res) => {
                     break;
                     case "cron" :  {
                         let name = queryResult.parameters.name;
+                        let cronId;
                         sendRequest(options,null,function(reply,statusCode){
 
                             for(let i = 0;i<reply.length;i++) {
                                 if(reply[i].cronName.toUpperCase() == name.toUpperCase()) {
                                     responseText.payload.google.systemIntent.data.listSelect.items.push({"optionInfo": {"key": ""+objectType+": "+reply[i].id+reply[i].name},"title": ""+reply[i].cronName+" (ID:"+reply[i].id+"): ","cronExpression":reply[i].cronExpression});
+                                    cronId = reply[i].id;
                                 }
                             }
                             if(responseText.payload.google.systemIntent.data.listSelect.items.length == 1) {
                                 let tmp = {"payload": {"google": {"expectUserResponse": true,"richResponse": {"items": [{"simpleResponse": {"textToSpeech": ""}},{"simpleResponse": {"textToSpeech": ""}}]}}}};
                                 tmp.payload.google.richResponse.items[0].simpleResponse.textToSpeech = responseText.payload.google.systemIntent.data.listSelect.items[0].title;
                                 tmp.payload.google.richResponse.items[1].simpleResponse.textToSpeech = "Description: "+responseText.payload.google.systemIntent.data.listSelect.items[0].cronExpression=="" ? "device does not have description" :responseText.payload.google.systemIntent.data.listSelect.items[0].cronExpression;
-                                console.log(JSON.stringify(tmp));
-                                console.log(responseText.payload.google.systemIntent.data.listSelect.items[0].description=="" ? "device does not have description" :responseText.payload.google.systemIntent.data.listSelect.items[0].description);
-                                console.log(tmp.payload.google.richResponse.items[1].simpleResponse.textToSpeech);
-                                responseText = tmp;
+                                //console.log(JSON.stringify(tmp));
+                                //console.log(responseText.payload.google.systemIntent.data.listSelect.items[0].description=="" ? "device does not have description" :responseText.payload.google.systemIntent.data.listSelect.items[0].description);
+                                //console.log(tmp.payload.google.richResponse.items[1].simpleResponse.textToSpeech);
+                                responseText.payload = tmp.payload;
+                                responseText.outputContexts = [{
+                                    "name": "projects/"+fulfillment.project.projectID+"/agent/sessions/"+conversationId+"/contexts/object",
+                                    "lifespanCount": 5,
+                                    "parameters": {
+                                      "object" : "device",
+                                      "id" : cronId
+                                    }
+                                }];
                             }
                             else if(responseText.payload.google.systemIntent.data.listSelect.items.length == 0) {
                                 responseText = Object.assign({},fulfillment["basic_response"]);
@@ -2349,17 +2400,18 @@ exports.eYantraWebhook = (req, res) => {
                         let param = findKey("param",queryResult.parameters);
                         let id = findKey("id",queryResult.outputContexts);
                         options.path += ""+id;
+                        console.log(param + " "+id + " " + options.path);
                         sendRequest(options,null,function(reply,statusCode) {
                             responseText = Object.assign({},fulfillment["basic_response"]);
                             if(statusCode == "405")
                                 responseText.fulfillmentText = "not authenticated !";
                             else if(statusCode == "404")
                                 responseText.fulfillmentText = "Looks like something is not right... May be the "+objectType+" does not exsist!";
-                            else if(statusCode == "200")
+                            else if(statusCode == "200") {
                                 responseText.fulfillmentText = ""+param+" of the "+objectType+" is: "+reply[param];
                                 if(reply[param] == "")
                                     responseText.fulfillmentText = ""+param+" of the "+objectType+" is not set";
-                            else
+                            } else
                                 responseText.fulfillmentText = "Sorry! I failed to do that... Please try again";
                             res.status(200).send(JSON.stringify(responseText));
                         });
@@ -2375,11 +2427,11 @@ exports.eYantraWebhook = (req, res) => {
                                 responseText.fulfillmentText = "not authenticated !";
                             else if(statusCode == "404")
                                 responseText.fulfillmentText = "Looks like something is not right... May be the "+objectType+" does not exsist!";
-                            else if(statusCode == "200")
+                            else if(statusCode == "200") {
                                 responseText.fulfillmentText = ""+param+" of the "+objectType+" is: "+reply[param];
                                 if(reply[param] == "")
                                     responseText.fulfillmentText = ""+param+" of the "+objectType+" is not set";
-                            else
+                            } else
                                 responseText.fulfillmentText = "Sorry! I failed to do that... Please try again";
                             res.status(200).send(JSON.stringify(responseText));
                         });
@@ -2395,11 +2447,11 @@ exports.eYantraWebhook = (req, res) => {
                                 responseText.fulfillmentText = "not authenticated !";
                             else if(statusCode == "404")
                                 responseText.fulfillmentText = "Looks like something is not right... May be the "+objectType+" does not exsist!";
-                            else if(statusCode == "200")
+                            else if(statusCode == "200") {
                                 responseText.fulfillmentText = ""+param+" of the "+objectType+" is: "+reply[param];
                                 if(reply[param] == "")
                                     responseText.fulfillmentText = ""+param+" of the "+objectType+" is not set";
-                            else
+                            } else
                                 responseText.fulfillmentText = "Sorry! I failed to do that... Please try again";
                             res.status(200).send(JSON.stringify(responseText));
                         });
