@@ -14,6 +14,9 @@ import javax.ws.rs.core.MediaType;
 import java.util.List;
 import java.util.Set;
 
+import java.util.HashMap;
+import java.util.Map;
+import org.glassfish.jersey.server.mvc.Template;
 import org.kyantra.exceptionhandling.AccessDeniedException;
 import org.kyantra.dao.ThingDAO;
 import org.kyantra.dao.DeviceDAO;
@@ -124,7 +127,7 @@ public class BlocklyResource extends BaseResource {
             deviceJson +="\"attributes\" : [ ";
             List <DeviceAttributeBean> attributes = object.getDeviceAttributes();
             if(attributes.size() == 0) {
-                unitJson += "[]";
+                deviceJson += "[]";
             } else {
                 for(DeviceAttributeBean subObject : attributes) {
                     deviceJson+="[\""+subObject.getName()+"\",\""+subObject.getId()+","+subObject.getName()+"\"],";
@@ -138,5 +141,14 @@ public class BlocklyResource extends BaseResource {
 
         String finalJson = "{\"allUnits\":"+allUnitsJson+",\"unitsJson\":"+unitJson+",\"thingsJson\":"+thingJson+",\"devicesJson\":"+deviceJson+"}";
         return finalJson;
+    }
+
+    @GET
+    @Path("/createRule")
+    @Template(name = "/blockly/createRule.ftl")
+    @Session
+    public Map<String, Object> createRule() {
+        final Map<String, Object> map = new HashMap<String, Object>();
+        return map;
     }
 }
