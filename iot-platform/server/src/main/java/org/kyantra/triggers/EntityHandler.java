@@ -11,8 +11,11 @@ import org.hibernate.Session;
 
 import org.kyantra.dao.ThingDAO;
 import org.kyantra.dao.DeviceDAO;
+import org.kyantra.dao.DeviceAttributeDAO;
+import org.kyantra.dao.ConfigDAO;
 import org.kyantra.dao.UnitDAO;
 import org.kyantra.beans.ThingBean;
+import org.kyantra.beans.DeviceAttributeBean;
 import org.kyantra.beans.UnitBean;
 import org.kyantra.beans.UserBean;
 import org.kyantra.beans.DeviceBean;
@@ -28,18 +31,23 @@ public class EntityHandler {
         if(o instanceof DeviceBean) {
             DeviceBean deviceBean = (DeviceBean) o;
             parameters[0] = deviceBean.getName();
-            parameters[1] = "721f3bee-c6fd-442a-9f4f-0fe635039b90";
+            parameters[1] = ConfigDAO.getInstance().get("device").getValue();
             parameters[2] = deviceBean.getId().toString();
         } else if(o instanceof ThingBean) {
             ThingBean thingBean = (ThingBean) o;
             parameters[0] = thingBean.getName();
-            parameters[1] = "2d3bd045-d49d-460a-bc9f-70ddb1d11d98";
+            parameters[1] = ConfigDAO.getInstance().get("thing").getValue();
             parameters[2] = thingBean.getId().toString();
         } else if(o instanceof UnitBean) {
             UnitBean unitBean = (UnitBean) o;
             parameters[0] = unitBean.getUnitName();
-            parameters[1] = "b1d2f9ee-cfe6-4488-b5fa-74fc9d2ac07a";
+            parameters[1] = ConfigDAO.getInstance().get("unit").getValue();
             parameters[2] = unitBean.getId().toString();
+        } else if(o instanceof DeviceAttributeBean) {
+            DeviceAttributeBean deviceAttributeBean = (DeviceAttributeBean) o;
+            parameters[0] = deviceAttributeBean.getName();
+            parameters[1] = ConfigDAO.getInstance().get("deviceAttribute").getValue();
+            parameters[2] = deviceAttributeBean.getId().toString();
         } else {
             return null;
         }
@@ -134,6 +142,24 @@ public class EntityHandler {
                 }
             }
             return count == 1;
+        } else if(o instanceof DeviceAttributeBean) {
+            int count = 0;
+            int page = 0;
+            List <DeviceAttributeBean> objects = DeviceAttributeDAO.getInstance().list(page++,10);
+            while(! objects.isEmpty()) {
+                List <DeviceAttributeBean> objectsPage = DeviceAttributeDAO.getInstance().list(page,10);
+                if( objectsPage.size() == 0) {
+                    break;
+                }
+                objects.addAll(objectsPage);
+                page++;
+            }
+            for(DeviceAttributeBean object : objects) {
+                if(object.getName().equals(objectName)) {
+                    count++;
+                }
+            }
+            return count == 1;
         }
         return false;
     }
@@ -161,21 +187,27 @@ public class EntityHandler {
             String inputData =  "['" + objectName + "']";
             String output = requestFor(url,"DELETE",inputData);
             System.out.println(objectName + " deleted from dialogflow");
-            if(o instanceof ThingBean) {
-                Set<DeviceBean> devices = DeviceDAO.getInstance().getByThing(id);
-                for(DeviceBean deviceBean : devices){
-                    triggerDelete(deviceBean);
+            if(o instanceof DeviceBean) {
+                DeviceBean deviceBean = (DeviceBean) o;
+                List <DeviceAttributeBean> attributes = deviceBean.getDeviceAttributes();
+                for(DeviceAttributeBean deviceAttribute : attributes){
+                    triggerDelete(deviceAttribute);
+                }
+            } else if(o instanceof ThingBean) {
+                ThingBean thingBean = (ThingBean) o;
+                Set<DeviceBean> devices = thingBean.getDevices();
+                for(DeviceBean device : devices){
+                    triggerDelete(device);
                 }
             } else if (o instanceof UnitBean) {
                 UnitBean unitBean = (UnitBean) o;
-                List<UnitBean> units = unitBean.getSubunits();
+                List <UnitBean> units = unitBean.getSubunits();
                 for(UnitBean unit : units) {
                     triggerDelete(unit);
-                    int Uid = unit.getId();
-                    Set<ThingBean> things = ThingDAO.getInstance().getByUnitId(Uid);
-                    for(ThingBean thingBean : things){
-                        triggerDelete(thingBean);
-                    }
+                }
+                List <ThingBean> things = unitBean.getThings();
+                for(ThingBean thing : things){
+                    triggerDelete(thing);
                 }
             }
         }

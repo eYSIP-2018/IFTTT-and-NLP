@@ -154,4 +154,21 @@ public class CronDAO extends BaseDAO {
         session.close();
         return new HashSet<>(list);
     }
+
+    /**
+     * Returns list of all devices, page by page
+     * @param page
+     * @param limit
+     * @return
+     */
+    public List<CronBean> list(int page, int limit){
+        Session session = mService.getSessionFactory().openSession();
+        String ql = "from CronBean";
+        Query query = session.createQuery(ql);
+        query.setFirstResult(page*limit);
+        query.setMaxResults(limit);
+        List<CronBean> list = query.getResultList();
+        session.close();
+        return list;
+    }
 }

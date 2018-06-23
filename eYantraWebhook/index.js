@@ -14,8 +14,8 @@ var fulfillment = {
     },
     "server" : {
         "protocol" : "http",
-        "hostname" : "547d88df.ngrok.io",
-        "port" : null
+        "hostname" : "127.0.0.1",
+        "port" : 8002
     },
     "create.thing": {
         "thing" : {

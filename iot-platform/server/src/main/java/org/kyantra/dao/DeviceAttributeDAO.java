@@ -7,12 +7,12 @@ import org.kyantra.beans.DeviceAttributeBean;
 import org.kyantra.beans.DeviceBean;
 import org.kyantra.beans.ThingBean;
 import org.kyantra.beans.UnitBean;
+import org.kyantra.triggers.EntityHandler;
 
 import javax.persistence.Query;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
 /**
  * Created by Siddhesh Prabhugaonkar on 13-11-2017.
  */
@@ -31,6 +31,7 @@ public class DeviceAttributeDAO extends BaseDAO {
 
         session.getTransaction().commit();
         session.close();
+        EntityHandler.getInstance().triggerAdd(deviceAttributeBean);
         return deviceAttributeBean;
     }
 
@@ -76,6 +77,7 @@ public class DeviceAttributeDAO extends BaseDAO {
         Session session = getService().getSessionFactory().openSession();
         Transaction tx = session.beginTransaction();
         DeviceAttributeBean deviceAttribute = session.get(DeviceAttributeBean.class, id);
+        EntityHandler.getInstance().triggerDelete(deviceAttribute);
         // required by bidirectional one to many
         deviceAttribute.getParentDevice().removeDeviceAttribute(deviceAttribute);
 //        session.delete(deviceAttribute);
@@ -89,6 +91,8 @@ public class DeviceAttributeDAO extends BaseDAO {
         Session session = getService().getSessionFactory().openSession();
         Transaction tx = session.beginTransaction();
         DeviceAttributeBean deviceAttribute = session.get(DeviceAttributeBean.class, id);
+        String deviceAttributeNew = name;
+        EntityHandler.getInstance().triggerUpdate(deviceAttributeNew,deviceAttribute);
         deviceAttribute.setName(name);
         deviceAttribute.setType(type);
         deviceAttribute.setDef(def);
