@@ -151,4 +151,22 @@ public class BlocklyResource extends BaseResource {
         final Map<String, Object> map = new HashMap<String, Object>();
         return map;
     }
+
+    @GET
+    @Path("/createThen")
+    @Template(name = "/blockly/createThen.ftl")
+    @Session
+    public Map<String, Object> createThen() {
+        final Map<String, Object> map = new HashMap<String, Object>();
+        return map;
+    }
+
+    @GET
+    @Path("/createCron")
+    @Template(name = "/blockly/createCron.ftl")
+    @Session
+    public Map<String, Object> createCron() {
+        final Map<String, Object> map = new HashMap<String, Object>();
+        return map;
+    }
 }

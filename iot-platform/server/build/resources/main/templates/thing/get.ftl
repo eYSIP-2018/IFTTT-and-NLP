@@ -1,4 +1,5 @@
 <#include "../common/header.ftl">
+<#include "../blockly/blocklyHeader.ftl"/>
 <body>
 <#include "../common/navbar.ftl"/>
 <#include "../common/chatbot.ftl"/>
@@ -201,6 +202,8 @@
 <#include "../modals/crud_cron.ftl"/>
 <#include "../modals/generate.ftl"/>
 <#include "../modals/crud_rule.ftl"/>
+<#include "../modals/rule_if.ftl"/>
+<#include "../modals/rule_then.ftl"/>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
@@ -209,6 +212,7 @@
     var token = $.cookie("authorization");
     var userId = ${user.id};
     var thingId = ${thing.id};
+
     var app = new Vue({
         el: '#container-main',
         data: {
@@ -530,8 +534,8 @@
 
             // TODO: Clear all the inputs here
             "addCron": function () {
-
                 $("#create_cron").modal('show');
+                addBlocklyCron();
             },
 
             // "edit": function () {

@@ -1,5 +1,5 @@
 <div id='create_cron' class="modal" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Create a cron<img src="/static/img/ajax-loader.gif" v-if="saveLoader"> </h5>
@@ -7,8 +7,11 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <div class="modal-body">
-                <form>
+            <div class="modal-body" id="blocklyCronArea">
+                <div id="blocklyDivCron" style="height: 60vh; width: 100%;"></div>
+
+                <div id="cronXml" style="display:none;"></div>
+                <form style="display:none;">
                     <div class="form-group">
                         <label>Name:</label>
                         <input class="form-control" v-model="cronName" placeholder="Irrigation Pump Cron" type="text" name="cronName">

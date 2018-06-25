@@ -3,18 +3,24 @@
 <script src="/static/js/blockly/generators/javascript.js"></script>
 <script src="/static/js/blockly/blocks_compressed.js"></script>
 <script src="/static/js/blockly/msg/js/en.js"></script>
-<script src="/static/js/blockly/blocks/Rules.js"></script>
-<script src="/static/js/blockly/generators/javascript/Rules.js"></script>
+<script src="/static/js/blockly/blocks/AllBlocksJS.js"></script>
+<script src="/static/js/blockly/generators/javascript/AllBlocksGenerator.js"></script>
 
 <div id="blocklyDiv" style="height: 90%; width: 100%;"></div>
 
 <xml id="toolbox" style="display: none">
-    <block type="logic"></block>
+    <block type="condition"></block>
+    <block type="expression"></block>
     <block type="unit"></block>
     <block type="thing"></block>
     <block type="value"></block>
-    <block type="condition"></block>
-    <block type="expression"></block>
+    <block type="logic"></block>
+    <block type="then"></block>
+    <block type="sns"></block>
+    <block type="ddb"></block>
+    <block type="assignment"></block>
+    <block type="cron"></block>
+    <block type="cron_details"></block>
 </xml>
 
 <script>

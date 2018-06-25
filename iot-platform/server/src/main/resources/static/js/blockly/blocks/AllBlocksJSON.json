@@ -1,0 +1,391 @@
+[{
+  "type": "unit",
+  "message0": "UNIT %1 %2 %3",
+  "args0": [
+    {
+      "type": "input_dummy",
+      "align": "CENTRE"
+    },
+    {
+      "type": "field_dropdown",
+      "name": "units",
+      "options": [
+        [
+          "",
+          ""
+        ]
+      ]
+    },
+    {
+      "type": "input_value",
+      "name": "NAME",
+      "align": "CENTRE"
+    }
+  ],
+  "output": "unit",
+  "colour": 230,
+  "tooltip": "Unit",
+  "helpUrl": ""
+},
+{
+  "type": "thing",
+  "lastDummyAlign0": "CENTRE",
+  "message0": "Thing %1 %2 %3 Device %4 %5 %6 Attribute %7 %8",
+  "args0": [
+    {
+      "type": "input_dummy",
+      "align": "CENTRE"
+    },
+    {
+      "type": "field_dropdown",
+      "name": "things",
+      "options": [
+        [
+          "",
+          ""
+        ]
+      ]
+    },
+    {
+      "type": "input_dummy",
+      "align": "CENTRE"
+    },
+    {
+      "type": "input_dummy",
+      "align": "CENTRE"
+    },
+    {
+      "type": "field_dropdown",
+      "name": "devices",
+      "options": [
+        [
+          "",
+          ""
+        ]
+      ]
+    },
+    {
+      "type": "input_dummy",
+      "align": "CENTRE"
+    },
+    {
+      "type": "input_dummy",
+      "align": "CENTRE"
+    },
+    {
+      "type": "field_dropdown",
+      "name": "attributes",
+      "options": [
+        [
+          "",
+          ""
+        ]
+      ]
+    }
+  ],
+  "output": "thing",
+  "colour": 230,
+  "tooltip": "Thing, device & it's attribute",
+  "helpUrl": ""
+},
+{
+  "type": "value",
+  "message0": "%1",
+  "args0": [
+    {
+      "type": "field_input",
+      "name": "input",
+      "text": "?"
+    }
+  ],
+  "output": "value",
+  "colour": 230,
+  "tooltip": "Value",
+  "helpUrl": ""
+},
+{
+  "type": "condition",
+  "message0": "If... %1 %2",
+  "args0": [
+    {
+      "type": "input_dummy"
+    },
+    {
+      "type": "input_statement",
+      "name": "expression",
+      "check": [
+        "condition_top",
+        "expression"
+      ]
+    }
+  ],
+  "previousStatement": "condition_top",
+  "nextStatement": "condition_bottom",
+  "colour": 230,
+  "tooltip": "If... condition",
+  "helpUrl": ""
+},
+{
+  "type": "logic",
+  "lastDummyAlign0": "CENTRE",
+  "message0": "%1",
+  "args0": [
+    {
+      "type": "field_dropdown",
+      "name": "logic",
+      "options": [
+        [
+          "and",
+          "and"
+        ],
+        [
+          "or",
+          "or"
+        ]
+      ]
+    }
+  ],
+  "previousStatement": "condition_bottom",
+  "nextStatement": "condition_top",
+  "colour": 230,
+  "tooltip": "Logical operator",
+  "helpUrl": ""
+},
+{
+  "type": "expression",
+  "message0": "%1 %2 %3 %4",
+  "args0": [
+    {
+      "type": "input_value",
+      "name": "lvalue",
+      "check": "unit"
+    },
+    {
+      "type": "field_dropdown",
+      "name": "operator",
+      "options": [
+        [
+          "==",
+          "=="
+        ],
+        [
+          "!=",
+          "!="
+        ],
+        [
+          "<",
+          "<"
+        ],
+        [
+          "<=",
+          "<="
+        ],
+        [
+          ">",
+          ">"
+        ],
+        [
+          ">=",
+          ">="
+        ]
+      ]
+    },
+    {
+      "type": "input_dummy",
+      "align": "CENTRE"
+    },
+    {
+      "type": "input_value",
+      "name": "rvalue",
+      "check": "value"
+    }
+  ],
+  "inputsInline": true,
+  "previousStatement": "expression",
+  "colour": 230,
+  "tooltip": "Create expression",
+  "helpUrl": ""
+},
+{
+  "type": "cron",
+  "message0": "Create cron %1 Name : %2 %3 Cron : %4 %5 Desired state : %6 %7",
+  "args0": [
+    {
+      "type": "input_dummy"
+    },
+    {
+      "type": "field_input",
+      "name": "name",
+      "text": "Cron name"
+    },
+    {
+      "type": "input_dummy"
+    },
+    {
+      "type": "field_input",
+      "name": "cron_expression",
+      "text": "* * * * ? *"
+    },
+    {
+      "type": "input_dummy"
+    },
+    {
+      "type": "input_dummy"
+    },
+    {
+      "type": "input_statement",
+      "name": "desired_state",
+      "check": "assignment"
+    }
+  ],
+  "colour": 230,
+  "tooltip": "Create cron",
+  "helpUrl": ""
+},
+{
+  "type": "cron_details",
+  "lastDummyAlign0": "CENTRE",
+  "message0": "Device %1 %2 %3 Attribute %4 %5",
+  "args0": [
+    {
+      "type": "input_dummy",
+      "align": "CENTRE"
+    },
+    {
+      "type": "field_dropdown",
+      "name": "devices",
+      "options": [
+        [
+          "",
+          ""
+        ]
+      ]
+    },
+    {
+      "type": "input_dummy",
+      "align": "CENTRE"
+    },
+    {
+      "type": "input_dummy",
+      "align": "CENTRE"
+    },
+    {
+      "type": "field_dropdown",
+      "name": "attributes",
+      "options": [
+        [
+          "",
+          ""
+        ]
+      ]
+    }
+  ],
+  "output": "cron_details",
+  "colour": 230,
+  "tooltip": "Choose device and attribute",
+  "helpUrl": ""
+},
+{
+  "type": "assignment",
+  "message0": "%1 = %2 %3",
+  "args0": [
+    {
+      "type": "input_value",
+      "name": "lvalue",
+      "check": [
+        "unit",
+        "cron_details"
+      ],
+      "align": "CENTRE"
+    },
+    {
+      "type": "input_dummy",
+      "align": "CENTRE"
+    },
+    {
+      "type": "input_value",
+      "name": "rvalue",
+      "check": "value",
+      "align": "CENTRE"
+    }
+  ],
+  "inputsInline": true,
+  "previousStatement": "assignment",
+  "colour": 230,
+  "tooltip": "The assignment operation",
+  "helpUrl": ""
+},
+{
+  "type": "then",
+  "message0": "Then... %1 %2",
+  "args0": [
+    {
+      "type": "input_dummy"
+    },
+    {
+      "type": "input_statement",
+      "name": "then_type",
+      "check": [
+        "ddb",
+        "sns",
+        "assignment"
+      ]
+    }
+  ],
+  "colour": 230,
+  "tooltip": "Then statement",
+  "helpUrl": ""
+},
+{
+  "type": "ddb",
+  "message0": "DDB Rule",
+  "previousStatement": "ddb",
+  "colour": 230,
+  "tooltip": "DDB Rule",
+  "helpUrl": ""
+},
+{
+  "type": "sns",
+  "message0": "SNS Rule %1 Topic Name : %2 %3 SNS Subject : %4 %5 Message : %6 %7 Interval (in min) : %8",
+  "args0": [
+    {
+      "type": "input_dummy",
+      "align": "CENTRE"
+    },
+    {
+      "type": "field_input",
+      "name": "topic",
+      "text": "Topic Name"
+    },
+    {
+      "type": "input_dummy"
+    },
+    {
+      "type": "field_input",
+      "name": "subject",
+      "text": "SNS subject"
+    },
+    {
+      "type": "input_dummy"
+    },
+    {
+      "type": "field_input",
+      "name": "message",
+      "text": "Optional message"
+    },
+    {
+      "type": "input_dummy"
+    },
+    {
+      "type": "field_number",
+      "name": "interval",
+      "value": 15,
+      "min": 1,
+      "max": 60
+    }
+  ],
+  "previousStatement": "sns",
+  "colour": 230,
+  "tooltip": "Create SNS Rule",
+  "helpUrl": ""
+}]

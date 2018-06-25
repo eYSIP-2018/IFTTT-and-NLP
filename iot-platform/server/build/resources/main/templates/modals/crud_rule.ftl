@@ -19,32 +19,40 @@
                                        placeholder="temperature_rule">
                                 <small class="text-muted">Name of the rule will be prefixed with &lt;thing-id&gt;_&lt;rule-type&gt;</small>
                             </div>
+                            <div class="form-group" style="display:none;">
+                                <label>Data</label>
+                                <input value="*" name="data" type="text" class="form-control" v-model='createRule.data'
+                                       placeholder="e.g. * or state.reported.deviceXX.XX, ...">
+                            </div>
+                            <div>
+                                <label>If...</label>
+                                <div class="form-group row col-md-12" style="margin-right:0; margin-left:0; padding:0;">
+                                    <input id="ruleCondition" name="condition" type="text" class="col-md-10 form-control" style="border-top-right-radius:0;border-bottom-right-radius:0;" v-model='createRule.condition'
+                                           placeholder="e.g. where state.reported.deviceXX.XX > 50">
+                                   <button class="col-md-2 btn btn-secondary" style="border-top-left-radius:0;border-bottom-left-radius:0;" onclick="return showRuleIfModal(event);" v-if="ruleUpdate"><i class="fa fa-puzzle-piece" aria-hidden="true"></i></button>
+                                   <button class="col-md-2 btn btn-secondary" style="border-top-left-radius:0;border-bottom-left-radius:0;" onclick="return showRuleIfModal(event);" v-else><i class="fa fa-puzzle-piece" aria-hidden="true"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col">
                             <div class="form-group">
                                 <label>Description</label>
                                 <input name="description" type="text" class="form-control"
                                        v-model='createRule.description'
                                        placeholder="Rule to send notifications via SMS">
+                                <small class="text-muted">&nbsp;</small>
                             </div>
-                            <div class="form-group">
-                                <label>Data</label>
-                                <input name="data" type="text" class="form-control" v-model='createRule.data'
-                                       placeholder="e.g. * or state.reported.deviceXX.XX, ...">
+                            <div class="form-group" v-show="ruleUpdate == false">
+                                <label for="comment">Then...</label>
+                                <div class="form-group row col-md-12" style="margin-right:0; margin-left:0; padding:0;">
+                                    <select id="ruleThen" class="col-md-10 form-control combo-box" id="rightRoles" style="border-top-right-radius:0;border-bottom-right-radius:0;" v-model='createRule.action'>
+                                        <option v-for="action in ruleActionList" v-bind:value="action">{{action}}
+                                        </option>
+                                    </select>
+                                   <button class="col-md-2 btn btn-secondary" style="border-top-left-radius:0;border-bottom-left-radius:0;" onclick="return showRuleThenModal(event);"><i class="fa fa-puzzle-piece" aria-hidden="true"></i></button>
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <label>Condition(Optional)</label>
-                                <input name="condition" type="text" class="form-control" v-model='createRule.condition'
-                                       placeholder="e.g. where state.reported.deviceXX.XX > 50">
-                            </div>
-                        </div>
-                        <div class="col" v-show="ruleUpdate == false">
-                            <div class="form-group">
-                                <label for="comment">Type</label>
-                                <select class="form-control combo-box" id="rightRoles" v-model='createRule.action'>
-                                    <option v-for="action in ruleActionList" v-bind:value="action">{{action}}
-                                    </option>
-                                </select>
-                            </div>
-                            <template v-if="createRule.action == 'SNS'">
+                            <span style="display:none;">
                                 <div class="form-group">
                                     <label>SNS Topic</label>
                                     <input name="topic" type="text" class="form-control"
@@ -66,7 +74,7 @@
                                     <input type="number" class="form-control" v-model="createRule.interval"
                                            placeholder="20">
                                 </div>
-                            </template>
+                            </span>
                         </div>
                     </div>
                 </form>
