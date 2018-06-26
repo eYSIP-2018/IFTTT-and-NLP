@@ -117,6 +117,7 @@
                         <div v-else class="h3 pt-2 pb-2 text-center text-muted" v-else>No crons</div>
                     </div>
                     <div class="card-footer">
+                        <input id="cronXml" type="hidden">
                         <button v-on:click="addCron" class="btn btn-sm btn-primary">ADD CRON</button>
                         <#--<button v-on:click="deleteCron(cron)" class="btn btn-sm btn-default">EDIT</button>-->
                     </div>

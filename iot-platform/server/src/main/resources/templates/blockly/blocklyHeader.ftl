@@ -12,6 +12,8 @@
     var blocklyRuleThenInitialized = false;
     var blocklyCronInitialized = false;
     var workspaceCron = null;
+    var workspaceRuleIf = null;
+    var workspaceRuleThen = null;
 
     $(document).ready(function(){
         document.getElementById('ruleIfXml').innerHTML = '<xml id="toolboxRuleIf" style="display: none">\
@@ -51,6 +53,7 @@
         if(blocklyRuleIfInitialized)
             return false;
 
+
         $.ajax({
             url: "/blockly/getJson",
             dataType: "text",
@@ -58,8 +61,6 @@
                 startBlocklyRuleIf(data);
             }
         });
-
-        var workspaceRuleIf = null;
 
         function startBlocklyRuleIf(data) {
             blocklyRuleIfInitialized = true;
@@ -116,7 +117,7 @@
                 }
                 else if(actionEvent.type == "change") {
                     let block = workspaceRuleIf.getBlockById(actionEvent.blockId);
-                    if(block.type == "device_details") {
+                    if(block.type == "device_details" && actionEvent.name == "devices") {
                         let deviceName = block.getFieldValue("devices");
                         block.getField("attributes").menuGenerator_ = devicesJson[deviceName].attributes;
                         block.getField("attributes").setText("");
@@ -145,8 +146,6 @@
                 startBlocklyRuleThen(data);
             }
         });
-
-        var workspaceRuleThen = null;
 
         function startBlocklyRuleThen(data) {
             blocklyRuleThenInitialized = true;
@@ -283,8 +282,6 @@
             }
         });
 
-        workspaceCron = null;
-
         function startBlocklyCron(data) {
             blocklyCronInitialized = true;
             data = JSON.parse(data);
@@ -340,7 +337,7 @@
                 }
                 else if(actionEvent.type == "change") {
                     let block = workspaceCron.getBlockById(actionEvent.blockId);
-                    if(block.type == "cron_details") {
+                    if(block.type == "cron_details" && actionEvent.name == "devices") {
                         let deviceName = block.getFieldValue("devices");
                         block.getField("attributes").menuGenerator_ = devicesJson[deviceName].attributes;
                         block.getField("attributes").setText("");
@@ -349,5 +346,125 @@
                 }
             }
         }
+    }
+
+    function getIfCondition(parts) {
+    	let conStr;
+    	if(Array.isArray(parts) && parts.length%2==0) {
+    		return false;
+    	} else if(!Array.isArray(parts) ){
+    		// for logic operator
+    		let object = parts;
+    		return " "+object.logic+" ";
+    	} else if(parts.length == 1) {
+    		//any of condition part
+    		let condition = parts[0];
+    		let parameters = [condition.lvalue.device.split(",")[0]+"."+condition.lvalue.attribute.split(",")[0],condition.operator,condition.rvalue];
+    		return "(reported.device"+parameters[0] + parameters[1] + parameters[2]+")";
+    	} else {
+    		conStr = "(";
+    		for(let i=0;i<parts.length;i++) {
+    			conStr += getIfCondition(parts[i]);
+    		}
+    		conStr+=")"
+    		return conStr;
+    	}
+    }
+
+    function saveRuleIf() {
+        let code = Blockly.JavaScript.workspaceToCode(workspaceRuleIf);
+        code = JSON.parse(code);
+        code = getIfCondition(code);
+        document.getElementById("ruleCondition").value = code;
+
+        let xml = Blockly.Xml.workspaceToDom(workspaceRuleIf);
+        let xml_text = Blockly.Xml.domToText(xml);
+        document.getElementById("ruleIfXml").value = xml_text;
+    }
+
+    function getParameter(lValueObject) {
+    	let childDeviceId;
+    	let childAttributeId;
+    	let operator;
+    	let rvalue;
+    	while(true){
+    		if(lValueObject.hasOwnProperty('lvalue')) {
+    			rvalue = lValueObject.rvalue;
+    			operator = lValueObject.operator;
+    			lValueObject = lValueObject.lvalue.child;
+    		} else if(lValueObject.hasOwnProperty('child')) {
+    			lValueObject = lValueObject.child;
+    		} else {
+    			childDeviceId = lValueObject.device.split(",")[0];
+    			childAttributeId = lValueObject.attribute.split(",")[0];
+    			break;
+    		}
+    	}
+    	return [childDeviceId+"."+ childAttributeId,operator,rvalue];
+    }
+
+    function setDesiredState(parts){
+    	let deviceAttribute = getParameter(parts.deviceDetails)[0];
+    	console.log("desired.device" + deviceAttribute);
+        return "desired.device" + deviceAttribute;
+    }
+
+    function saveRuleThen() {
+        let code = Blockly.JavaScript.workspaceToCode(workspaceRuleThen);
+        code = JSON.parse(code);
+        if(code.type == "actuator") {
+            let actuatorAction = setDesiredState(parts);
+            console.log("actuatorAction "+ actuatorAction);
+        } else if(code.type == "SNS") {
+            $("#topic").val(code.name);
+            $("#subject").val(code.subject);
+            $("#message").val(code.message);
+            $("#interval").val(code.interval);
+        } else {
+            console.log("DDB");
+        }
+        let xml = Blockly.Xml.workspaceToDom(workspaceRuleThen);
+        let xml_text = Blockly.Xml.domToText(xml);
+        document.getElementById("ruleThenXml").value = xml_text;
+    }
+
+    function saveCron() {
+        let code = Blockly.JavaScript.workspaceToCode(workspaceCron);
+        code = JSON.parse(code);
+        let cronName = code.name;
+        let cronExpression = code.cron;
+        let deviceName = code.deviceDetails.device.split(",")[1];
+        let attributeName  = code.deviceDetails.attribute.split(",")[1];
+        let newValue = code.newValue;
+
+        let cronDevice = document.getElementById("cronDevice");
+        let flagDevice = false;
+        for(let i=0;i<cronDevice.children.length;i++) {
+            if(cronDevice.children[i].text == deviceName) {
+                //setting option to select
+                cronDevice.value = cronDevice.children[i].value;
+                flagDevice = true;
+                break;
+            }
+        }
+        if(flagDevice){
+            let cronAttribute = document.getElementById("cronAttribute");
+            let flagAttribute = false;
+            for(let i=0;i<cronAttribute.children.length;i++) {
+                if(cronAttribute.children[i].text == attributeName) {
+                    //setting option to select
+                    cronAttribute.value = cronAttribute.children[i].value;
+                    flagAttribute = true;
+                    break;
+                }
+            }
+            if(flagAttribute){
+                document.getElementById("cronAttributeValue").value = newValue;
+                let xml = Blockly.Xml.workspaceToDom(workspaceCron);
+                let xml_text = Blockly.Xml.domToText(xml);
+                document.getElementById("cronXml").value = xml_text;
+            }
+        }
+        alert("error");
     }
 </script>
