@@ -1,0 +1,192 @@
+\documentclass[10pt, a4paper]{beamer}
+
+\usepackage{graphicx}
+
+\usetheme{Berkeley}
+\usecolortheme{sidebartab}
+
+\begin{document}
+	\setbeamertemplate{sidebar left}{}
+	\title{Progress Presentation-I}
+	\subtitle{e-Yantra Summer Internship-2018
+	\vspace{0.1cm}
+	\\ eYISA
+	\\\&
+	\\IFTTT for IOT}
+	\author{
+		\begin{minipage}[b]{0.40\textwidth}
+			\raggedleft
+			\hspace{2.2cm}
+			Team:
+			\newline
+			\vspace{0.28cm}
+			\\\hspace{1.95cm}Mentors:
+			\newline\\\vspace{0.45cm}
+		\end{minipage}%
+		\begin{minipage}[b]{0.60\textwidth}
+			\raggedright
+			Onkar J. Sathe
+			\\Rohit G. Rathi			
+			\vspace{0.3cm}
+			\\Omkar Manjrekar
+			\\Vikrant Fernandes
+			\\Deepa Avudiappan
+		\end{minipage}%
+	}
+	\institute{IIT Bombay}
+	\date{\today}
+	%\addtobeamertemplate{sidebar left}{}{\includegraphics[scale = 0.3]{logowithtext.png}}
+	\frame{\titlepage}
+
+\setbeamertemplate{sidebar left}[sidebar theme]
+\section{Overview of Project}
+\begin{frame}{Overview of Project}
+	eYISA:
+	\begin{itemize}
+		\item Objective
+		\begin{enumerate}	
+			\item Building a NLP based assistant to access eYantra IOT platform  through text and voice control over the Web portal and through Google Assistant!
+			\item Devloping flexible block based GUI for IFTTT rules as an alternative to conventional ways of writing rules using code/SQL.
+		\end{enumerate}
+		\item Deliverables 
+		\begin{enumerate}
+			\item The assistant should at least be able to perform all the frequent queries that take place on IoT platform.
+			\item User should see device data in the chat interface itself.
+			\item A web chatbot interface to be integrated with IoT Platform
+			\item Validations of IFTTT rules with minimization of Lambda functions.
+			\item Final application should show CRON rules being implemented for irrigation.
+		\end{enumerate}
+	\end{itemize}
+\end{frame}
+
+\section{Overview of Task}
+\begin{frame}{Overview of Task}
+   % Please add the following required packages to your document preamble:
+% \usepackage{graphicx}
+\begin{table}[]
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|c|c|c|}
+\hline
+Task.no & Task & Deadline \\ \hline
+1 & Understanding e-Yantra IoT Platform and its APIs & 2 days \\ \hline
+2 & \begin{tabular}[c]{@{}c@{}}
+Getting familiar with Dialogflow and \\ required programming languages\end{tabular} & 3 days \\ \hline
+3 & \begin{tabular}[c]{@{}c@{}}Gathering phrases to train the agent.
+\end{tabular} & 3 days \\ \hline
+4 & \begin{tabular}[c]{@{}c@{}}Adding entities and intents 
+\end{tabular} & 3 days \\ \hline
+5 & \begin{tabular}[c]{@{}c@{}}
+Take actions on the output of phrases\\ returned by API properly and ask for\\ missing information if any
+\end{tabular} & 2 day \\ \hline
+6 & \begin{tabular}[c]{@{}c@{}}
+Testing this and the speech interface\\ and retraing on more examples if required.\end{tabular} & 3 days \\ \hline
+\end{tabular}%
+}
+\end{table}
+\end{frame}
+
+\begin{frame}{}
+
+% Please add the following required packages to your document preamble:
+% \usepackage{graphicx}
+\begin{table}[]
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|c|c|c|}
+\hline
+Task.no & Task & Deadline \\ \hline
+7 & \begin{tabular}[c]{@{}c@{}}
+Develop a proper web interface to \\
+be integrable with IoT platform \\ designing throughout the website.\end{tabular} & 2 days \\ \hline
+8 & \begin{tabular}[c]{@{}c@{}}
+Integration with E-Yantra platform \\
+and a demo application \\ \end{tabular} & 1 day \\ \hline
+9 & \begin{tabular}[c]{@{}c@{}}
+Learning VueJs and component designing \end{tabular} & 4 day \\ \hline
+10 & \begin{tabular}[c]{@{}c@{}}
+Designing algorithm for converting UI bloks\\ to lambda code with loose coupling
+\end{tabular} & 4 days \\ \hline
+11 & \begin{tabular}[c]{@{}c@{}}
+Testing and improving efficiency
+\end{tabular} & 1 days \\ \hline
+12 & \begin{tabular}[c]{@{}c@{}}
+Documentation
+\end{tabular} & 2 days \\ \hline
+\end{tabular}%
+}
+\end{table}
+\end{frame}
+
+\section{Tasks Accomplished}
+\begin{frame}{What we have done so far...}
+	\begin{itemize}
+		\item Understanding eYantra IoT Platform \& its APIs, DialogFlow and AWS-IoT
+		\newline
+		\item Teaching the assistant to talk \& listen and Webhook in JavaScript
+		\newline
+		\item Integrating the IoT assistant with Google Assistant
+		\newline
+		\item Implemented secure OAuth2 token authentication
+		\newline
+		\item Successfully handled ESP-DHT through assistant (accessing sensor data and changing the LED state)
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{What we have done so far...}
+	\begin{minipage}[b]{0.55\textwidth}
+		\raggedright
+		\begin{itemize}
+			\item Integrating the assitant in IoT platform's website with chatbot UI
+			\newline\\\vspace{0.2cm}
+			\item Making the assistant dynamic enough to handle variety of devices \& sensors with their properties
+			\newline\\\vspace{0.2cm}
+			\item Assistant will be able to handle other complex commands on IoT platform like Crons from natural language.
+		\end{itemize}
+		\vspace{0.3cm}
+	\end{minipage}%
+	\begin{minipage}[b]{0.45\textwidth}
+		\centering
+		\includegraphics[totalheight=6cm]{assistant.png}
+	\end{minipage}%
+\end{frame}
+
+\begin{frame}{What we have done so far...}
+	\begin{itemize}
+		\item Learning about Blockly and it's alternatives
+		\item Creating block based GUI fot IF-This-Then-That Rules on IoT platform and covertig them to JSON for validation
+		\newline\\\vspace{0.3cm}				
+	\end{itemize}
+	\includegraphics[totalheight=4cm]{architecture.png}
+	\vspace{0.3cm}
+	\\\centerline{Flow of the IoT Assistant}
+\end{frame}
+
+\section{Challenges Faced}
+\begin{frame}{Challenges faced and How we solved them...}
+	\begin{itemize}
+		\item Making the assistant to be able to handle variety of devices and sensors
+		\newline
+		\item Conveting normal english phrases to Cron Expressions
+		\newline
+		\hspace{4cm} - After looking at all the available libraries we decided to build our own JavaScript Library (natural-cron.js)
+	\end{itemize}
+\end{frame}
+
+\section{Future Plans}
+\begin{frame}{Future Plans}
+	\begin{itemize}
+		\item Completing remaining Blockly GUI with save \& restore features and integrating it with iot-platform
+		\newline\\
+		\item Validating and converting generated JSON to valid JavaScript code for AWS Lambda
+		\newline\\
+		\item Testing assistant, crons and blockly and keep improving the efficiency
+		\newline\\
+		\item Well commented code \& documentation
+	\end{itemize}
+\end{frame}
+
+
+\section{Thank You}
+\begin{frame}{Thank You}
+	\centering Thank You...
+\end{frame}
+\end{document}
