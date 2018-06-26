@@ -209,6 +209,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
 <script src="/static/js/app.js"></script>
 <script>
+    // TODO: Cannot delete form item in device
+    // TODO: Bug for device with no name; Validation needed
     var token = $.cookie("authorization");
     var userId = ${user.id};
     var thingId = ${thing.id};
@@ -527,7 +529,7 @@
                         console.log(data);
                         that.ruleActionList = data;
                     }
-                })
+                });
                 that.getCrons();
 
             },
@@ -649,7 +651,7 @@
             "saveDevice": function () {
                 var that = this;
                 this.saveLoader = true;
-                that.createDevice.ownerUnitId = that.thing.parentUnit.id;
+                that.createDevice.ownerUnitId = that.thing.parentUnitId;
                 that.createDevice.parentThingId = that.thing.id;
                 if (this.createDevice.id) {
                     $.ajax({

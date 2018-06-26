@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 
 @Entity
-@Table(name = "blockly")//, uniqueConstraints = @UniqueConstraint(columnNames={"data", "topic"}))
+@Table(name = "blockly")
 public class BlocklyBean {
 
     @Id

@@ -2,14 +2,13 @@ package org.kyantra.dao;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.kyantra.beans.RightsBean;
-import org.kyantra.beans.RoleEnum;
-import org.kyantra.beans.ThingBean;
-import org.kyantra.beans.UnitBean;
-import org.kyantra.beans.UserBean;
+import org.kyantra.beans.BlocklyBean;
 import org.springframework.jmx.export.notification.UnableToSendNotificationException;
 
 import javax.persistence.Query;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -60,7 +59,7 @@ public class BlocklyDAO extends BaseDAO{
         return blockly;
     }
 
-    public RuleBean getByBlockIdAndType(int blockId, String blockType) {
+    /*public BlocklyBean getByBlockIdAndType(int blockId, String blockType) {
         Session session = getService().getSessionFactory().openSession();
 
         CriteriaBuilder builder = session.getCriteriaBuilder();
@@ -73,6 +72,15 @@ public class BlocklyDAO extends BaseDAO{
         Query query = session.createQuery(criteria);
         BlocklyBean blocklyBean = (BlocklyBean) query.getSingleResult();
 
+        session.close();
+        return blocklyBean;
+    }*/
+
+    public BlocklyBean getByBlockIdAndType(int blockId, String blockType) {
+        Session session = getService().getSessionFactory().openSession();
+        String ql = "from BlocklyBean where blockId="+blockId +" and blockType="+blockType;
+        Query query = session.createQuery(ql);
+        BlocklyBean blocklyBean = (BlocklyBean) query.getResultList();
         session.close();
         return blocklyBean;
     }

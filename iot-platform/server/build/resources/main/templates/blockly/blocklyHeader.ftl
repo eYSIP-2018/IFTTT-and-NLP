@@ -16,8 +16,7 @@
         document.getElementById('ruleIfXml').innerHTML = '<xml id="toolboxRuleIf" style="display: none">\
             <block type="condition"></block>\
             <block type="expression"></block>\
-            <block type="unit"></block>\
-            <block type="thing"></block>\
+            <block type="cron_details"></block>\
             <block type="value"></block>\
             <block type="logic"></block>\
         </xml>';

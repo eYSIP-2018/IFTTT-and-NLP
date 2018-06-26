@@ -82,7 +82,7 @@ Blockly.Blocks['logic'] = {
 Blockly.Blocks['expression'] = {
   init: function() {
     this.appendValueInput("lvalue")
-        .setCheck("unit");
+        .setCheck("cron_details");
     this.appendDummyInput()
         .setAlign(Blockly.ALIGN_CENTRE)
         .appendField(new Blockly.FieldDropdown([["==","=="], ["!=","!="], ["<","<"], ["<=","<="], [">",">"], [">=",">="]]), "operator");
