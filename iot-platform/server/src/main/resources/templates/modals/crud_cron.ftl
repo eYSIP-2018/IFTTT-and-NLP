@@ -1,4 +1,4 @@
-<div id='create_cron' class="modal" tabindex="-1" role="dialog">
+<div id='create_cron' class="modal" role="dialog">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">

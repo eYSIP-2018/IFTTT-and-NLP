@@ -21,7 +21,8 @@
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header">
-                        {{ thing.name }}
+                        <span>(<span id="thingId">{{ thing.id }}</span>) | </span>
+                        <span id="thingName">{{ thing.name }}</span>
                         <div class="float-right">
                             <div class="row clearfix">
                                 <img src="/static/img/ajax-loader.gif" v-if="saveLoaderStorage">
@@ -570,7 +571,7 @@
             },
 
             "saveCron": function () {
-
+                console.log("this:"+JSON.stringify(this.cronDevice));
                 var that = this;
                 that.saveLoader = true;
                 var desired = {};

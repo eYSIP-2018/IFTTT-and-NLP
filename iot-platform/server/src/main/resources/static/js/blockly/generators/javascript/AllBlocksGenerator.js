@@ -86,6 +86,13 @@ Blockly.JavaScript['cron_details'] = function(block) {
   return [code, Blockly.JavaScript.ORDER_NONE];
 };
 
+Blockly.JavaScript['device_details'] = function(block) {
+  var dropdown_devices = block.getFieldValue('devices');
+  var dropdown_attributes = block.getFieldValue('attributes');
+  var code = '{\"device\":\"'+dropdown_devices+'\",\"attribute\":\"'+dropdown_attributes+'\"}';
+  return [code, Blockly.JavaScript.ORDER_NONE];
+};
+
 Blockly.JavaScript['assignment'] = function(block) {
     var value_lvalue = Blockly.JavaScript.valueToCode(block, 'lvalue', Blockly.JavaScript.ORDER_ATOMIC);
     var value_rvalue = Blockly.JavaScript.valueToCode(block, 'rvalue', Blockly.JavaScript.ORDER_ATOMIC);

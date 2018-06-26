@@ -11,12 +11,13 @@
     var blocklyRuleIfInitialized = false;
     var blocklyRuleThenInitialized = false;
     var blocklyCronInitialized = false;
+    var workspaceCron = null;
 
     $(document).ready(function(){
         document.getElementById('ruleIfXml').innerHTML = '<xml id="toolboxRuleIf" style="display: none">\
             <block type="condition"></block>\
             <block type="expression"></block>\
-            <block type="cron_details"></block>\
+            <block type="device_details"></block>\
             <block type="value"></block>\
             <block type="logic"></block>\
         </xml>';
@@ -64,9 +65,10 @@
             blocklyRuleIfInitialized = true;
             data = JSON.parse(data);
 
-            var allUnits = data.allUnits;
-            var unitsJson = data.unitsJson;
-            var thingsJson = data.thingsJson;
+            let thingName = document.getElementById('thingId').innerHTML;
+            thingName += ','+document.getElementById('thingName').innerHTML;
+
+            var allDevices = data.thingsJson[thingName].devices;
             var devicesJson = data.devicesJson;
 
             var optionsRuleIf = {
@@ -94,89 +96,31 @@
                 }
             };
 
-            /* Inject your workspace */
+            /* Inject IF workspace */
             workspaceRuleIf = Blockly.inject("blocklyDivRuleIf", optionsRuleIf);
             workspaceRuleIf.addChangeListener(actionEventListener);
-            function setField(currentBlock,currentType) {
-                if(currentType == "things") {
-                    let thingName = currentBlock.getFieldValue("things");
-                    currentBlock.getField("devices").menuGenerator_ = thingsJson[thingName].devices;
-                    currentBlock.getField("devices").setText("");
-                    currentBlock.getField("devices").setValue("");
-                    setField(currentBlock,"devices");
-                } else if(currentType == "devices") {
-                    let deviceName = currentBlock.getFieldValue("devices");
-                    currentBlock.getField("attributes").menuGenerator_ = devicesJson[deviceName].attributes;
-                    currentBlock.getField("attributes").setText("");
-                    currentBlock.getField("attributes").setValue("");
-                }
-            }
-
-            function setDropDownOptions(parentBlock,currentBlock) {
-                if(!currentBlock.hasOwnProperty("type")) {
-                    return ;
-                }
-                if(currentBlock.type =="unit") {
-                    if(parentBlock != null && parentBlock.type == "unit") {
-                        let parentUnitName = parentBlock.getFieldValue("units");
-                        if(unitsJson.hasOwnProperty(parentUnitName)) {
-                            let dropDown = currentBlock.getField("units");
-                            dropDown.menuGenerator_ = unitsJson[parentUnitName].subunits;
-                            dropDown.setText("");
-                            dropDown.setValue("");
-                        } else {
-                            let dropDown = currentBlock.getField("units");
-                            dropDown.menuGenerator_ = [];
-                            dropDown.setText("");
-                            dropDown.setValue("");
-                        }
-                    } else if(parentBlock == null) {
-                        let dropdown = currentBlock.getField("units");
-                        dropdown.menuGenerator_ = allUnits;
-                        dropdown.setText(allUnits[0][0]);
-                        dropdown.setValue(allUnits[0][1]);
-                        return;
-                    }
-                } else if(currentBlock.type == "thing") {
-                    if(parentBlock != null) {
-                        let parentUnitName = parentBlock.getFieldValue("units");
-                        if(unitsJson.hasOwnProperty(parentUnitName)) {
-                            let dropDown = currentBlock.getField("things");
-                            dropDown.menuGenerator_ = unitsJson[parentUnitName].things;
-                            dropDown.setText("");
-                            dropDown.setValue("");
-                        }
-                        setField(currentBlock,"things");
-                    }
-                }
-                if(parentBlock!=null && (parentBlock.type=="unit" || parentBlock.type=="thing")) {
-                    let children = currentBlock.getChildren();
-                    if(children.length != 0) {
-                        setDropDownOptions(currentBlock, children[0]);
-                    }
-                }
-            }
 
             function actionEventListener(actionEvent) {
                 let allBlocks = workspaceRuleIf.getAllBlocks();
                 if(actionEvent.type == "create") {
                     let block = workspaceRuleIf.getBlockById(actionEvent.blockId);
-                    if(block.type == "unit") {
-                        let dropdown = block.getField("units");
-                        dropdown.menuGenerator_ = allUnits;
-                        dropdown.setText(allUnits[0][0]);
-                        dropdown.setValue(allUnits[0][1]);
+                    if(block.type == "device_details") {
+                        let dropdown = block.getField("devices");
+                        dropdown.menuGenerator_ = allDevices;
+                        dropdown.setText(allDevices[0][0]);
+                        dropdown.setValue(allDevices[0][1]);
+                        block.getField("attributes").menuGenerator_ = devicesJson[allDevices[0][1]].attributes;
+                        block.getField("attributes").setText("");
+                        block.getField("attributes").setValue("");
                     }
                 }
-                if(actionEvent.type=="move" && actionEvent.oldParentId!=actionEvent.newParentId) {
+                else if(actionEvent.type == "change") {
                     let block = workspaceRuleIf.getBlockById(actionEvent.blockId);
-                    setDropDownOptions(block.getParent(), block);
-                } else if(actionEvent.type == "change") {
-                    let block = workspaceRuleIf.getBlockById(actionEvent.blockId);
-                    if(block.getChildren().length > 0)
-                        setDropDownOptions(block, block.getChildren()[0]);
-                    else if(block.type == "thing") {
-                        setField(block,actionEvent.name);
+                    if(block.type == "device_details") {
+                        let deviceName = block.getFieldValue("devices");
+                        block.getField("attributes").menuGenerator_ = devicesJson[deviceName].attributes;
+                        block.getField("attributes").setText("");
+                        block.getField("attributes").setValue("");
                     }
                 }
             }
@@ -339,15 +283,16 @@
             }
         });
 
-        var workspaceCron = null;
+        workspaceCron = null;
 
         function startBlocklyCron(data) {
             blocklyCronInitialized = true;
             data = JSON.parse(data);
 
-            var allUnits = data.allUnits;
-            var unitsJson = data.unitsJson;
-            var thingsJson = data.thingsJson;
+            let thingName = document.getElementById('thingId').innerHTML;
+            thingName += ','+document.getElementById('thingName').innerHTML;
+
+            var allDevices = data.thingsJson[thingName].devices;
             var devicesJson = data.devicesJson;
 
             var optionsCron = {
@@ -378,86 +323,28 @@
             /* Inject your workspace */
             workspaceCron = Blockly.inject("blocklyDivCron", optionsCron);
             workspaceCron.addChangeListener(actionEventListener);
-            function setField(currentBlock,currentType) {
-                if(currentType == "things") {
-                    let thingName = currentBlock.getFieldValue("things");
-                    currentBlock.getField("devices").menuGenerator_ = thingsJson[thingName].devices;
-                    currentBlock.getField("devices").setText("");
-                    currentBlock.getField("devices").setValue("");
-                    setField(currentBlock,"devices");
-                } else if(currentType == "devices") {
-                    let deviceName = currentBlock.getFieldValue("devices");
-                    currentBlock.getField("attributes").menuGenerator_ = devicesJson[deviceName].attributes;
-                    currentBlock.getField("attributes").setText("");
-                    currentBlock.getField("attributes").setValue("");
-                }
-            }
-
-            function setDropDownOptions(parentBlock,currentBlock) {
-                if(!currentBlock.hasOwnProperty("type")) {
-                    return ;
-                }
-                if(currentBlock.type =="unit") {
-                    if(parentBlock != null && parentBlock.type == "unit") {
-                        let parentUnitName = parentBlock.getFieldValue("units");
-                        if(unitsJson.hasOwnProperty(parentUnitName)) {
-                            let dropDown = currentBlock.getField("units");
-                            dropDown.menuGenerator_ = unitsJson[parentUnitName].subunits;
-                            dropDown.setText("");
-                            dropDown.setValue("");
-                        } else {
-                            let dropDown = currentBlock.getField("units");
-                            dropDown.menuGenerator_ = [];
-                            dropDown.setText("");
-                            dropDown.setValue("");
-                        }
-                    } else if(parentBlock == null) {
-                        let dropdown = currentBlock.getField("units");
-                        dropdown.menuGenerator_ = allUnits;
-                        dropdown.setText(allUnits[0][0]);
-                        dropdown.setValue(allUnits[0][1]);
-                        return;
-                    }
-                } else if(currentBlock.type == "thing") {
-                    if(parentBlock != null) {
-                        let parentUnitName = parentBlock.getFieldValue("units");
-                        if(unitsJson.hasOwnProperty(parentUnitName)) {
-                            let dropDown = currentBlock.getField("things");
-                            dropDown.menuGenerator_ = unitsJson[parentUnitName].things;
-                            dropDown.setText("");
-                            dropDown.setValue("");
-                        }
-                        setField(currentBlock,"things");
-                    }
-                }
-                if(parentBlock!=null && (parentBlock.type=="unit" || parentBlock.type=="thing")) {
-                    let children = currentBlock.getChildren();
-                    if(children.length != 0) {
-                        setDropDownOptions(currentBlock, children[0]);
-                    }
-                }
-            }
 
             function actionEventListener(actionEvent) {
                 let allBlocks = workspaceCron.getAllBlocks();
                 if(actionEvent.type == "create") {
                     let block = workspaceCron.getBlockById(actionEvent.blockId);
-                    if(block.type == "unit") {
-                        let dropdown = block.getField("units");
-                        dropdown.menuGenerator_ = allUnits;
-                        dropdown.setText(allUnits[0][0]);
-                        dropdown.setValue(allUnits[0][1]);
+                    if(block.type == "cron_details") {
+                        let dropdown = block.getField("devices");
+                        dropdown.menuGenerator_ = allDevices;
+                        dropdown.setText(allDevices[0][0]);
+                        dropdown.setValue(allDevices[0][1]);
+                        block.getField("attributes").menuGenerator_ = devicesJson[allDevices[0][1]].attributes;
+                        block.getField("attributes").setText("");
+                        block.getField("attributes").setValue("");
                     }
                 }
-                if(actionEvent.type=="move" && actionEvent.oldParentId!=actionEvent.newParentId) {
+                else if(actionEvent.type == "change") {
                     let block = workspaceCron.getBlockById(actionEvent.blockId);
-                    setDropDownOptions(block.getParent(), block);
-                } else if(actionEvent.type == "change") {
-                    let block = workspaceCron.getBlockById(actionEvent.blockId);
-                    if(block.getChildren().length > 0)
-                        setDropDownOptions(block, block.getChildren()[0]);
-                    else if(block.type == "thing") {
-                        setField(block,actionEvent.name);
+                    if(block.type == "cron_details") {
+                        let deviceName = block.getFieldValue("devices");
+                        block.getField("attributes").menuGenerator_ = devicesJson[deviceName].attributes;
+                        block.getField("attributes").setText("");
+                        block.getField("attributes").setValue("");
                     }
                 }
             }

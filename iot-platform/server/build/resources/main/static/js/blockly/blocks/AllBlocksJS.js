@@ -82,7 +82,7 @@ Blockly.Blocks['logic'] = {
 Blockly.Blocks['expression'] = {
   init: function() {
     this.appendValueInput("lvalue")
-        .setCheck("cron_details");
+        .setCheck("device_details");
     this.appendDummyInput()
         .setAlign(Blockly.ALIGN_CENTRE)
         .appendField(new Blockly.FieldDropdown([["==","=="], ["!=","!="], ["<","<"], ["<=","<="], [">",">"], [">=",">="]]), "operator");
@@ -131,6 +131,27 @@ Blockly.Blocks['cron_details'] = {
         .setAlign(Blockly.ALIGN_CENTRE)
         .appendField(new Blockly.FieldDropdown([["",""]]), "attributes");
     this.setOutput(true, "cron_details");
+    this.setColour(230);
+ this.setTooltip("Choose device and attribute");
+ this.setHelpUrl("");
+  }
+};
+
+Blockly.Blocks['device_details'] = {
+  init: function() {
+    this.appendDummyInput()
+        .setAlign(Blockly.ALIGN_CENTRE)
+        .appendField("Device");
+    this.appendDummyInput()
+        .setAlign(Blockly.ALIGN_CENTRE)
+        .appendField(new Blockly.FieldDropdown([["",""]]), "devices");
+    this.appendDummyInput()
+        .setAlign(Blockly.ALIGN_CENTRE)
+        .appendField("Attribute");
+    this.appendDummyInput()
+        .setAlign(Blockly.ALIGN_CENTRE)
+        .appendField(new Blockly.FieldDropdown([["",""]]), "attributes");
+    this.setOutput(true, "device_details");
     this.setColour(230);
  this.setTooltip("Choose device and attribute");
  this.setHelpUrl("");
