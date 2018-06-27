@@ -380,6 +380,7 @@
         let xml = Blockly.Xml.workspaceToDom(workspaceRuleIf);
         let xml_text = Blockly.Xml.domToText(xml);
         document.getElementById("ruleIfXml").value = xml_text;
+        $("#rule_if").modal('hide');
     }
 
     function getParameter(lValueObject) {
@@ -413,7 +414,7 @@
         let code = Blockly.JavaScript.workspaceToCode(workspaceRuleThen);
         code = JSON.parse(code);
         if(code.type == "actuator") {
-            let actuatorAction = setDesiredState(parts);
+            let actuatorAction = setDesiredState(code);
             console.log("actuatorAction "+ actuatorAction);
         } else if(code.type == "SNS") {
             $("#topic").val(code.name);
@@ -426,45 +427,72 @@
         let xml = Blockly.Xml.workspaceToDom(workspaceRuleThen);
         let xml_text = Blockly.Xml.domToText(xml);
         document.getElementById("ruleThenXml").value = xml_text;
+        $("#rule_then").modal('hide');
     }
 
-    function saveCron() {
+    function saveCronData(loader, callback) {
         let code = Blockly.JavaScript.workspaceToCode(workspaceCron);
         code = JSON.parse(code);
         let cronName = code.name;
         let cronExpression = code.cron;
+        // check if there is no device attribute
         let deviceName = code.deviceDetails.device.split(",")[1];
         let attributeName  = code.deviceDetails.attribute.split(",")[1];
         let newValue = code.newValue;
+
+        if(cronName=="" || cronExpression=="" || deviceName=="" || attributeName=="" || newValue=="") {
+            loader.saveLoader = false;
+            alert("Please fill up all the details!");
+            return;
+        }
+
+        document.getElementById("cronName").value = cronName;
+        document.getElementById("cronName").dispatchEvent(new Event('input', {'bubbles': true,'cancelable': true}));
+
+        document.getElementById("cronExpression").value = cronExpression;
+        document.getElementById("cronExpression").dispatchEvent(new Event('input', {'bubbles': true,'cancelable': true}));
 
         let cronDevice = document.getElementById("cronDevice");
         let flagDevice = false;
         for(let i=0;i<cronDevice.children.length;i++) {
             if(cronDevice.children[i].text == deviceName) {
                 //setting option to select
-                cronDevice.value = cronDevice.children[i];
+                cronDevice.value = cronDevice.children[i].value;
+                document.getElementById("cronDevice").dispatchEvent(new Event('change', {'bubbles': true,'cancelable': true}));
                 flagDevice = true;
                 break;
             }
         }
         if(flagDevice){
-            let cronAttribute = document.getElementById("cronAttribute");
-            let flagAttribute = false;
-            for(let i=0;i<cronAttribute.children.length;i++) {
-                if(cronAttribute.children[i].text == attributeName) {
-                    //setting option to select
-                    cronAttribute.value = cronAttribute.children[i];
-                    flagAttribute = true;
-                    break;
+            setTimeout(function(){
+                let cronAttribute = document.getElementById("cronAttribute");
+
+                let flagAttribute = false;
+                for(let i=0;i<cronAttribute.children.length;i++) {
+                    if(cronAttribute.children[i].text == attributeName) {
+                        //setting option to select
+                        cronAttribute.value = cronAttribute.children[i].value;
+                        document.getElementById("cronAttribute").dispatchEvent(new Event('change', {'bubbles': true,'cancelable': true}));
+                        flagAttribute = true;
+                        break;
+                    }
                 }
-            }
-            if(flagAttribute){
-                document.getElementById("cronAttributeValue").value = newValue;
-                let xml = Blockly.Xml.workspaceToDom(workspaceCron);
-                let xml_text = Blockly.Xml.domToText(xml);
-                document.getElementById("cronXml").value = xml_text;
-            }
+                if(flagAttribute){
+                    setTimeout(function(){
+                        let xml = Blockly.Xml.workspaceToDom(workspaceCron);
+                        let xml_text = Blockly.Xml.domToText(xml);
+                        document.getElementById("cronXml").value = xml_text;
+                        document.getElementById("cronXml").dispatchEvent(new Event('input', {'bubbles': true,'cancelable': true}));
+
+                        document.getElementById("cronAttributeValue").value = newValue;
+                        document.getElementById("cronAttributeValue").dispatchEvent(new Event('input', {'bubbles': true,'cancelable': true}));
+                        document.getElementById("cronAttributeValue").dispatchEvent(new Event('change', {'bubbles': true,'cancelable': true}));
+
+                        setTimeout(callback,1500);
+
+                    }, 1500);
+                }
+            }, 1500);
         }
-        alert("error");
     }
 </script>

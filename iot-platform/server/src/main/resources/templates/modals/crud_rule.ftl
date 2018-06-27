@@ -19,7 +19,7 @@
                                        placeholder="temperature_rule">
                                 <small class="text-muted">Name of the rule will be prefixed with &lt;thing-id&gt;_&lt;rule-type&gt;</small>
                             </div>
-                            <div class="form-group" style="display:none;">
+                            <div class="form-group"  >
                                 <label>Data</label>
                                 <input value="*" name="data" type="text" class="form-control" v-model='createRule.data'
                                        placeholder="e.g. * or state.reported.deviceXX.XX, ...">
@@ -54,7 +54,7 @@
                                    <button class="col-md-2 btn btn-secondary" style="border-top-left-radius:0;border-bottom-left-radius:0;" onclick="return showRuleThenModal(event);"><i class="fa fa-puzzle-piece" aria-hidden="true"></i></button>
                                 </div>
                             </div>
-                            <span style="display:none;">
+                            <span  >
                                 <div class="form-group">
                                     <label>SNS Topic</label>
                                     <input id="topic" name="topic" type="text" class="form-control"

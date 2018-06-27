@@ -10,14 +10,14 @@
             <div class="modal-body" id="blocklyCronArea">
                 <div id="blocklyDivCron" style="height: 60vh; width: 100%;"></div>
 
-                <form>
+                <form style="display:none;">
                     <div class="form-group">
                         <label>Name:</label>
-                        <input class="form-control" v-model="cronName" placeholder="Irrigation Pump Cron" type="text" name="cronName">
+                        <input id="cronName" class="form-control" v-model="cronName" placeholder="Irrigation Pump Cron" type="text" name="cronName">
                     </div>
                     <div class="form-group">
                         <label>Cron Expression:</label>
-                        <input class="form-control" v-model="cronExpression" placeholder="* * * * ? *">
+                        <input id="cronExpression" class="form-control" v-model="cronExpression" placeholder="* * * * ? *">
                         <p class="text-sm-left">The cron expression should be of format <a target="_new" href="http://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html#CronExpressions">specified here</a> </p>
                         <p class="text-sm-left">Time here is <strong>UTC</strong></p>
                     </div>
