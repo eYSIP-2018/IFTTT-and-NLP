@@ -382,6 +382,7 @@
         let xml_text = Blockly.Xml.domToText(xml);
         document.getElementById("ruleIfXml").value = xml_text;
         $("#rule_if").modal('hide');
+        $('#crud_rule').focus();
     }
 
     function getParameter(lValueObject) {
@@ -429,6 +430,7 @@
         let xml_text = Blockly.Xml.domToText(xml);
         document.getElementById("ruleThenXml").value = xml_text;
         $("#rule_then").modal('hide');
+        $('#crud_rule').focus();
     }
 
     function saveCronData(loader, callback) {
