@@ -116,7 +116,7 @@
                 }
                 else if(actionEvent.type == "change") {
                     let block = workspaceRuleIf.getBlockById(actionEvent.blockId);
-                    if(block.type == "device_details") {
+                    if(block.type == "device_details" && actionEvent.name == "devices") {
                         let deviceName = block.getFieldValue("devices");
                         block.getField("attributes").menuGenerator_ = devicesJson[deviceName].attributes;
                         block.getField("attributes").setText("");
@@ -333,6 +333,7 @@
                         dropdown.menuGenerator_ = allDevices;
                         dropdown.setText(allDevices[0][0]);
                         dropdown.setValue(allDevices[0][1]);
+                        console.log(JSON.stringify(devicesJson[allDevices[0][1]]));
                         block.getField("attributes").menuGenerator_ = devicesJson[allDevices[0][1]].attributes;
                         block.getField("attributes").setText("");
                         block.getField("attributes").setValue("");
@@ -340,7 +341,7 @@
                 }
                 else if(actionEvent.type == "change") {
                     let block = workspaceCron.getBlockById(actionEvent.blockId);
-                    if(block.type == "cron_details") {
+                    if(block.type == "cron_details" && actionEvent.name == "devices") {
                         let deviceName = block.getFieldValue("devices");
                         block.getField("attributes").menuGenerator_ = devicesJson[deviceName].attributes;
                         block.getField("attributes").setText("");
