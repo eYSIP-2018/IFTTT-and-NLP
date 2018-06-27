@@ -10,22 +10,21 @@
             <div class="modal-body" id="blocklyCronArea">
                 <div id="blocklyDivCron" style="height: 60vh; width: 100%;"></div>
 
-                <div id="cronXml" style="display:none;"></div>
                 <form style="display:none;">
                     <div class="form-group">
                         <label>Name:</label>
-                        <input class="form-control" v-model="cronName" placeholder="Irrigation Pump Cron" type="text" name="cronName">
+                        <input id="cronName" class="form-control" v-model="cronName" placeholder="Irrigation Pump Cron" type="text" name="cronName">
                     </div>
                     <div class="form-group">
                         <label>Cron Expression:</label>
-                        <input class="form-control" v-model="cronExpression" placeholder="* * * * ? *">
+                        <input id="cronExpression" class="form-control" v-model="cronExpression" placeholder="* * * * ? *">
                         <p class="text-sm-left">The cron expression should be of format <a target="_new" href="http://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html#CronExpressions">specified here</a> </p>
                         <p class="text-sm-left">Time here is <strong>UTC</strong></p>
                     </div>
                     <#--TODO: Ability to select multiple actuators-->
                     <div class="form-group">
                         <label>Device:</label>
-                        <select v-model="cronDevice" class="form-control custom-select">
+                        <select id="cronDevice" v-model="cronDevice" class="form-control custom-select">
                             <option v-for="device in devices" v-bind:value="device">
                                 {{ device.name }}
                             </option>
@@ -33,7 +32,7 @@
                     </div>
                     <div class="form-group">
                         <label>Attribute:</label>
-                        <select v-model="cronAttribute" class="form-control custom-select">
+                        <select id="cronAttribute" v-model="cronAttribute" class="form-control custom-select">
                             <option v-for="attr in cronDevice.deviceAttributes" v-bind:value="attr" v-if="attr.actuator">
                                 {{ attr.name }}
                             </option>
@@ -41,10 +40,10 @@
                     </div>
                     <div class="form-group" v-if="cronAttribute">
                         <label>Set Value:</label>
-                        <input v-if="cronAttribute.type=='Double'" v-model="cronAttributeValue" type="text" class="form-control"  placeholder="Type a float">
-                        <input v-if="cronAttribute.type=='Integer'" v-model="cronAttributeValue" type="number" class="form-control"  placeholder="Type and integer">
-                        <input v-if="cronAttribute.type=='String'" v-model="cronAttributeValue" type="number" class="form-control"  placeholder="Type a string">
-                        <select v-if="cronAttribute.type=='Boolean'" v-model="cronAttributeValue" class="form-control custom-select">
+                        <input id="cronAttributeValue" v-if="cronAttribute.type=='Double'" v-model="cronAttributeValue" type="text" class="form-control"  placeholder="Type a float">
+                        <input id="cronAttributeValue" v-if="cronAttribute.type=='Integer'" v-model="cronAttributeValue" type="number" class="form-control"  placeholder="Type and integer">
+                        <input id="cronAttributeValue" v-if="cronAttribute.type=='String'" v-model="cronAttributeValue" type="number" class="form-control"  placeholder="Type a string">
+                        <select id="cronAttributeValue" v-if="cronAttribute.type=='Boolean'" v-model="cronAttributeValue" class="form-control custom-select">
                             <option value="1">
                                 True
                             </option>

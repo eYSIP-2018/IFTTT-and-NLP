@@ -15,7 +15,7 @@
                 <div id="ruleThenXml" style="display:none;"></div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" onclick="">Done</button>
+                <button type="button" class="btn btn-primary" onclick="saveRuleThen()">Done</button>
                 <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times" aria-hidden="true"></i> Close</button>
             </div>
         </div>

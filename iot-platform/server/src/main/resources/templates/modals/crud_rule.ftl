@@ -19,7 +19,7 @@
                                        placeholder="temperature_rule">
                                 <small class="text-muted">Name of the rule will be prefixed with &lt;thing-id&gt;_&lt;rule-type&gt;</small>
                             </div>
-                            <div class="form-group" style="display:none;">
+                            <div class="form-group"  >
                                 <label>Data</label>
                                 <input value="*" name="data" type="text" class="form-control" v-model='createRule.data'
                                        placeholder="e.g. * or state.reported.deviceXX.XX, ...">
@@ -29,6 +29,7 @@
                                 <div class="form-group row col-md-12" style="margin-right:0; margin-left:0; padding:0;">
                                     <input id="ruleCondition" name="condition" type="text" class="col-md-10 form-control" style="border-top-right-radius:0;border-bottom-right-radius:0;" v-model='createRule.condition'
                                            placeholder="e.g. where state.reported.deviceXX.XX > 50">
+                                    <input id="ruleIFXML" type="hidden">
                                    <button class="col-md-2 btn btn-secondary" style="border-top-left-radius:0;border-bottom-left-radius:0;" onclick="return showRuleIfModal(event);" v-if="ruleUpdate"><i class="fa fa-puzzle-piece" aria-hidden="true"></i></button>
                                    <button class="col-md-2 btn btn-secondary" style="border-top-left-radius:0;border-bottom-left-radius:0;" onclick="return showRuleIfModal(event);" v-else><i class="fa fa-puzzle-piece" aria-hidden="true"></i></button>
                                 </div>
@@ -45,6 +46,7 @@
                             <div class="form-group" v-show="ruleUpdate == false">
                                 <label for="comment">Then...</label>
                                 <div class="form-group row col-md-12" style="margin-right:0; margin-left:0; padding:0;">
+                                    <input id="ruleThenXML" type="hidden">
                                     <select id="ruleThen" class="col-md-10 form-control combo-box" id="rightRoles" style="border-top-right-radius:0;border-bottom-right-radius:0;" v-model='createRule.action'>
                                         <option v-for="action in ruleActionList" v-bind:value="action">{{action}}
                                         </option>
@@ -52,16 +54,16 @@
                                    <button class="col-md-2 btn btn-secondary" style="border-top-left-radius:0;border-bottom-left-radius:0;" onclick="return showRuleThenModal(event);"><i class="fa fa-puzzle-piece" aria-hidden="true"></i></button>
                                 </div>
                             </div>
-                            <span style="display:none;">
+                            <span  >
                                 <div class="form-group">
                                     <label>SNS Topic</label>
-                                    <input name="topic" type="text" class="form-control"
+                                    <input id="topic" name="topic" type="text" class="form-control"
                                            v-model='createRule.sns_topic'
                                            placeholder="my_subscription_topic">
                                 </div>
                                 <div class="form-group">
                                     <label for="subject">Subject</label>
-                                    <input class="form-control" type="text" v-model="createRule.subject"
+                                    <input id="subject" class="form-control" type="text" v-model="createRule.subject"
                                            placeholder="temperature is high">
                                 </div>
                                 <div class="form-group">
@@ -71,7 +73,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="interval">Interval(in minutes)</label>
-                                    <input type="number" class="form-control" v-model="createRule.interval"
+                                    <input id="interval" type="number" class="form-control" v-model="createRule.interval"
                                            placeholder="20">
                                 </div>
                             </span>

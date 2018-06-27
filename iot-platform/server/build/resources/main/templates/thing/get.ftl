@@ -117,6 +117,7 @@
                         <div v-else class="h3 pt-2 pb-2 text-center text-muted" v-else>No crons</div>
                     </div>
                     <div class="card-footer">
+                        <input id="cronXml" type="hidden">
                         <button v-on:click="addCron" class="btn btn-sm btn-primary">ADD CRON</button>
                         <#--<button v-on:click="deleteCron(cron)" class="btn btn-sm btn-default">EDIT</button>-->
                     </div>
@@ -571,29 +572,31 @@
             },
 
             "saveCron": function () {
-                console.log("this:"+JSON.stringify(this.cronDevice));
                 var that = this;
                 that.saveLoader = true;
-                var desired = {};
+                saveCronData(that, function() {
+                    var desired = {};
 
-                desired["device" + that.cronDevice.id + "." + that.cronAttribute.id] = (that.cronAttribute.type === 'Integer' || that.cronAttribute.type === 'Boolean') ? parseInt(that.cronAttributeValue, 10) : that.cronAttributeValue;
-                if (that.cronAttribute.type === 'Double') {
-                    desired["device" + that.cronDevice.id + "." + that.cronAttribute.id] = parseFloat(that.cronAttributeValue);
-                }
-                $.ajax({
-                    url: "/cron/create",
-                    "method": "POST",
-                    "data": {
-                        "name": that.cronName,
-                        "thingId": thingId,
-                        "cronExpression": that.cronExpression,
-                        "desiredState": JSON.stringify(desired)
-                    },
-                    success: function (data) {
-                        that.saveLoader = false;
-                        $("#create_cron").modal('hide');
-                        that.getCrons();
+                    desired["device" + that.cronDevice.id + "." + that.cronAttribute.id] = (that.cronAttribute.type === 'Integer' || that.cronAttribute.type === 'Boolean') ? parseInt(that.cronAttributeValue, 10) : that.cronAttributeValue;
+                    if (that.cronAttribute.type === 'Double') {
+                        desired["device" + that.cronDevice.id + "." + that.cronAttribute.id] = parseFloat(that.cronAttributeValue);
                     }
+
+                    $.ajax({
+                        url: "/cron/create",
+                        "method": "POST",
+                        "data": {
+                            "name": that.cronName,
+                            "thingId": thingId,
+                            "cronExpression": that.cronExpression,
+                            "desiredState": JSON.stringify(desired)
+                        },
+                        success: function (data) {
+                            that.saveLoader = false;
+                            $("#create_cron").modal('hide');
+                            that.getCrons();
+                        }
+                    });
                 });
             },
 
