@@ -85,17 +85,13 @@ public class ActuatorRuleResource extends BaseResource {
 
             BlocklyBean blocklyIfXmlBean = new BlocklyBean();
             blocklyIfXmlBean.setBlockType("IF-BLOCK");
-            blocklyIfXmlBean.setBlockId(ruleBean.getId());
             blocklyIfXmlBean.setXml(ruleIfXml);
             blocklyIfXmlBean.setParentThing(ThingDAO.getInstance().get(parentThingId));
-            BlocklyDAO.getInstance().add(blocklyIfXmlBean);
 
             BlocklyBean blocklyThenXmlBean = new BlocklyBean();
             blocklyThenXmlBean.setBlockType("THEN-BLOCK");
-            blocklyThenXmlBean.setBlockId(ruleBean.getId());
             blocklyThenXmlBean.setXml(ruleThenXml);
             blocklyIfXmlBean.setParentThing(ThingDAO.getInstance().get(parentThingId));
-            BlocklyDAO.getInstance().add(blocklyThenXmlBean);
 
             Set<ConstraintViolation<RuleBean>> constraintViolations = ValidatorService.getValidator().validate(ruleBean);
 
@@ -128,7 +124,10 @@ public class ActuatorRuleResource extends BaseResource {
 
                 // Get updated ruleBean
                 ruleBean = RuleDAO.getInstance().get(ruleBean.getId());
-
+                blocklyIfXmlBean.setBlockId(ruleBean.getId());
+                BlocklyDAO.getInstance().add(blocklyIfXmlBean);
+                blocklyThenXmlBean.setBlockId(ruleBean.getId());
+                BlocklyDAO.getInstance().add(blocklyThenXmlBean);
             } catch (Exception e) {
                 e.printStackTrace();
                 return "{\"success\": false}";
