@@ -377,10 +377,11 @@
         code = JSON.parse(code);
         code = getIfCondition(code);
         document.getElementById("ruleCondition").value = code;
-
+        document.getElementById("ruleCondition").dispatchEvent(new Event('input', {'bubbles': true,'cancelable': true}));
         let xml = Blockly.Xml.workspaceToDom(workspaceRuleIf);
         let xml_text = Blockly.Xml.domToText(xml);
         document.getElementById("ruleIfXml").value = xml_text;
+        document.getElementById("ruleIfXml").dispatchEvent(new Event('input', {'bubbles': true,'cancelable': true}));
         $("#rule_if").modal('hide');
         $('#crud_rule').focus();
     }
@@ -416,7 +417,6 @@
         let code = Blockly.JavaScript.workspaceToCode(workspaceRuleThen);
         code = JSON.parse(code);
         if(code.type == "actuator") {
-            $("#ruleThen").val("Actuator");
             let actuatorAction = setDesiredState(code);
             $("#attribute").val(actuatorAction);
             $("#newValue").val(code.newValue);
@@ -424,13 +424,11 @@
             document.getElementById("newValue").dispatchEvent(new Event('input', {'bubbles': true,'cancelable': true}));
             console.log("actuatorAction "+ actuatorAction);
         } else if(code.type == "SNS") {
-            $("#ruleThen").val("SNS");
-            $("#topic").val(code.name);
-            $("#subject").val(code.subject);
-            $("#message").val(code.message);
-            $("#interval").val(code.interval);
+            $("#topic").val(code.name);document.getElementById("topic").dispatchEvent(new Event('input', {'bubbles': true,'cancelable': true}));
+            $("#subject").val(code.subject);document.getElementById("subject").dispatchEvent(new Event('input', {'bubbles': true,'cancelable': true}));
+            $("#message").val(code.message);document.getElementById("message").dispatchEvent(new Event('input', {'bubbles': true,'cancelable': true}));
+            $("#interval").val(code.interval);document.getElementById("interval").dispatchEvent(new Event('input', {'bubbles': true,'cancelable': true}));
         } else {
-            $("#ruleThen").val("DDB");
             console.log("DDB");
         }
         let xml = Blockly.Xml.workspaceToDom(workspaceRuleThen);
@@ -438,10 +436,8 @@
         document.getElementById("ruleThenXml").value = xml_text;
         $("#rule_then").modal('hide');
         $('#crud_rule').focus();
-<<<<<<< HEAD
+        $("#ruleThen").val(code.type);
         document.getElementById("ruleThen").dispatchEvent(new Event('change', {'bubbles': true,'cancelable': true}));
-=======
->>>>>>> edfa77ba599d952e5e4a85e46c6cbb2efda10319
     }
 
     function saveCronData(loader, callback) {
