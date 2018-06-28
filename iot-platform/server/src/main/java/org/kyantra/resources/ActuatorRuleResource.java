@@ -84,13 +84,7 @@ public class ActuatorRuleResource extends BaseResource {
             ruleBean.setParentThing(ThingDAO.getInstance().get(parentThingId));
 
             BlocklyBean blocklyIfXmlBean = new BlocklyBean();
-            blocklyIfXmlBean.setBlockType("IF-BLOCK");
             blocklyIfXmlBean.setXml(ruleIfXml);
-            blocklyIfXmlBean.setParentThing(ThingDAO.getInstance().get(parentThingId));
-
-            BlocklyBean blocklyThenXmlBean = new BlocklyBean();
-            blocklyThenXmlBean.setBlockType("THEN-BLOCK");
-            blocklyThenXmlBean.setXml(ruleThenXml);
             blocklyIfXmlBean.setParentThing(ThingDAO.getInstance().get(parentThingId));
 
             Set<ConstraintViolation<RuleBean>> constraintViolations = ValidatorService.getValidator().validate(ruleBean);
@@ -202,17 +196,10 @@ public class ActuatorRuleResource extends BaseResource {
             // Get updated ruleBean
             ruleBean = RuleDAO.getInstance().get(ruleBean.getId());
 
-            BlocklyBean blocklyIfXmlBean = BlocklyDAO.getInstance().getByBlockIdAndType(ruleBean.getId(),"IF-BLOCK");
+            BlocklyBean blocklyIfXmlBean = BlocklyDAO.getInstance().getByBlockId(ruleBean.getId());
             BlocklyDAO.getInstance().update(blocklyIfXmlBean.getId(),
                                     ruleBean.getId(),
-                                    "IF-BLOCK",
                                     ruleIfXml);
-
-            BlocklyBean blocklyThenXmlBean = BlocklyDAO.getInstance().getByBlockIdAndType(ruleBean.getId(),"THEN-BLOCK");
-            BlocklyDAO.getInstance().update(blocklyThenXmlBean.getId(),
-                                    ruleBean.getId(),
-                                    "THEN-BLOCK",
-                                    ruleThenXml);
 
             return gson.toJson(ruleBean);
         }
@@ -247,11 +234,8 @@ public class ActuatorRuleResource extends BaseResource {
             // delete rule in AWS
             DeleteTopicRuleResult deleteTopicRuleResult = RuleHelper.getInstance().deleteRule(ruleBean);
 
-            BlocklyBean blocklyIfBean = BlocklyDAO.getInstance().getByBlockIdAndType(ruleBean.getId(),"IF-BLOCK");
+            BlocklyBean blocklyIfBean = BlocklyDAO.getInstance().getByBlockId(ruleBean.getId());
             BlocklyDAO.getInstance().delete(blocklyIfBean.getId());
-            BlocklyBean blocklyThenBean = BlocklyDAO.getInstance().getByBlockIdAndType(ruleBean.getId(),"THEN-BLOCK");
-            BlocklyDAO.getInstance().delete(blocklyThenBean.getId());
-
 
             // delete rule bean which should also delete entries from Actuator
             RuleDAO.getInstance().delete(ruleId);
@@ -289,11 +273,8 @@ public class ActuatorRuleResource extends BaseResource {
             // delete rule in AWS
             DeleteTopicRuleResult deleteTopicRuleResult = RuleHelper.getInstance().deleteRule(ruleBean);
 
-            BlocklyBean blocklyIfBean = BlocklyDAO.getInstance().getByBlockIdAndType(ruleBean.getId(),"IF-BLOCK");
+            BlocklyBean blocklyIfBean = BlocklyDAO.getInstance().getByBlockId(ruleBean.getId());
             BlocklyDAO.getInstance().delete(blocklyIfBean.getId());
-            BlocklyBean blocklyThenBean = BlocklyDAO.getInstance().getByBlockIdAndType(ruleBean.getId(),"THEN-BLOCK");
-            BlocklyDAO.getInstance().delete(blocklyThenBean.getId());
-
             // delete rule bean which should also delete entries from Actuator
             RuleDAO.getInstance().deleteByName(ruleName);
             return "{\"success\": true}";

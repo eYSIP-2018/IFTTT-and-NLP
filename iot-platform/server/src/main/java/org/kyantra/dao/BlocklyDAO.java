@@ -45,14 +45,13 @@ public class BlocklyDAO extends BaseDAO{
         session.close();
     }
 
-    public BlocklyBean update(int id, int blockId, String blockType, String xml) {
+    public BlocklyBean update(int id, int blockId, String xml) {
         if(id <= 0)
             return null;
         Session session = getService().getSessionFactory().openSession();
         Transaction tx = session.beginTransaction();
         BlocklyBean blockly = session.get(BlocklyBean.class, id);
         blockly.setBlockId(blockId);
-        blockly.setBlockType(blockType);
         blockly.setXml(xml);
         tx.commit();
         session.close();
@@ -84,9 +83,9 @@ public class BlocklyDAO extends BaseDAO{
         return new HashSet<>(list);
     }
 
-    public BlocklyBean getByBlockIdAndType(int blockId, String blockType) {
+    public BlocklyBean getByBlockId(int blockId) {
         Session session = getService().getSessionFactory().openSession();
-        String ql = "from BlocklyBean where blockId="+blockId +" and blockType='"+blockType+"'";
+        String ql = "from BlocklyBean where blockId="+blockId;
         Query query = session.createQuery(ql);
         BlocklyBean blocklyBean = (BlocklyBean) query.getResultList();
         session.close();

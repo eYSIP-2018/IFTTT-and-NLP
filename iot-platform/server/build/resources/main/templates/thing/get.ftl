@@ -386,17 +386,10 @@
                 that.ruleUpdate = true;
                 // Load XML of blockly for IF condition
                 var blocklyIfXmlObject = this.blocklyXmls.find(function(blockly){
-                    return blockly.blockId == rule.id && blockly.blockType == 'IF-BLOCK';
+                    return blockly.blockId == rule.id;
                 });
                 if(typeof blocklyIfXmlObject  != 'undefined' && blocklyIfXmlObject) {
                     that.createRule.ruleIfXml = blocklyIfXmlObject.xml;
-                }
-                // Load XML of blockly for IF condition
-                var blocklyThenXmlObject = this.blocklyXmls.find(function(blockly){
-                    return blockly.blockId == rule.id && blockly.blockType == 'THEN-BLOCK';
-                });
-                if(typeof blocklyThenXmlObject  != 'undefined' && blocklyThenXmlObject) {
-                    that.createRule.ruleThenXml = blocklyThenXmlObject.xml;
                 }
                 $('#create_rule').modal('show');
             },

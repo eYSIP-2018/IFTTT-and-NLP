@@ -141,17 +141,6 @@ public class BlocklyResource extends BaseResource {
         return finalJson;
     }
 
-    @POST
-    @Path("/getXml/{id}")
-    @Session
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Produces(MediaType.APPLICATION_JSON)
-    public String getXml(@PathParam("id") Integer blockId,
-                         @FormParam("type") String type) {
-        BlocklyBean bean = BlocklyDAO.getInstance().getByBlockIdAndType(blockId,type);
-        return gson.toJson(bean);
-    }
-
     @GET
     @Path("thing/{id}")
     @Session
