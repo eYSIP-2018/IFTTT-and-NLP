@@ -310,7 +310,6 @@
                     attribute:"",
                     newValue:"",
                     ruleIfXml:"",
-                    ruleThenXml:"",
                     interval: 15
                 };
                 this.ruleUpdate = false;
@@ -329,8 +328,7 @@
                     "topic": that.createRule.topic,
                     "condition": that.createRule.condition,
                     "action": that.createRule.action,
-                    "ruleIfXml": that.createRule.ruleIfXml,
-                    "ruleThenXml": that.createRule.ruleThenXml
+                    "ruleIfXml": that.createRule.ruleIfXml
                 };
 
                 // send extra parameters according to the type of rule
@@ -405,8 +403,7 @@
                     "topic": that.createRule.topic,
                     "condition": that.createRule.condition,
                     "parentThing": thingId,
-                    "ruleIfXml": that.createRule.ruleIfXml,
-                    "ruleThenXml": that.createRule.ruleThenXml
+                    "ruleIfXml": that.createRule.ruleIfXml
                 };
 
                 $.ajax({

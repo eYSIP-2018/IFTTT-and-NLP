@@ -49,8 +49,7 @@ public class ActuatorRuleResource extends BaseResource {
                          @FormParam("condition") String condition,
                          @FormParam("attribute") String attribute,
                          @FormParam("newValue") String newValue,
-                         @FormParam("ruleIfXml") String ruleIfXml,
-                         @FormParam("ruleThenXml") String ruleThenXml) {
+                         @FormParam("ruleIfXml") String ruleIfXml) {
         /*
          * Steps:
          * 1. create ActuatorBean
@@ -120,8 +119,6 @@ public class ActuatorRuleResource extends BaseResource {
                 ruleBean = RuleDAO.getInstance().get(ruleBean.getId());
                 blocklyIfXmlBean.setBlockId(ruleBean.getId());
                 BlocklyDAO.getInstance().add(blocklyIfXmlBean);
-                blocklyThenXmlBean.setBlockId(ruleBean.getId());
-                BlocklyDAO.getInstance().add(blocklyThenXmlBean);
             } catch (Exception e) {
                 e.printStackTrace();
                 return "{\"success\": false}";
@@ -164,8 +161,7 @@ public class ActuatorRuleResource extends BaseResource {
                          @FormParam("data") String data,
                          @FormParam("condition") String condition,
                          @FormParam("parentThing") Integer parentThingId,
-                         @FormParam("ruleIfXml") String ruleIfXml,
-                         @FormParam("ruleThenXml") String ruleThenXml) {
+                         @FormParam("ruleIfXml") String ruleIfXml) {
 
         // create RuleBean
         RuleBean ruleBean = RuleDAO.getInstance().get(ruleId);

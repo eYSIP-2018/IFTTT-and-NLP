@@ -354,6 +354,7 @@
     }
 
     function getIfCondition(parts) {
+        console.log("in function");
     	let conStr;
     	if(Array.isArray(parts) && parts.length%2==0) {
     		return false;
@@ -437,7 +438,6 @@
         }
         let xml = Blockly.Xml.workspaceToDom(workspaceRuleThen);
         let xml_text = Blockly.Xml.domToText(xml);
-        document.getElementById("ruleThenXml").value = xml_text;document.getElementById("ruleThenXml").dispatchEvent(new Event('input', {'bubbles': true,'cancelable': true}));
         $("#rule_then").modal('hide');
         $('#crud_rule').focus();
         $("#ruleThen").val(code.type);
