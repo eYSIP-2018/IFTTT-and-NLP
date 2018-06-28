@@ -330,6 +330,7 @@
                         dropdown.menuGenerator_ = allDevices;
                         dropdown.setText(allDevices[0][0]);
                         dropdown.setValue(allDevices[0][1]);
+                        console.log(JSON.stringify(devicesJson[allDevices[0][1]]));
                         block.getField("attributes").menuGenerator_ = devicesJson[allDevices[0][1]].attributes;
                         block.getField("attributes").setText("");
                         block.getField("attributes").setValue("");
@@ -437,7 +438,10 @@
         document.getElementById("ruleThenXml").value = xml_text;
         $("#rule_then").modal('hide');
         $('#crud_rule').focus();
+<<<<<<< HEAD
         document.getElementById("ruleThen").dispatchEvent(new Event('change', {'bubbles': true,'cancelable': true}));
+=======
+>>>>>>> edfa77ba599d952e5e4a85e46c6cbb2efda10319
     }
 
     function saveCronData(loader, callback) {

@@ -330,6 +330,7 @@
                         dropdown.menuGenerator_ = allDevices;
                         dropdown.setText(allDevices[0][0]);
                         dropdown.setValue(allDevices[0][1]);
+                        console.log(JSON.stringify(devicesJson[allDevices[0][1]]));
                         block.getField("attributes").menuGenerator_ = devicesJson[allDevices[0][1]].attributes;
                         block.getField("attributes").setText("");
                         block.getField("attributes").setValue("");
