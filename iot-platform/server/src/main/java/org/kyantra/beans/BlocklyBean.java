@@ -28,6 +28,9 @@ public class BlocklyBean {
     @Column(name = "`xml`")
     String xml;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    private ThingBean parentThing;
+
     public Integer getBlockId() {
         return blockId;
     }
@@ -58,5 +61,13 @@ public class BlocklyBean {
 
     public void setXml(String xml) {
         this.xml = xml;
+    }
+
+    public ThingBean getParentThing() {
+        return parentThing;
+    }
+
+    public void setParentThing(ThingBean parentThing) {
+        this.parentThing = parentThing;
     }
 }

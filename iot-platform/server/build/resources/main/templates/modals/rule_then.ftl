@@ -12,7 +12,7 @@
             <div class="modal-body" id="blocklyRuleThenArea" style="height: 60vh; width: 100%;">
                 <div id="blocklyDivRuleThen" style="height: 60vh; width: 100%;"></div>
 
-                <div id="ruleThenXml" style="display:none;"></div>
+                <div id="ruleThenXmlToolBox" style="display:none;"></div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" onclick="saveRuleThen()">Done</button>

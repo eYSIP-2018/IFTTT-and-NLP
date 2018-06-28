@@ -12,7 +12,7 @@
             <div class="modal-body" id="blocklyRuleIfArea" style="height: 60vh; width: 100%;">
                 <div id="blocklyDivRuleIf" style="height: 60vh; width: 100%;"></div>
 
-                <div id="ruleIfXml" style="display:none;"></div>
+                <div id="ruleIfXmlToolBox" style="display:none;"></div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" onclick="saveRuleIf()">Done</button>

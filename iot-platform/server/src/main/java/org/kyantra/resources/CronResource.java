@@ -4,8 +4,10 @@ import io.swagger.annotations.Api;
 import org.kyantra.beans.CronBean;
 import org.kyantra.beans.RoleEnum;
 import org.kyantra.beans.ThingBean;
+import org.kyantra.beans.BlocklyBean;
 import org.kyantra.beans.UserBean;
 import org.kyantra.dao.CronDAO;
+import org.kyantra.dao.BlocklyDAO;
 import org.kyantra.dao.ThingDAO;
 import org.kyantra.exceptionhandling.AccessDeniedException;
 import org.kyantra.helper.AuthorizationHelper;
@@ -78,6 +80,8 @@ public class CronResource extends BaseResource {
         if (AuthorizationHelper.getInstance().checkAccess(user, targetThing)) {
             try {
                 CronDAO.getInstance().delete(id);
+                BlocklyBean blocklyBean = BlocklyDAO.getInstance().getByBlockIdAndType(id,"CRON");
+                BlocklyDAO.getInstance().delete(blocklyBean.getId());
                 return "{}";
             } catch (Throwable t) {
                 t.printStackTrace();
@@ -106,7 +110,8 @@ public class CronResource extends BaseResource {
             @FormParam("thingId") Integer thingId,
             @FormParam("name") String cronName,
             @FormParam("cronExpression") String cronExpression,
-            @FormParam("desiredState") String desiredState) throws AccessDeniedException {
+            @FormParam("desiredState") String desiredState,
+            @FormParam("ruleCronXml") String ruleCronXml) throws AccessDeniedException {
         ThingBean targetThing = ThingDAO.getInstance().get(thingId);
         UserBean user = (UserBean) getSecurityContext().getUserPrincipal();
         if (AuthorizationHelper.getInstance().checkAccess(user, targetThing)) {
@@ -117,6 +122,13 @@ public class CronResource extends BaseResource {
                 bean.setDesiredState(desiredState);
                 bean.setParentThing(ThingDAO.getInstance().get(thingId));
                 bean = CronDAO.getInstance().add(bean);
+
+                BlocklyBean blocklyXmlBean = new BlocklyBean();
+                blocklyXmlBean.setBlockType("CRON");
+                blocklyXmlBean.setBlockId(bean.getId());
+                blocklyXmlBean.setXml(ruleCronXml);
+                BlocklyDAO.getInstance().add(blocklyXmlBean);
+
                 return gson.toJson(bean);
 
             } catch (Throwable t) {

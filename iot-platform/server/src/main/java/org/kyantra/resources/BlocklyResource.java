@@ -17,15 +17,13 @@ import java.util.Set;
 import java.util.HashMap;
 import java.util.Map;
 import org.glassfish.jersey.server.mvc.Template;
+import org.kyantra.interfaces.Secure;
 import org.kyantra.exceptionhandling.AccessDeniedException;
 import org.kyantra.dao.ThingDAO;
 import org.kyantra.dao.DeviceDAO;
 import org.kyantra.dao.UnitDAO;
-import org.kyantra.beans.ThingBean;
-import org.kyantra.beans.UnitBean;
-import org.kyantra.beans.DeviceAttributeBean;
-import org.kyantra.beans.UserBean;
-import org.kyantra.beans.DeviceBean;
+import org.kyantra.dao.BlocklyDAO;
+import org.kyantra.beans.*;
 import org.kyantra.helper.AuthorizationHelper;
 import io.swagger.annotations.Api;
 
@@ -143,30 +141,30 @@ public class BlocklyResource extends BaseResource {
         return finalJson;
     }
 
-    @GET
-    @Path("/createRule")
-    @Template(name = "/blockly/createRule.ftl")
+    @POST
+    @Path("/getXml/{id}")
     @Session
-    public Map<String, Object> createRule() {
-        final Map<String, Object> map = new HashMap<String, Object>();
-        return map;
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String getXml(@PathParam("id") Integer blockId,
+                         @FormParam("type") String type) {
+        BlocklyBean bean = BlocklyDAO.getInstance().getByBlockIdAndType(blockId,type);
+        return gson.toJson(bean);
     }
 
     @GET
-    @Path("/createThen")
-    @Template(name = "/blockly/createThen.ftl")
+    @Path("thing/{id}")
     @Session
-    public Map<String, Object> createThen() {
-        final Map<String, Object> map = new HashMap<String, Object>();
-        return map;
-    }
+    @Secure(roles = {RoleEnum.READ, RoleEnum.WRITE, RoleEnum.ALL})
+    @Produces(MediaType.APPLICATION_JSON)
+    public String getByThing(@PathParam("id") Integer id) throws AccessDeniedException {
+        ThingBean targetThing = ThingDAO.getInstance().get(id);
+        UserBean user = (UserBean)getSecurityContext().getUserPrincipal();
 
-    @GET
-    @Path("/createCron")
-    @Template(name = "/blockly/createCron.ftl")
-    @Session
-    public Map<String, Object> createCron() {
-        final Map<String, Object> map = new HashMap<String, Object>();
-        return map;
+        if (AuthorizationHelper.getInstance().checkAccess(user, targetThing)) {
+            Set<BlocklyBean> blocklybeans = BlocklyDAO.getInstance().getByThingId(id);
+            return gson.toJson(blocklybeans);
+        }
+        else throw new AccessDeniedException();
     }
 }

@@ -254,7 +254,8 @@
             cronAttributeValue: "",
             cronName: "",
             crons: [],
-            storageEnabled: ""
+            storageEnabled: "",
+            blocklyXmls: []
         },
         methods: {
 
@@ -308,6 +309,8 @@
                     message: "",
                     attribute:"",
                     newValue:"",
+                    ruleIfXml:"",
+                    ruleThenXml:"",
                     interval: 15
                 };
                 this.ruleUpdate = false;
@@ -325,7 +328,9 @@
                     "data": that.createRule.data,
                     "topic": that.createRule.topic,
                     "condition": that.createRule.condition,
-                    "action": that.createRule.action
+                    "action": that.createRule.action,
+                    "ruleIfXml": that.createRule.ruleIfXml,
+                    "ruleThenXml": that.createRule.ruleThenXml
                 };
 
                 // send extra parameters according to the type of rule
@@ -392,7 +397,9 @@
                     "data": that.createRule.data,
                     "topic": that.createRule.topic,
                     "condition": that.createRule.condition,
-                    "parentThing": thingId
+                    "parentThing": thingId,
+                    "ruleIfXml": that.createRule.ruleIfXml,
+                    "ruleThenXml": that.createRule.ruleThenXml
                 };
 
                 $.ajax({
@@ -532,13 +539,31 @@
                 $.ajax({
                     url: "/rule/sns/thing/" + thingId,
                     success: function (data) {
-                        that.rules.push(data);
+                        that.rules = data;
                     }
                 });
                 $.ajax({
                     url: "/rule/actuator/thing/" + thingId,
                     success: function (data) {
-                        that.rules.push(data);
+                        that.rules = data;
+                    }
+                });
+                $.ajax({
+                    url: "/rule/actuator/thing/" + thingId,
+                    success: function (data) {
+                        that.rules = data;
+                    }
+                });
+                $.ajax({
+                    url: "/rule/actuator/thing/" + thingId,
+                    success: function (data) {
+                        that.rules = data;
+                    }
+                });
+                $.ajax({
+                    url: "/blockly/thing/" + thingId,
+                    success: function (data) {
+                        that.blocklyXmls = data;
                     }
                 });
                 $.ajax({

@@ -2,6 +2,7 @@ package org.kyantra.resources;
 
 import org.glassfish.jersey.server.mvc.Template;
 import org.kyantra.beans.SnsBean;
+import org.kyantra.beans.ActuatorBean;
 import org.kyantra.beans.ThingBean;
 import org.kyantra.beans.UnitBean;
 import org.kyantra.beans.UserBean;
@@ -316,6 +317,19 @@ public class HomeResource extends BaseResource {
         map.put("active","sns");
         SnsBean sns = SnsDAO.getInstance().get(id);
         map.put("sns", sns);
+        setCommonData(map);
+        return map;
+    }
+
+    @GET
+    @Path("/rules/actuator/{id}")
+    @Template(name = "/rules/actuator/get.ftl")
+    @Session
+    public Map<String, Object> getActuatorRules(@PathParam("id") Integer id) {
+        final Map<String, Object> map = new HashMap<String, Object>();
+        map.put("active","actuator");
+        ActuatorBean actuator = ActuatorDAO.getInstance().get(id);
+        map.put("actuator", actuator);
         setCommonData(map);
         return map;
     }

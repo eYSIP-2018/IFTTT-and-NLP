@@ -29,7 +29,7 @@
                                 <div class="form-group row col-md-12" style="margin-right:0; margin-left:0; padding:0;">
                                     <input id="ruleCondition" name="condition" type="text" class="col-md-10 form-control" style="border-top-right-radius:0;border-bottom-right-radius:0;" v-model='createRule.condition'
                                            placeholder="e.g. where state.reported.deviceXX.XX > 50">
-                                    <input id="ruleIFXML" type="hidden">
+                                    <input id="ruleIfXml" type="hidden" v-model='createRule.ruleIfXml'>
                                    <button class="col-md-2 btn btn-secondary" style="border-top-left-radius:0;border-bottom-left-radius:0;" onclick="return showRuleIfModal(event);" v-if="ruleUpdate"><i class="fa fa-puzzle-piece" aria-hidden="true"></i></button>
                                    <button class="col-md-2 btn btn-secondary" style="border-top-left-radius:0;border-bottom-left-radius:0;" onclick="return showRuleIfModal(event);" v-else><i class="fa fa-puzzle-piece" aria-hidden="true"></i></button>
                                 </div>
@@ -46,7 +46,7 @@
                             <div class="form-group" v-show="ruleUpdate == false">
                                 <label for="comment">Then...</label>
                                 <div class="form-group row col-md-12" style="margin-right:0; margin-left:0; padding:0;">
-                                    <input id="ruleThenXML" type="hidden">
+                                    <input id="ruleThenXml" type="hidden" v-model='createRule.ruleThenXml'>
                                     <select id="ruleThen" class="col-md-10 form-control combo-box" id="rightRoles" style="border-top-right-radius:0;border-bottom-right-radius:0;" v-model='createRule.action'>
                                         <option v-for="action in ruleActionList" v-bind:value="action">{{action}}
                                         </option>

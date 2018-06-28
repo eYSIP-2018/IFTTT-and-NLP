@@ -98,7 +98,7 @@ Blockly.JavaScript['assignment'] = function(block) {
     var value_rvalue = Blockly.JavaScript.valueToCode(block, 'rvalue', Blockly.JavaScript.ORDER_ATOMIC);
     value_lvalue = value_lvalue.slice(1,-1);
     value_rvalue = value_rvalue.slice(1,-1);
-    var code = '\"type\":\"actuator\",\"deviceDetails\":'+value_lvalue+',\"newValue\":'+value_rvalue;
+    var code = '\"type\":\"Actuator\",\"deviceDetails\":'+value_lvalue+',\"newValue\":'+value_rvalue;
     return code;
 };
 

@@ -16,7 +16,7 @@
     var workspaceRuleThen = null;
 
     $(document).ready(function(){
-        document.getElementById('ruleIfXml').innerHTML = '<xml id="toolboxRuleIf" style="display: none">\
+        document.getElementById('ruleIfXmlToolBox').innerHTML = '<xml id="toolboxRuleIf" style="display: none">\
             <block type="condition"></block>\
             <block type="expression"></block>\
             <block type="device_details"></block>\
@@ -24,7 +24,7 @@
             <block type="logic"></block>\
         </xml>';
 
-        document.getElementById('ruleThenXml').innerHTML = '<xml id="toolboxRuleThen" style="display: none">\
+        document.getElementById('ruleThenXmlToolBox').innerHTML = '<xml id="toolboxRuleThen" style="display: none">\
             <block type="then"></block>\
             <block type="sns"></block>\
             <block type="ddb"></block>\
@@ -416,7 +416,7 @@
     function saveRuleThen() {
         let code = Blockly.JavaScript.workspaceToCode(workspaceRuleThen);
         code = JSON.parse(code);
-        if(code.type == "actuator") {
+        if(code.type == "Actuator") {
             let actuatorAction = setDesiredState(code);
             $("#attribute").val(actuatorAction);
             $("#newValue").val(code.newValue);
