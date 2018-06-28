@@ -381,6 +381,7 @@
         let xml_text = Blockly.Xml.domToText(xml);
         document.getElementById("ruleIfXml").value = xml_text;
         $("#rule_if").modal('hide');
+        $('#crud_rule').focus();
     }
 
     function getParameter(lValueObject) {
@@ -414,20 +415,29 @@
         let code = Blockly.JavaScript.workspaceToCode(workspaceRuleThen);
         code = JSON.parse(code);
         if(code.type == "actuator") {
+            $("#ruleThen").val("Actuator");
             let actuatorAction = setDesiredState(code);
+            $("#attribute").val(actuatorAction);
+            $("#newValue").val(code.newValue);
+            document.getElementById("attribute").dispatchEvent(new Event('input', {'bubbles': true,'cancelable': true}));
+            document.getElementById("newValue").dispatchEvent(new Event('input', {'bubbles': true,'cancelable': true}));
             console.log("actuatorAction "+ actuatorAction);
         } else if(code.type == "SNS") {
+            $("#ruleThen").val("SNS");
             $("#topic").val(code.name);
             $("#subject").val(code.subject);
             $("#message").val(code.message);
             $("#interval").val(code.interval);
         } else {
+            $("#ruleThen").val("DDB");
             console.log("DDB");
         }
         let xml = Blockly.Xml.workspaceToDom(workspaceRuleThen);
         let xml_text = Blockly.Xml.domToText(xml);
         document.getElementById("ruleThenXml").value = xml_text;
         $("#rule_then").modal('hide');
+        $('#crud_rule').focus();
+        document.getElementById("ruleThen").dispatchEvent(new Event('change', {'bubbles': true,'cancelable': true}));
     }
 
     function saveCronData(loader, callback) {

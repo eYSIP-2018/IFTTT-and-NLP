@@ -156,7 +156,12 @@
                                                 v-on:click="editRuleModal(rule, idx)">EDIT</button>
                                     </td>
                                     <td>
+                                    <div v-if="rule.snsAction">
                                         <a v-bind:href="'/rules/' + rule.type.toLowerCase() + '/' + rule.snsAction.id" class="btn btn-success btn-sm" role="button" aria-pressed="true">DETAILS</a>
+                                    </div>
+                                    <div v-if="rule.actuatorAction">
+                                        <a v-bind:href="'/rules/' + rule.type.toLowerCase() + '/' + rule.actuatorAction.id" class="btn btn-success btn-sm" role="button" aria-pressed="true">DETAILS</a>
+                                    </div>
                                         <#--<button v-on:click="" class="btn btn-sm btn-success">CHANGE</button>-->
                                     </td>
                                 </tr>
@@ -301,6 +306,8 @@
                     sns_topic: "",
                     subject: "",
                     message: "",
+                    attribute:"",
+                    newValue:"",
                     interval: 15
                 };
                 this.ruleUpdate = false;
@@ -327,6 +334,9 @@
                     formData.subject = that.createRule.subject;
                     formData.message = that.createRule.message;
                     formData.interval = that.createRule.interval;
+                } else if(that.createRule.action == 'Actuator') {
+                    formData.attribute = that.createRule.attribute;
+                    formData.newValue = that.createRule.newValue;
                 }
 
                 console.log(that.createRule.action);
@@ -522,7 +532,13 @@
                 $.ajax({
                     url: "/rule/sns/thing/" + thingId,
                     success: function (data) {
-                        that.rules = data;
+                        that.rules.push(data);
+                    }
+                });
+                $.ajax({
+                    url: "/rule/actuator/thing/" + thingId,
+                    success: function (data) {
+                        that.rules.push(data);
                     }
                 });
                 $.ajax({
