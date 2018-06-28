@@ -24,6 +24,7 @@ public class BlocklyBean {
     @Column(name = "`blockType`", length = 50)
     String blockType;
 
+    @Lob
     @Expose
     @Column(name = "`xml`")
     String xml;

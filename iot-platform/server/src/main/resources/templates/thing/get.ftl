@@ -321,7 +321,6 @@
             "saveRule": function () {
                 var that = this;
                 that.saveLoader = true;
-
                 var formData = {
                     "name": that.createRule.name,
                     "description": that.createRule.description,

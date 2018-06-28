@@ -349,33 +349,39 @@
         }
     }
 
-    function getIfCondition(parts) {
-    	let conStr;
-    	if(Array.isArray(parts) && parts.length%2==0) {
-    		return false;
-    	} else if(!Array.isArray(parts) ){
-    		// for logic operator
-    		let object = parts;
-    		return " "+object.logic+" ";
-    	} else if(parts.length == 1) {
-    		//any of condition part
-    		let condition = parts[0];
-    		let parameters = [condition.lvalue.device.split(",")[0]+"."+condition.lvalue.attribute.split(",")[0],condition.operator,condition.rvalue];
-    		return "(reported.device"+parameters[0] + parameters[1] + parameters[2]+")";
-    	} else {
-    		conStr = "(";
-    		for(let i=0;i<parts.length;i++) {
-    			conStr += getIfCondition(parts[i]);
-    		}
-    		conStr+=")"
-    		return conStr;
-    	}
+    function getIfCondition(mainJSON, parts, currentString, currentIndex) {
+        let conStr;
+        if(!currentIndex)
+            currentIndex = 0;
+        if(!currentString)
+            currentString = "";
+        let ownPart;
+        if(currentIndex == -1)
+            ownPart = parts;
+        else
+            ownPart = parts;
+        if(Array.isArray(ownPart) && ownPart.length%2==0) {
+            return false;
+        } else if(!Array.isArray(ownPart) ){
+            let object = ownPart;
+            return "bit"+object.logic+"("+currentString+","+getIfCondition(mainJSON[currentIndex+1], mainJSON[currentIndex+1],"",0)+") == 1";
+        } else if(ownPart.length == 1) {
+            let condition = ownPart[0];
+            let parameters = [condition.lvalue.device.split(",")[0]+"."+condition.lvalue.attribute.split(",")[0],condition.operator,condition.rvalue];
+            return "get(state.reported,'device"+parameters[0]+"') "+parameters[1]+" "+parameters[2];
+        } else {
+            currentString = getIfCondition(mainJSON, ownPart[0], "", 0);
+            for(currentIndex = 1; currentIndex<ownPart.length; currentIndex+=2) {
+                currentString = getIfCondition(mainJSON, parts[currentIndex], currentString, currentIndex);
+            }
+            return currentString;
+        }
     }
 
     function saveRuleIf() {
         let code = Blockly.JavaScript.workspaceToCode(workspaceRuleIf);
         code = JSON.parse(code);
-        code = getIfCondition(code);
+        code = getIfCondition(code,code,"",-1);
         document.getElementById("ruleCondition").value = code;
         document.getElementById("ruleCondition").dispatchEvent(new Event('input', {'bubbles': true,'cancelable': true}));
         let xml = Blockly.Xml.workspaceToDom(workspaceRuleIf);
