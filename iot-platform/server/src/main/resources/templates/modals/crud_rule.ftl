@@ -54,7 +54,7 @@
                                    <button class="col-md-2 btn btn-secondary" style="border-top-left-radius:0;border-bottom-left-radius:0;" onclick="return showRuleThenModal(event);"><i class="fa fa-puzzle-piece" aria-hidden="true"></i></button>
                                 </div>
                             </div>
-                            <span  >
+                            <span style="display:none;">
                                 <div class="form-group">
                                     <label>SNS Topic</label>
                                     <input id="topic" name="topic" type="text" class="form-control"
@@ -75,6 +75,19 @@
                                     <label for="interval">Interval(in minutes)</label>
                                     <input id="interval" type="number" class="form-control" v-model="createRule.interval"
                                            placeholder="20">
+                                </div>
+                            </span>
+                            <span style="display:none;">
+                                <div class="form-group">
+                                    <label>Attribute</label>
+                                    <input id="attribute" name="attribute" type="text" class="form-control"
+                                           v-model='createRule.attribute'
+                                           placeholder="desired.device##.##">
+                                </div>
+                                <div class="form-group">
+                                    <label for="subject">New Value</label>
+                                    <input id="newValue" class="form-control" type="text" v-model="createRule.newValue"
+                                           placeholder="0/1">
                                 </div>
                             </span>
                         </div>

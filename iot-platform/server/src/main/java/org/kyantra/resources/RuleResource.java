@@ -23,6 +23,11 @@ public class RuleResource extends BaseResource {
         return new SnsRuleResource(sc, request);
     }
 
+    @Path("/actuator")
+    public ActuatorRuleResource getActuatorRule() {
+        return new ActuatorRuleResource(sc, request);
+    }
+
     @GET
     @Path("/actions")
     @Session

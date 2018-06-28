@@ -33,7 +33,8 @@ public class HibernateService {
                 .addAnnotatedClass(RuleBean.class)
                 .addAnnotatedClass(SnsBean.class)
                 .addAnnotatedClass(SnsSubscriptionBean.class)
-                .addAnnotatedClass(BlocklyBean.class);
+                .addAnnotatedClass(BlocklyBean.class)
+                .addAnnotatedClass(ActuatorBean.class);
 
         StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties());
         sessionFactory = configuration.buildSessionFactory(builder.build());

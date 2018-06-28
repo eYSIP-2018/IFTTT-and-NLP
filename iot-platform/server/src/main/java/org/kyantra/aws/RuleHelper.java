@@ -5,6 +5,7 @@ import com.amazonaws.services.dynamodbv2.document.*;
 import com.amazonaws.services.iot.model.*;
 import org.kyantra.beans.RuleBean;
 import org.kyantra.beans.SnsBean;
+import org.kyantra.beans.ActuatorBean;
 import org.kyantra.dao.ConfigDAO;
 import org.kyantra.dao.RuleDAO;
 import org.kyantra.utils.AwsIotHelper;
@@ -62,7 +63,39 @@ public class RuleHelper {
             topicRuleRequest.withRuleName(ruleNameAws)
                     .withTopicRulePayload(rulePayload);
         }
+        else if (ruleBean.getType().equals("Actuator")) {
+            ActuatorBean actuatorBean = (ActuatorBean) actionBean;
 
+            // constructed names of entities
+            String thingName = "thing" + ruleBean.getParentThing().getId();
+            String ruleName = ruleBean.getName();
+            String ruleNameAws = thingName + "_actuator_" + ruleName;
+
+            // add ruleName in rule query
+            String data = ruleBean.getData();
+            // this is string prefix needed to get ruleName inside a rule
+            String suffix = "";
+            if(!data.equals("")) {
+                suffix = ", \"" + thingName + "_actuator_" + ruleName + "\" as ruleName";
+            }
+
+            // put details about the item in DynamoDB NotificationDetail table
+            AmazonDynamoDB amazonDynamoDB = AwsIotHelper.getAmazonDynamoDBClient();
+            DynamoDB dynamoDB = new DynamoDB(amazonDynamoDB);
+            Table table = dynamoDB.getTable("actuatorStates");
+            Item item = new Item()
+                    .withPrimaryKey("ruleName", ruleNameAws)
+                    .withString("attribute", actuatorBean.getAttribute())
+                    .withString("newValue", actuatorBean.getNewValue());
+            PutItemOutcome outcome = table.putItem(item);
+
+            // create rule payload: {using data provided in ruleBean and snsBean}
+            TopicRulePayload rulePayload = ActuatorHelper.getInstance().createActuatorRulePayload(ruleBean, actuatorBean, suffix);
+
+            // create rule at AWS
+            topicRuleRequest.withRuleName(ruleNameAws)
+                    .withTopicRulePayload(rulePayload);
+        }
         return AwsIotHelper.getIotClient().createTopicRule(topicRuleRequest);
     }
 
@@ -97,6 +130,29 @@ public class RuleHelper {
 
             // Update the rule in DB
             RuleDAO.getInstance().update(ruleBean);
+        } else if (ruleBean.getType().equals("Actuator")) {
+            ActuatorBean actuatorBean = (ActuatorBean) actionBean;
+
+            // constructed names of entities
+            String thingName = "thing" + ruleBean.getParentThing().getId();
+            String ruleName = ruleBean.getName();
+            String ruleNameAws = thingName + "_actuator_" + ruleName;
+
+            // add ruleName in rule query
+            String data = ruleBean.getData();
+            // this is string prefix needed to get ruleName inside a rule
+            String suffix = "";
+            if(!data.equals("")) {
+                suffix = ", \"" + thingName + "_actuator_" + ruleName + "\" as ruleName";
+            }
+
+
+            // create rule payload: {using data provided in ruleBean and snsBean}
+            TopicRulePayload rulePayload = ActuatorHelper.getInstance().createActuatorRulePayload(ruleBean, actuatorBean, suffix);
+
+            // create rule at AWS
+            topicRuleRequest.withRuleName(ruleNameAws)
+                    .withTopicRulePayload(rulePayload);
         }
 
         return AwsIotHelper.getIotClient().replaceTopicRule(topicRuleRequest);
@@ -118,6 +174,12 @@ public class RuleHelper {
         AmazonDynamoDB amazonDynamoDB = AwsIotHelper.getAmazonDynamoDBClient();
         DynamoDB dynamoDB = new DynamoDB(amazonDynamoDB);
         Table table = dynamoDB.getTable("NotificationDetail");
+        table.deleteItem(new PrimaryKey("ruleName", ruleName));
+
+        ruleName = "thing" + ruleBean.getParentThing().getId() + "_actuator_" + ruleBean.getName();
+        deleteTopicRuleRequest.withRuleName(ruleName);
+
+        table = dynamoDB.getTable("actuatorStates");
         table.deleteItem(new PrimaryKey("ruleName", ruleName));
 
         DeleteTopicRuleResult deleteTopicRuleResult =

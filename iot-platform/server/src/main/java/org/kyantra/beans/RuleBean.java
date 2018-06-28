@@ -45,6 +45,10 @@ public class RuleBean {
     @OneToOne(mappedBy = "parentRule", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private SnsBean snsAction;
 
+    @Expose
+    @OneToOne(mappedBy = "parentRule", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private ActuatorBean actuatorAction;
+
     @ManyToOne(fetch = FetchType.EAGER)
     private ThingBean parentThing;
 
@@ -108,6 +112,10 @@ public class RuleBean {
         return snsAction;
     }
 
+    public ActuatorBean getActuatorAction() {
+        return actuatorAction;
+    }
+
     public SnsBean addSNSAction(SnsBean snsAction) {
         //TODO: Perform checks for presence of other actions
         //For simplicity one rule has one action only; other fields are null
@@ -120,6 +128,21 @@ public class RuleBean {
         if(this.snsAction != null) {
             snsAction.setParentRule(null);
             this.snsAction = null;
+        }
+    }
+
+    public ActuatorBean addActuatorAction(ActuatorBean actuatorAction) {
+        //TODO: Perform checks for presence of other actions
+        //For simplicity one rule has one action only; other fields are null
+        actuatorAction.setParentRule(this);
+        this.actuatorAction = actuatorAction;
+        return actuatorAction;
+    }
+
+    public void removeActuatorAction() {
+        if(this.actuatorAction != null) {
+            actuatorAction.setParentRule(null);
+            this.actuatorAction = null;
         }
     }
 

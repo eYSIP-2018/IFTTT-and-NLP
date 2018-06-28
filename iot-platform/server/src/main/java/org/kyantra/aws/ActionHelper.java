@@ -10,7 +10,7 @@ import org.kyantra.dao.ConfigDAO;
 // singleton
 public class ActionHelper {
 
-    private static String[] actionTypes = {"SNS", "DDB"};
+    private static String[] actionTypes = {"Actuator","SNS", "DDB"};
 
     private static ActionHelper instance;
 
