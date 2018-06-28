@@ -1,9 +1,22 @@
+/*
+    WebHook for DialogFlow assistant in JavaScript
+    To be deployed on webhooks like Google Cloud Functions, AWS Lambda, etc.
+
+    Auther:
+        Onk_r Sathe
+        RathiRohit
+*/
+
+//Get natural-cron.js library for converting english phrases to cron expressions
 const getCronString = require('./natural-cron/src/readableToCron').getCronString;
 
+//JSON Object with details of Project, Server and Endpoint API Details
 var fulfillment = {
+    //DialogFlow project details
     "project": {
         "projectID": "eyantra-iot-f0957"
     },
+    //Basic response format of DialogFlow
     "basic_response" : {
         "fulfillmentText": "",
         "fulfillmentMessages": [],
@@ -12,11 +25,13 @@ var fulfillment = {
         "outputContexts": [],
         "followupEventInput": {}
     },
+    //IoT platform's server details
     "server" : {
         "protocol" : "http",
         "hostname" : "127.0.0.1",
         "port" : 8002
     },
+    //Intent <=> API endpoint mapping
     "create.thing": {
         "thing" : {
             "endpoint" : "/thing/create",
@@ -682,6 +697,7 @@ var fulfillment = {
     }
 };
 
+//Including requirements for making REST calls to API endpoints
 const http = require('http');
 const qs = require('querystring');
 
@@ -692,6 +708,8 @@ var objectType;
 var options;
 var reply;
 var conversationId;
+
+//Find perticular Key in JSON recursively and return it's value, returns NULL if Key not found
 function findKey(key, data) {
     for(var dataKey in data) {
         if(dataKey == key)
@@ -705,8 +723,8 @@ function findKey(key, data) {
     return null;
 }
 
+//Function to make HTTP requests with given Options, Input data & Callback function
 function sendRequest(options, apiInput, callback) {
-    console.log("in send at start");
     var request = http.request(options, function (response) {
         var chunks = "";
 
@@ -716,35 +734,44 @@ function sendRequest(options, apiInput, callback) {
 
         response.on("end", function () {
             reply = JSON.parse(chunks);
-            console.log("in send at end");
             callback(reply,this.statusCode);
         });
     });
+    //If data has to be send with request
     if(apiInput != null)
         request.write(qs.stringify(apiInput));
     request.end();
 }
 
+//Main Webhook function
 exports.eYantraWebhook = (req, res) => {
+    //Check if request has all the required parameters in JSON
     if(req.hasOwnProperty("body") && req.body.hasOwnProperty("queryResult") && req.body.queryResult.hasOwnProperty("intent") && req.body.queryResult.intent.hasOwnProperty("displayName")) {
+
+        //Take out all required major Values from request JSON
         queryResult = req.body.queryResult;
-        console.log("Intent : "+ queryResult.intent.displayName);
         intent = queryResult.intent.displayName;
         objectType = findKey("object", queryResult);
         token = findKey("accessToken", req.body);
         conversationId = findKey("conversationId", req.body);
+
+        //Initialize responseText with default response JSON
         responseText = Object.assign({},fulfillment["basic_response"]);
+
+        //Check if auth token is available (for requests from web assistant)
         if(token == null) {
             token = findKey("session",req.body);
             if(token != null)
                 token = token.split('/').pop();
         }
+
+        //If token is not available
         if(token == null) {
             responseText.fulfillmentText = "not authenticated!";
             res.status(200).send(JSON.stringify(responseText));
         }
-        console.log("Token: "+token);
-        console.log("ObjectType : "+objectType);
+
+        //Set corresponding API endpoint options
         options = {
             "method": fulfillment[intent][objectType]["type"],
             "hostname": fulfillment["server"]["hostname"],
@@ -756,8 +783,10 @@ exports.eYantraWebhook = (req, res) => {
                 "Cookie": "authorization=; authorization="+token
             }
         };
+
+        //Process intents seperately
         switch(intent) {
-            /*done*/
+            /*Done*/
             case "create.thing" : {
                 let apiInput = fulfillment[intent][objectType]["apiInput"];
                 apiInput.name = queryResult.parameters.name;
@@ -788,7 +817,7 @@ exports.eYantraWebhook = (req, res) => {
             }
             break;
 
-            /*done*/
+            /*Done*/
             case "create.unit" : {
                 let apiInput = fulfillment[intent][objectType]["apiInput"];
                 apiInput.unitName = queryResult.parameters.name;
@@ -820,7 +849,7 @@ exports.eYantraWebhook = (req, res) => {
             }
             break;
 
-            /*done*/
+            /*Done*/
             case "create.device" : {
                 let apiInput = fulfillment[intent][objectType]["apiInput"];
                 apiInput.name = queryResult.parameters.name;
@@ -1017,6 +1046,7 @@ exports.eYantraWebhook = (req, res) => {
             }
             break;
 
+            /*Done*/
             case "object.delete-all - yes" : {
                 switch(objectType) {
                     case "cron" :
@@ -2633,7 +2663,9 @@ exports.eYantraWebhook = (req, res) => {
             break;
 
         }
-    } else {
+    }
+    //Bad request
+    else {
         responseText.fulfillmentText = "";
         res.status(200).send(JSON.stringify(responseText));
     }
