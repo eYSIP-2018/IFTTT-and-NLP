@@ -86,7 +86,7 @@ public class BlocklyDAO extends BaseDAO{
 
     public BlocklyBean getByBlockIdAndType(int blockId, String blockType) {
         Session session = getService().getSessionFactory().openSession();
-        String ql = "from BlocklyBean where blockId="+blockId +" and blockType="+blockType;
+        String ql = "from BlocklyBean where blockId="+blockId +" and blockType='"+blockType+"'";
         Query query = session.createQuery(ql);
         BlocklyBean blocklyBean = (BlocklyBean) query.getResultList();
         session.close();
