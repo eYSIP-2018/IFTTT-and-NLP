@@ -506,7 +506,6 @@
 
             // load required data
             "load": function () {
-
                 var that = this;
                 $.ajax({
                     url: "/thing/get/" + thingId,
@@ -671,7 +670,7 @@
             "saveDevice": function () {
                 var that = this;
                 this.saveLoader = true;
-                that.createDevice.ownerUnitId = that.thing.parentUnitId;
+                that.createDevice.ownerUnitId = that.thing.parentUnit.id;
                 that.createDevice.parentThingId = that.thing.id;
                 if (this.createDevice.id) {
                     $.ajax({
