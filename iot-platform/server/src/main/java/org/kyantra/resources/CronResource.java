@@ -80,8 +80,6 @@ public class CronResource extends BaseResource {
         if (AuthorizationHelper.getInstance().checkAccess(user, targetThing)) {
             try {
                 CronDAO.getInstance().delete(id);
-                BlocklyBean blocklyBean = BlocklyDAO.getInstance().getByBlockIdAndType(id,"CRON");
-                BlocklyDAO.getInstance().delete(blocklyBean.getId());
                 return "{}";
             } catch (Throwable t) {
                 t.printStackTrace();
@@ -122,12 +120,6 @@ public class CronResource extends BaseResource {
                 bean.setDesiredState(desiredState);
                 bean.setParentThing(ThingDAO.getInstance().get(thingId));
                 bean = CronDAO.getInstance().add(bean);
-
-                BlocklyBean blocklyXmlBean = new BlocklyBean();
-                blocklyXmlBean.setBlockType("CRON");
-                blocklyXmlBean.setBlockId(bean.getId());
-                blocklyXmlBean.setXml(ruleCronXml);
-                BlocklyDAO.getInstance().add(blocklyXmlBean);
 
                 return gson.toJson(bean);
 

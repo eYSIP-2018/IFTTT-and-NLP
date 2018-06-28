@@ -59,6 +59,10 @@
             dataType: "text",
             success: function(data) {
                 startBlocklyRuleIf(data);
+                if($('#ruleIfXml').val() != '') {
+                    var xml = Blockly.Xml.textToDom($('#ruleIfXml').val());
+                    Blockly.Xml.domToWorkspace(xml, workspaceRuleIf);
+                }
             }
         });
 
@@ -439,7 +443,6 @@
         }
         let xml = Blockly.Xml.workspaceToDom(workspaceRuleThen);
         let xml_text = Blockly.Xml.domToText(xml);
-        document.getElementById("ruleThenXml").value = xml_text;
         $("#rule_then").modal('hide');
         $('#crud_rule').focus();
         $("#ruleThen").val(code.type);

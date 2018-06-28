@@ -310,7 +310,6 @@
                     attribute:"",
                     newValue:"",
                     ruleIfXml:"",
-                    ruleThenXml:"",
                     interval: 15
                 };
                 this.ruleUpdate = false;
@@ -328,8 +327,7 @@
                     "topic": that.createRule.topic,
                     "condition": that.createRule.condition,
                     "action": that.createRule.action,
-                    "ruleIfXml": that.createRule.ruleIfXml,
-                    "ruleThenXml": that.createRule.ruleThenXml
+                    "ruleIfXml": that.createRule.ruleIfXml
                 };
 
                 // send extra parameters according to the type of rule
@@ -383,6 +381,13 @@
                 that.createRule.idx = idx;
                 // Load form modal in update mode
                 that.ruleUpdate = true;
+                // Load XML of blockly for IF condition
+                var blocklyIfXmlObject = this.blocklyXmls.find(function(blockly){
+                    return blockly.blockId == rule.id;
+                });
+                if(typeof blocklyIfXmlObject  != 'undefined' && blocklyIfXmlObject) {
+                    that.createRule.ruleIfXml = blocklyIfXmlObject.xml;
+                }
                 $('#create_rule').modal('show');
             },
 
@@ -397,8 +402,7 @@
                     "topic": that.createRule.topic,
                     "condition": that.createRule.condition,
                     "parentThing": thingId,
-                    "ruleIfXml": that.createRule.ruleIfXml,
-                    "ruleThenXml": that.createRule.ruleThenXml
+                    "ruleIfXml": that.createRule.ruleIfXml
                 };
 
                 $.ajax({

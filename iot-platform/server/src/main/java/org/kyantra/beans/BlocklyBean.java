@@ -20,10 +20,6 @@ public class BlocklyBean {
     @Column(name = "`blockId`")
     Integer blockId;
 
-    @Expose
-    @Column(name = "`blockType`", length = 50)
-    String blockType;
-
     @Lob
     @Expose
     @Column(name = "`xml`")
@@ -46,14 +42,6 @@ public class BlocklyBean {
 
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    public String getBlockType() {
-        return blockType;
-    }
-
-    public void setBlockType(String blockType) {
-        this.blockType = blockType;
     }
 
     public String getXml() {

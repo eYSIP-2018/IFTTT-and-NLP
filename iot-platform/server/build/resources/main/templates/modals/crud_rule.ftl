@@ -46,7 +46,6 @@
                             <div class="form-group" v-show="ruleUpdate == false">
                                 <label for="comment">Then...</label>
                                 <div class="form-group row col-md-12" style="margin-right:0; margin-left:0; padding:0;">
-                                    <input id="ruleThenXml" type="hidden" v-model='createRule.ruleThenXml'>
                                     <select id="ruleThen" class="col-md-10 form-control combo-box" id="rightRoles" style="border-top-right-radius:0;border-bottom-right-radius:0;" v-model='createRule.action'>
                                         <option v-for="action in ruleActionList" v-bind:value="action">{{action}}
                                         </option>
