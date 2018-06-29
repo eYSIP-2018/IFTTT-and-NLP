@@ -4,6 +4,7 @@
 <script src="/static/js/blockly/msg/js/en.js"></script>
 <script src="/static/js/blockly/blocks/AllBlocksJS.js"></script>
 <script src="/static/js/blockly/generators/javascript/AllBlocksGenerator.js"></script>
+<script src="/static/js/natural-cron-alpha-v0.0.1.bundle.js"></script>
 
 <link rel="stylesheet" href="/static/css/blocklyModals.css">
 
@@ -508,10 +509,30 @@
                         document.getElementById("cronAttributeValue").dispatchEvent(new Event('change', {'bubbles': true,'cancelable': true}));
 
                         setTimeout(callback,1500);
-
                     }, 1500);
                 }
             }, 1500);
         }
+    }
+
+    function generateCron() {
+        let retVal = prompt("When would you like to execute this ?", "every day at 2:45PM");
+        retVal = getCronString(retVal);
+        if(retVal.includes('ERROR'))
+            alert("Oops! looks like something is not right...\n\n"+retVal);
+        else {
+            autoCopyToClipboard(retVal);
+            prompt("Here is your cron expression:\n(already copied to the clipboard!)", retVal);
+            document.execCommand("Copy");
+        }
+    }
+
+    function autoCopyToClipboard(text) {
+        let input = document.createElement('input');
+        input.setAttribute('value', text);
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand('copy');
+        document.body.removeChild(input);
     }
 </script>
