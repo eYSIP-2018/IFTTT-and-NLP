@@ -368,7 +368,7 @@
             return false;
         } else if(!Array.isArray(ownPart) ){
             let object = ownPart;
-            return "bit"+object.logic+"("+currentString+","+getIfCondition(mainJSON[currentIndex+1], mainJSON[currentIndex+1],"",0)+") == 1";
+            return "bit"+object.logic+"("+currentString+","+getIfCondition(mainJSON[currentIndex+1], mainJSON[currentIndex+1],"",0)+") = 1";
         } else if(ownPart.length == 1) {
             let condition = ownPart[0];
             let parameters = [condition.lvalue.device.split(",")[0]+"."+condition.lvalue.attribute.split(",")[0],condition.operator,condition.rvalue];
