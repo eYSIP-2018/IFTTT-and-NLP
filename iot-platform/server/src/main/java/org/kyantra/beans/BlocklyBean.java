@@ -1,7 +1,7 @@
 package org.kyantra.beans;
 
 import com.google.gson.annotations.Expose;
-
+import org.hibernate.annotations.NaturalId;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -17,6 +17,7 @@ public class BlocklyBean {
     Integer id;
 
     @Expose
+    @NaturalId
     @Column(name = "`blockId`")
     Integer blockId;
 

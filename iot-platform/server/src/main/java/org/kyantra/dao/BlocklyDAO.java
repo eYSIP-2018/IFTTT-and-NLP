@@ -85,9 +85,9 @@ public class BlocklyDAO extends BaseDAO{
 
     public BlocklyBean getByBlockId(int blockId) {
         Session session = getService().getSessionFactory().openSession();
-        String ql = "from BlocklyBean where blockId="+blockId;
-        Query query = session.createQuery(ql);
-        BlocklyBean blocklyBean = (BlocklyBean) query.getResultList();
+        BlocklyBean blocklyBean = session.byNaturalId(BlocklyBean.class)
+                   .using("blockId",blockId)
+                   .load();
         session.close();
         return blocklyBean;
     }

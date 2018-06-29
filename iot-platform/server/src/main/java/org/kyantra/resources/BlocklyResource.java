@@ -48,7 +48,7 @@ public class BlocklyResource extends BaseResource {
         String allUnitsJson = "[";
         String unitJson = "{\"\":{\"subunits\": [[]],\"things\": [[]]},";
         for(UnitBean object : unitObjects) {
-            allUnitsJson += "[\""+object.getUnitName()+"\",\""+object.getId()+","+object.getUnitName()+"\"],";
+            allUnitsJson += "[\""+object.getId()+","+object.getUnitName()+"\",\""+object.getId()+","+object.getUnitName()+"\"],";
             unitJson += "\""+object.getId()+","+object.getUnitName()+"\" : { ";
             unitJson +="\"subunits\" : [ ";
             List <UnitBean> subunits = object.getSubunits();
@@ -56,7 +56,7 @@ public class BlocklyResource extends BaseResource {
                 unitJson += "[]";
             } else {
                 for(UnitBean subObject : subunits) {
-                    unitJson+="[\""+subObject.getUnitName()+"\",\""+subObject.getId()+","+subObject.getUnitName()+"\"],";
+                    unitJson+="[\""+subObject.getId()+","+subObject.getUnitName()+"\",\""+subObject.getId()+","+subObject.getUnitName()+"\"],";
                 }
             }
             unitJson+="],";
@@ -66,7 +66,7 @@ public class BlocklyResource extends BaseResource {
                 unitJson += "[]";
             } else {
                 for(ThingBean subObject : things) {
-                    unitJson+="[\""+subObject.getName()+"\",\""+subObject.getId()+","+subObject.getName()+"\"],";
+                    unitJson+="[\""+subObject.getId()+","+subObject.getName()+"\",\""+subObject.getId()+","+subObject.getName()+"\"],";
                 }
             }
             unitJson+="]},";
@@ -98,7 +98,7 @@ public class BlocklyResource extends BaseResource {
                 thingJson += "[]";
             } else {
                 for(DeviceBean device : devices) {
-                    thingJson+="[\""+device.getName()+"\",\""+device.getId()+","+device.getName()+"\"],";
+                    thingJson+="[\""+device.getId()+","+device.getName()+"\",\""+device.getId()+","+device.getName()+"\"],";
                 }
             }
 
@@ -128,7 +128,7 @@ public class BlocklyResource extends BaseResource {
                 deviceJson += "[]";
             } else {
                 for(DeviceAttributeBean subObject : attributes) {
-                    deviceJson+="[\""+subObject.getName()+"\",\""+subObject.getId()+","+subObject.getName()+"\"],";
+                    deviceJson+="[\""+subObject.getId()+","+subObject.getName()+"\",\""+subObject.getId()+","+subObject.getName()+"\"],";
                 }
             }
             deviceJson+="]},";
