@@ -85,7 +85,7 @@ Blockly.Blocks['expression'] = {
         .setCheck("device_details");
     this.appendDummyInput()
         .setAlign(Blockly.ALIGN_CENTRE)
-        .appendField(new Blockly.FieldDropdown([["==","=="], ["!=","!="], ["<","<"], ["<=","<="], [">",">"], [">=",">="]]), "operator");
+        .appendField(new Blockly.FieldDropdown([["=","="], ["!=","!="], ["<","<"], ["<=","<="], [">",">"], [">=",">="]]), "operator");
     this.appendValueInput("rvalue")
         .setCheck("value");
     this.setInputsInline(true);
