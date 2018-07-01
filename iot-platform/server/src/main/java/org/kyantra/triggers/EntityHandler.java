@@ -214,9 +214,12 @@ public class EntityHandler {
     }
 
     //update entities from dialogflow
-    public void triggerUpdate(Object newObjectName,Object object) {
+    public void triggerUpdate(String newObjectName,Object object) {
         String parameters[] = getParameters(object);
         String objectName = parameters[0];
+        if(objectName.equals(newObjectName)) {
+            return ;
+        }
         if(isValid(objectName,object)) {
             String eid = parameters[1];
             String url = new String("https://api.dialogflow.com/v1/entities/"+eid+"/entries?v=20150910");
