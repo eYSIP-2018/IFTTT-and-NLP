@@ -656,20 +656,45 @@ var fulfillment = {
         }
     },
     "pubsub.get-shadow-by-name" : {
-        "pubsubShadow": {
-            "endpoint" : "/thing/list/page/0",
+        "pubsub": {
+            "endpoint" : "/pubsub/attribute/",
             "type" : "GET",
             "content_type" : "application/x-www-form-urlencoded",
             "response_type" : "application/json",
             "url_parameter" : true,
             "apiInput" : {
-                "id" : ""
+                "str" : ""
             }
         }
     },
     "pubsub.set-value-by-name" : {
-        "pubsubValue": {
-            "endpoint" : "/thing/list/page/0",
+        "pubsub": {
+            "endpoint" : "/pubsub/attribute/",
+            "type" : "GET",
+            "content_type" : "application/x-www-form-urlencoded",
+            "response_type" : "application/json",
+            "url_parameter" : true,
+            "apiInput" : {
+                "id" : "",
+                "value" : ""
+            }
+        }
+    },
+    "pubsub.get-shadow-by-context" : {
+        "pubsub": {
+            "endpoint" : "/pubsub/attribute/",
+            "type" : "GET",
+            "content_type" : "application/x-www-form-urlencoded",
+            "response_type" : "application/json",
+            "url_parameter" : true,
+            "apiInput" : {
+                "str" : ""
+            }
+        }
+    },
+    "pubsub.set-value-by-context" : {
+        "pubsub": {
+            "endpoint" : "/pubsub/attribute/",
             "type" : "GET",
             "content_type" : "application/x-www-form-urlencoded",
             "response_type" : "application/json",
@@ -693,6 +718,40 @@ var fulfillment = {
                 "cronExpression" : "",
                 "desiredState" : ""
             }
+        }
+    },
+    "object.get-it" : {
+        "thing" : {
+            "endpoint" : "/thing/get/",
+            "type" : "GET",
+            "content_type" : "application/x-www-form-urlencoded",
+            "response_type" : "application/json",
+            "url_parameter" : true,
+            "apiInput" : {}
+        },
+        "unit" : {
+            "endpoint" : "/unit/get/",
+            "type" : "GET",
+            "content_type" : "application/x-www-form-urlencoded",
+            "response_type" : "application/json",
+            "url_parameter" : true,
+            "apiInput" : {}
+        },
+        "device" : {
+            "endpoint" : "/device/get/",
+            "type" : "GET",
+            "content_type" : "application/x-www-form-urlencoded",
+            "response_type" : "application/json",
+            "url_parameter" : true,
+            "apiInput" : {}
+        },
+        "user" : {
+            "endpoint" : "/user/get/",
+            "type" : "GET",
+            "content_type" : "application/x-www-form-urlencoded",
+            "response_type" : "application/json",
+            "url_parameter" : true,
+            "apiInput" : {}
         }
     }
 };
@@ -722,6 +781,19 @@ function findKey(key, data) {
     }
     return null;
 }
+
+//find key value from contexts
+function fromOutputContext(outputContexts,context,key) {
+    for(let outputContext of outputContexts) {
+        let contextName = outputContext.name;
+        contextName = contextName.slice(contextName.lastIndexOf('/')+1);
+        if(contextName == context) {
+            return outputContext.parameters[key];
+        }
+    }
+    return null;
+}
+
 
 //Function to make HTTP requests with given Options, Input data & Callback function
 function sendRequest(options, apiInput, callback) {
@@ -772,6 +844,7 @@ exports.eYantraWebhook = (req, res) => {
         }
 
         //Set corresponding API endpoint options
+        console.log(intent + " " + objectType);
         options = {
             "method": fulfillment[intent][objectType]["type"],
             "hostname": fulfillment["server"]["hostname"],
@@ -802,13 +875,19 @@ exports.eYantraWebhook = (req, res) => {
                         responseText.fulfillmentText = "not authenticated !";
                     }
                     else {
-                        responseText.fulfillmentText = "Thing created with Id : "+reply.id + " Name : " + reply.name + " parentUnit : " + reply.parentUnit.id + " "+reply.parentUnit.unitName;
+                        if(reply.hasOwnProperty('success')){
+                            responseText.fulfillmentText = "Thing created but alredy topic rule is exist!";
+                        }
+                        else {
+                            responseText.fulfillmentText = "Thing created with Id : "+reply.id + " Name : " + reply.name + " parentUnit : " + reply.parentUnit.id + " "+reply.parentUnit.unitName;
+                        }
                         responseText.outputContexts = [{
                             "name": "projects/"+fulfillment.project.projectID+"/agent/sessions/"+conversationId+"/contexts/object",
                             "lifespanCount": 5,
                             "parameters": {
                               "object" : "thing",
-                              "id" : reply.id
+                              "id" : reply.id,
+                              "name": apiInput.name
                             }
                         }];
                     }
@@ -1600,11 +1679,14 @@ exports.eYantraWebhook = (req, res) => {
             break;
 
             /*Done*/
+            case "pubsub.get-shadow-by-context" :
             case "pubsub.get-shadow-by-name" : {
                 console.log("inside " + intent);
-                let name = findKey("device", queryResult.parameters);
-                let attribute = findKey("attribute", queryResult.parameters);
+                let name = queryResult.parameters.device;
+                let attribute = queryResult.parameters.attribute;
                 console.log("object name :" +  name +" attribute: "+attribute);
+                options.path+=''+attribute;
+                console.log(options.path);
                 sendRequest(options,null,function(reply,statusCode){
                     if(statusCode!= "200") {
                         responseText.fulfillmentText = "not authenticated !";
@@ -1612,22 +1694,15 @@ exports.eYantraWebhook = (req, res) => {
                     else {
                         let tempAttributeList = [];
                         for(let i=0; i<reply.length; i++) {
-                            for(let j=0; j<reply[i].devices.length; j++) {
-                                if(reply[i].devices[j].name.toUpperCase() == name.toUpperCase()) {
-                                    for(let k=0; k<reply[i].devices[j].deviceAttributes.length; k++) {
-                                        if(reply[i].devices[j].deviceAttributes[k].name.toUpperCase() == attribute.toUpperCase()) {
-                                            tempAttributeList.push({"attributeID":reply[i].devices[j].deviceAttributes[k].id, "deviceID":reply[i].devices[j].id, "deviceName":reply[i].devices[j].name, "thingID":reply[i].id, "thingName":reply[i].name});
-                                            break;
-                                        }
-                                    }
-                                }
+                            if(reply[i].deviceName.toUpperCase() == name.toUpperCase()) {
+                                tempAttributeList.push({"attributeId":reply[i].deviceAttributeId,"deviceId":reply[i].deviceId,"deviceName":reply[i].deviceName,"parentThingId":reply[i].parentThingId,"parentThingName" : reply[i].parentThingName});
                             }
                         }
                         if(tempAttributeList.length > 1) {
                             responseText = Object.assign({},fulfillment["basic_response"]);;
                             let tmpPayload = {"google": {"expectUserResponse": true,"richResponse": {"items": [{"simpleResponse": {"textToSpeech": "Found more than one devices with that name... Choose one of these IDs..."}}]},"systemIntent": {"intent": "actions.intent.OPTION","data": {"@type": "type.googleapis.com/google.actions.v2.OptionValueSpec","listSelect": {"items": []}}}}};
                             for(let i=0; i<tempAttributeList.length; i++) {
-                                tmpPayload.payload.google.systemIntent.data.listSelect.items.push({"optionInfo": {"key": ""+tempAttributeList[i].deviceID+""+tempAttributeList[i].deviceName+""+tempAttributeList[i].thingID+""+tempAttributeList[i].attributeID},"title": ""+tempAttributeList[i].deviceName+" (ID:"+tempAttributeList[i].deviceID+")", "description":"ParentThing: "+tempAttributeList[i].thingName});
+                                tmpPayload.payload.google.systemIntent.data.listSelect.items.push({"optionInfo": {"key": ""+tempAttributeList[i].deviceId+""+tempAttributeList[i].deviceName+""+tempAttributeList[i].parentThingId+""+tempAttributeList[i].attributeId},"title": ""+tempAttributeList[i].deviceName+" (ID:"+tempAttributeList[i].deviceId+")", "description":"ParentThing: "+tempAttributeList[i].parentThingName});
                             }
                             responseText.outputContexts = [{
                                 "name": "projects/"+fulfillment.project.projectID+"/agent/sessions/"+conversationId+"/contexts/action-id-by-name",
@@ -1642,7 +1717,7 @@ exports.eYantraWebhook = (req, res) => {
                             res.status(200).send(JSON.stringify(responseText));
                         }
                         else if(tempAttributeList.length == 1) {
-                            let id = tempAttributeList[0].thingID;
+                            let id = tempAttributeList[0].parentThingId;
                             console.log("pubsub id "+ id);
                             options.method = fulfillment["object.action-id-by-name"]["pubsubShadow"]["type"];
                             options.path = fulfillment["object.action-id-by-name"]["pubsubShadow"]["endpoint"];
@@ -1655,9 +1730,19 @@ exports.eYantraWebhook = (req, res) => {
                                 }
                                 else {
                                     responseText = Object.assign({},fulfillment["basic_response"]);
-                                    if(reply.state.reported.hasOwnProperty("device"+tempAttributeList[0].deviceID+"."+tempAttributeList[0].attributeID))
-                                        responseText.fulfillmentText = "The "+attribute+" is "+reply.state.reported["device"+tempAttributeList[0].deviceID+"."+tempAttributeList[0].attributeID];
-                                    else
+                                    if(reply.state.reported.hasOwnProperty("device"+tempAttributeList[0].deviceId+"."+tempAttributeList[0].attributeId)) {
+                                        responseText.fulfillmentText = "The "+attribute+" is "+reply.state.reported["device"+tempAttributeList[0].deviceId+"."+tempAttributeList[0].attributeId];
+                                        responseText.outputContexts = [{
+                                            "name": "projects/"+fulfillment.project.projectID+"/agent/sessions/"+conversationId+"/contexts/pubsubs",
+                                            "lifespanCount": 1,
+                                            "parameters": {
+                                              "device" : tempAttributeList[0].deviceId,
+                                              "attribute" : tempAttributeList[0].attributeId,
+                                              "thing" : tempAttributeList[0].parentThingId,
+                                              "deviceName" : tempAttributeList[0].deviceName
+                                            }
+                                        }];
+                                    } else
                                         responseText.fulfillmentText = "Oops! I can't find the "+attribute+"! Check if the device is on and connected.";
                                 }
                                 res.status(200).send(JSON.stringify(responseText));
@@ -1674,12 +1759,15 @@ exports.eYantraWebhook = (req, res) => {
             break;
 
             /*Done*/
+            case "pubsub.set-value-by-context" :
             case "pubsub.set-value-by-name" : {
                 console.log("inside " + intent);
                 let name = findKey("device", queryResult.parameters);
                 let attribute = findKey("attribute", queryResult.parameters);
                 let value = findKey("value",queryResult.parameters);
                 console.log("object name :" +  name +" attribute: "+attribute + " value : " + value);
+                options.path+=''+attribute;
+                console.log(options.path);
                 sendRequest(options,null,function(reply,statusCode){
                     if(statusCode!= "200") {
                         responseText.fulfillmentText = "not authenticated !";
@@ -1687,22 +1775,15 @@ exports.eYantraWebhook = (req, res) => {
                     else {
                         let tempAttributeList = [];
                         for(let i=0; i<reply.length; i++) {
-                            for(let j=0; j<reply[i].devices.length; j++) {
-                                if(reply[i].devices[j].name.toUpperCase() == name.toUpperCase()) {
-                                    for(let k=0; k<reply[i].devices[j].deviceAttributes.length; k++) {
-                                        if(reply[i].devices[j].deviceAttributes[k].name.toUpperCase() == attribute.toUpperCase()) {
-                                            tempAttributeList.push({"attributeID":reply[i].devices[j].deviceAttributes[k].id, "deviceID":reply[i].devices[j].id, "deviceName":reply[i].devices[j].name, "thingID":reply[i].id, "thingName":reply[i].name});
-                                            break;
-                                        }
-                                    }
-                                }
+                            if(reply[i].deviceName.toUpperCase() == name.toUpperCase()) {
+                                tempAttributeList.push({"attributeId":reply[i].deviceAttributeId,"deviceId":reply[i].deviceId,"deviceName":reply[i].deviceName,"parentThingId":reply[i].parentThingId,"parentThingName" : reply[i].parentThingName});
                             }
                         }
                         if(tempAttributeList.length > 1) {
                             responseText = Object.assign({},fulfillment["basic_response"]);
                             let tmpPayload = {"google": {"expectUserResponse": true,"richResponse": {"items": [{"simpleResponse": {"textToSpeech": "Found more than one devices with that name... Choose one of these IDs..."}}]},"systemIntent": {"intent": "actions.intent.OPTION","data": {"@type": "type.googleapis.com/google.actions.v2.OptionValueSpec","listSelect": {"items": []}}}}};
                             for(let i=0; i<tempAttributeList.length; i++) {
-                                tmpPayload.payload.google.systemIntent.data.listSelect.items.push({"optionInfo": {"key": ""+tempAttributeList[i].deviceID+""+tempAttributeList[i].deviceName+""+tempAttributeList[i].thingID+""+tempAttributeList[i].attributeID},"title": ""+tempAttributeList[i].deviceName+" (ID:"+tempAttributeList[i].deviceID+")", "description":"ParentThing: "+tempAttributeList[i].thingName});
+                                tmpPayload.payload.google.systemIntent.data.listSelect.items.push({"optionInfo": {"key": ""+tempAttributeList[i].deviceId+""+tempAttributeList[i].deviceName+""+tempAttributeList[i].parentThingId+""+tempAttributeList[i].attributeId},"title": ""+tempAttributeList[i].deviceName+" (ID:"+tempAttributeList[i].deviceId+")", "description":"ParentThing: "+tempAttributeList[i].parentThingName});
                             }
                             responseText.outputContexts = [{
                                 "name": "projects/"+fulfillment.project.projectID+"/agent/sessions/"+conversationId+"/contexts/action-id-by-name",
@@ -1718,7 +1799,7 @@ exports.eYantraWebhook = (req, res) => {
                             res.status(200).send(JSON.stringify(responseText));
                         }
                         else if(tempAttributeList.length == 1) {
-                            let id = tempAttributeList[0].attributeID;
+                            let id = tempAttributeList[0].attributeId;
                             console.log("pubsub id "+ id);
                             options.method = fulfillment["object.action-id-by-name"]["pubsubValue"]["type"];
                             options.path = fulfillment["object.action-id-by-name"]["pubsubValue"]["endpoint"];
@@ -1731,8 +1812,19 @@ exports.eYantraWebhook = (req, res) => {
                                 }
                                 else {
                                     responseText = Object.assign({},fulfillment["basic_response"]);
-                                    if(reply.state.desired.hasOwnProperty("device"+tempAttributeList[0].deviceID+"."+tempAttributeList[0].attributeID))
-                                        responseText.fulfillmentText = "The "+attribute+" is "+reply.state.desired["device"+tempAttributeList[0].deviceID+"."+tempAttributeList[0].attributeID];
+                                    if(reply.state.desired.hasOwnProperty("device"+tempAttributeList[0].deviceId+"."+tempAttributeList[0].attributeId)) {
+                                        responseText.fulfillmentText = "The "+attribute+" is "+reply.state.desired["device"+tempAttributeList[0].deviceId+"."+tempAttributeList[0].attributeId];
+                                        responseText.outputContexts = [{
+                                            "name": "projects/"+fulfillment.project.projectID+"/agent/sessions/"+conversationId+"/contexts/pubsubs",
+                                            "lifespanCount": 1,
+                                            "parameters": {
+                                              "device" : tempAttributeList[0].deviceId,
+                                              "attribute" : tempAttributeList[0].attributeId,
+                                              "thing" : tempAttributeList[0].parentThingId,
+                                              "deviceName" : tempAttributeList[0].deviceName
+                                            }
+                                        }];
+                                    }
                                     else
                                         responseText.fulfillmentText = "Oops! I can't find the "+attribute+"! Check if the device is on and connected.";
                                 }
@@ -1895,8 +1987,10 @@ exports.eYantraWebhook = (req, res) => {
                             break;
                             case "pubsubShadow" : {
                                 let attribute = findKey("attributeName",req.body);
-                                options.method = fulfillment["pubsub.get-shadow-by-name"]["pubsubShadow"]["type"];
-                                options.path = fulfillment["pubsub.get-shadow-by-name"]["pubsubShadow"]["endpoint"];
+                                options.method = fulfillment["pubsub.get-shadow-by-name"]["pubsub"]["type"];
+                                options.path = fulfillment["pubsub.get-shadow-by-name"]["pubsub"]["endpoint"];
+                                options.path+=''+attribute;
+                                console.log(options.path);
                                 sendRequest(options,null,function(reply,statusCode){
                                     if(statusCode!= "200") {
                                         responseText.fulfillmentText = "not authenticated !";
@@ -1904,42 +1998,42 @@ exports.eYantraWebhook = (req, res) => {
                                     else {
                                         let tempAttributeList = [];
                                         for(let i=0; i<reply.length; i++) {
-                                            for(let j=0; j<reply[i].devices.length; j++) {
-                                                if(reply[i].devices[j].id == id) {
-                                                    for(let k=0; k<reply[i].devices[j].deviceAttributes.length; k++) {
-                                                        if(reply[i].devices[j].deviceAttributes[k].name.toUpperCase() == attribute.toUpperCase()) {
-                                                            tempAttributeList.push({"attributeID":reply[i].devices[j].deviceAttributes[k].id, "deviceID":reply[i].devices[j].id, "deviceName":reply[i].devices[j].name, "thingID":reply[i].id, "thingName":reply[i].name});
-                                                            break;
-                                                        }
-                                                    }
-                                                }
-                                                if(tempAttributeList.length != 0)
-                                                    break;
+                                            if(reply[i].deviceId == id && [i].deviceName.toUpperCase() == name.toUpperCase()) {
+                                                tempAttributeList.push({"attributeId":reply[i].deviceAttributeId,"deviceId":reply[i].deviceId,"deviceName":reply[i].deviceName,"parentThingId":reply[i].parentThingId,"parentThingName" : reply[i].parentThingName});
                                             }
-                                            if(tempAttributeList.length != 0)
-                                                break;
                                         }
+                                        id = tempAttributeList[0].parentThingId;
+                                        console.log("pubsub id "+ id);
+                                        options.method = fulfillment["object.action-id-by-name"]["pubsubShadow"]["type"];
+                                        options.path = fulfillment["object.action-id-by-name"]["pubsubShadow"]["endpoint"];
+                                        options.path += ""+id;
+                                        console.log(options.path);
+                                        sendRequest(options,null,function(reply,statusCode){
+                                            if(statusCode != "200") {
+                                                responseText = Object.assign({},fulfillment["basic_response"]);
+                                                responseText.fulfillmentText = "Failed to get shadow ! Make sure you are authenticated or check if the device specified exsists or not";
+                                            }
+                                            else {
+                                                responseText = Object.assign({},fulfillment["basic_response"]);
+                                                if(reply.state.reported.hasOwnProperty("device"+tempAttributeList[0].deviceId+"."+tempAttributeList[0].attributeId)) {
+                                                    responseText.fulfillmentText = "The "+attribute+" is "+reply.state.reported["device"+tempAttributeList[0].deviceId+"."+tempAttributeList[0].attributeId];
+                                                    responseText.outputContexts = [{
+                                                        "name": "projects/"+fulfillment.project.projectID+"/agent/sessions/"+conversationId+"/contexts/pubsubs",
+                                                        "lifespanCount": 1,
+                                                        "parameters": {
+                                                          "device" : tempAttributeList[0].deviceId,
+                                                          "attribute" : tempAttributeList[0].attributeId,
+                                                          "thing" : tempAttributeList[0].parentThingId,
+                                                          "deviceName" : tempAttributeList[0].deviceName
+                                                        }
+                                                    }];
+                                                }
+                                                else
+                                                    responseText.fulfillmentText = "Oops! I can't find the "+attribute+"! Check if the device is on and connected.";
+                                            }
+                                            res.status(200).send(JSON.stringify(responseText));
+                                        });
                                     }
-                                    id = tempAttributeList[0].thingID;
-                                    console.log("pubsub id "+ id);
-                                    options.method = fulfillment["object.action-id-by-name"]["pubsubShadow"]["type"];
-                                    options.path = fulfillment["object.action-id-by-name"]["pubsubShadow"]["endpoint"];
-                                    options.path += ""+id;
-                                    console.log(options.path);
-                                    sendRequest(options,null,function(reply,statusCode){
-                                        if(statusCode != "200") {
-                                            responseText = Object.assign({},fulfillment["basic_response"]);
-                                            responseText.fulfillmentText = "Failed to get shadow ! Make sure you are authenticated or check if the device specified exsists or not";
-                                        }
-                                        else {
-                                            responseText = Object.assign({},fulfillment["basic_response"]);
-                                            if(reply.state.reported.hasOwnProperty("device"+tempAttributeList[0].deviceID+"."+tempAttributeList[0].attributeID))
-                                                responseText.fulfillmentText = "The "+attribute+" is "+reply.state.reported["device"+tempAttributeList[0].deviceID+"."+tempAttributeList[0].attributeID];
-                                            else
-                                                responseText.fulfillmentText = "Oops! I can't find the "+attribute+"! Check if the device is on and connected.";
-                                        }
-                                        res.status(200).send(JSON.stringify(responseText));
-                                    });
                                 });
                             }
                             break;
@@ -1947,6 +2041,8 @@ exports.eYantraWebhook = (req, res) => {
                                 let attribute = findKey("attributeName",req.body);
                                 options.method = fulfillment["pubsub.get-shadow-by-name"]["pubsubValue"]["type"];
                                 options.path = fulfillment["pubsub.get-shadow-by-name"]["pubsubValue"]["endpoint"];
+                                options.path+=''+attribute;
+                                console.log(options.path);
                                 sendRequest(options,null,function(reply,statusCode){
                                     if(statusCode!= "200") {
                                         responseText.fulfillmentText = "not authenticated !";
@@ -1954,43 +2050,43 @@ exports.eYantraWebhook = (req, res) => {
                                     else {
                                         let tempAttributeList = [];
                                         for(let i=0; i<reply.length; i++) {
-                                            for(let j=0; j<reply[i].devices.length; j++) {
-                                                if(reply[i].devices[j].id == id) {
-                                                    for(let k=0; k<reply[i].devices[j].deviceAttributes.length; k++) {
-                                                        if(reply[i].devices[j].deviceAttributes[k].name.toUpperCase() == attribute.toUpperCase()) {
-                                                            tempAttributeList.push({"attributeID":reply[i].devices[j].deviceAttributes[k].id, "deviceID":reply[i].devices[j].id, "deviceName":reply[i].devices[j].name, "thingID":reply[i].id, "thingName":reply[i].name});
-                                                            break;
-                                                        }
-                                                    }
-                                                }
-                                                if(tempAttributeList.length != 0)
-                                                    break;
+                                            if(reply[i].deviceId == id && [i].deviceName.toUpperCase() == name.toUpperCase()) {
+                                                tempAttributeList.push({"attributeId":reply[i].deviceAttributeId,"deviceId":reply[i].deviceId,"deviceName":reply[i].deviceName,"parentThingId":reply[i].parentThingId,"parentThingName" : reply[i].parentThingName});
                                             }
-                                            if(tempAttributeList.length != 0)
-                                                break;
                                         }
+                                        id = tempAttributeList[0].attributeId;
+                                        let value = findKey("value",queryResult.outputContexts);
+                                        console.log("pubsub id "+ id);
+                                        options.method = fulfillment["object.action-id-by-name"]["pubsubValue"]["type"];
+                                        options.path = fulfillment["object.action-id-by-name"]["pubsubValue"]["endpoint"];
+                                        options.path += ""+id;
+                                        console.log(options.path);
+                                        sendRequest(options,{"value" : value},function(reply,statusCode){
+                                            if(statusCode != "200") {
+                                                responseText = Object.assign({},fulfillment["basic_response"]);
+                                                responseText.fulfillmentText = "Failed to set atrribute ! Make sure you are authenticated or check if the device specified exsists or not";
+                                            }
+                                            else {
+                                                responseText = Object.assign({},fulfillment["basic_response"]);
+                                                if(reply.state.desired.hasOwnProperty("device"+tempAttributeList[0].deviceId+"."+tempAttributeList[0].attributeId)) {
+                                                    responseText.fulfillmentText = "The "+attribute+" is "+reply.state.desired["device"+tempAttributeList[0].deviceId+"."+tempAttributeList[0].attributeId];
+                                                    responseText.outputContexts = [{
+                                                        "name": "projects/"+fulfillment.project.projectID+"/agent/sessions/"+conversationId+"/contexts/pubsubs",
+                                                        "lifespanCount": 1,
+                                                        "parameters": {
+                                                          "device" : tempAttributeList[0].deviceId,
+                                                          "attribute" : tempAttributeList[0].attributeId,
+                                                          "thing" : tempAttributeList[0].parentThingId,
+                                                          "deviceName" : tempAttributeList[0].deviceName
+                                                        }
+                                                    }];
+                                                }
+                                                else
+                                                    responseText.fulfillmentText = "Oops! I can't find the "+attribute+"! Check if the device is on and connected.";
+                                            }
+                                            res.status(200).send(JSON.stringify(responseText));
+                                        });
                                     }
-                                    id = tempAttributeList[0].attributeID;
-                                    let value = findKey("value",queryResult.outputContexts);
-                                    console.log("pubsub id "+ id);
-                                    options.method = fulfillment["object.action-id-by-name"]["pubsubValue"]["type"];
-                                    options.path = fulfillment["object.action-id-by-name"]["pubsubValue"]["endpoint"];
-                                    options.path += ""+id;
-                                    console.log(options.path);
-                                    sendRequest(options,{"value" : value},function(reply,statusCode){
-                                        if(statusCode != "200") {
-                                            responseText = Object.assign({},fulfillment["basic_response"]);
-                                            responseText.fulfillmentText = "Failed to set atrribute ! Make sure you are authenticated or check if the device specified exsists or not";
-                                        }
-                                        else {
-                                            responseText = Object.assign({},fulfillment["basic_response"]);
-                                            if(reply.state.desired.hasOwnProperty("device"+tempAttributeList[0].deviceID+"."+tempAttributeList[0].attributeID))
-                                                responseText.fulfillmentText = "The "+attribute+" is "+reply.state.desired["device"+tempAttributeList[0].deviceID+"."+tempAttributeList[0].attributeID];
-                                            else
-                                                responseText.fulfillmentText = "Oops! I can't find the "+attribute+"! Check if the device is on and connected.";
-                                        }
-                                        res.status(200).send(JSON.stringify(responseText));
-                                    });
                                 });
                             }
                             break;
@@ -2103,7 +2199,7 @@ exports.eYantraWebhook = (req, res) => {
                 switch(objectType) {
                     case "thing" : {
                         let name = queryResult.parameters.name;
-                        let thingId;
+                        let thing;
                         sendRequest(options,null,function(reply,statusCode){
                             for(let i = 0;i<reply.length;i++) {
                                 if(reply[i].name.toUpperCase() == name.toUpperCase()) {
@@ -2111,7 +2207,7 @@ exports.eYantraWebhook = (req, res) => {
                                     if(reply[i].storageEnabled == true)
                                     storageEnabled = "and storage enabled.";
                                     responseText.payload.google.systemIntent.data.listSelect.items.push({"optionInfo": {"key": ""+objectType+": "+reply[i].id+reply[i].name},"title": ""+reply[i].name+" (ID:"+reply[i].id+"): "+reply[i].description,"description": "Unit: "+reply[i].parentUnit.unitName+"(ID:"+reply[i].parentUnit.id+") The thing has "+reply[i].devices.length+" devices, "+reply[i].crons.length+" crons, "+reply[i].rules.length+"rules "+storageEnabled});
-                                    thingId = reply[i].id;
+                                    thing = reply[i];
                                 }
                             }
                             if(responseText.payload.google.systemIntent.data.listSelect.items.length == 1) {
@@ -2124,7 +2220,9 @@ exports.eYantraWebhook = (req, res) => {
                                     "lifespanCount": 5,
                                     "parameters": {
                                       "object" : "thing",
-                                      "id" : thingId
+                                      "id" : thing.id,
+                                      "name": thing.name,
+                                      "description":thing.description
                                     }
                                 }];
                             }
@@ -2138,12 +2236,12 @@ exports.eYantraWebhook = (req, res) => {
                     break;
                     case "unit" : {
                         let name = queryResult.parameters.name;
-                        let unitId;
+                        let unit;
                         sendRequest(options,null,function(reply,statusCode){
                             for(let i = 0;i<reply.length;i++) {
                                 if(reply[i].unitName.toUpperCase() == name.toUpperCase()) {
                                     responseText.payload.google.systemIntent.data.listSelect.items.push({"optionInfo": {"key": ""+objectType+": "+reply[i].id+reply[i].unitName},"title": "(ID:"+reply[i].id+")"+reply[i].unitName,"description": ""+reply[i].description});
-                                    unitId = reply[i].id;
+                                    unit = reply[i];
                                 }
                             }
                             if(responseText.payload.google.systemIntent.data.listSelect.items.length == 1) {
@@ -2156,7 +2254,10 @@ exports.eYantraWebhook = (req, res) => {
                                     "lifespanCount": 5,
                                     "parameters": {
                                       "object" : "unit",
-                                      "id" : unitId
+                                      "id" : unit.id,
+                                      "unitName" : unit.unitName,
+                                      "description" : unit.description,
+                                      "photo" : unit.photo
                                     }
                                 }];
                             }
@@ -2170,12 +2271,12 @@ exports.eYantraWebhook = (req, res) => {
                     break;
                     case "user" : {
                         let name = queryResult.parameters.name;
-                        let userId;
+                        let user;
                         sendRequest(options,null,function(reply,statusCode){
                             for(let i = 0;i<reply.length;i++) {
                                 if(reply[i].name.toUpperCase() == name.toUpperCase()) {
                                     responseText.payload.google.systemIntent.data.listSelect.items.push({"optionInfo": {"key": ""+objectType+": "+reply[i].id+reply[i].name},"title": "(ID:"+reply[i].id+")"+reply[i].name,"description": ""+reply[i].email});
-                                    userId = reply[i].id;
+                                    user = reply[i];
                                 }
                             }
                             if(responseText.payload.google.systemIntent.data.listSelect.items.length == 1) {
@@ -2188,7 +2289,9 @@ exports.eYantraWebhook = (req, res) => {
                                     "lifespanCount": 5,
                                     "parameters": {
                                       "object" : "user",
-                                      "id" : userId
+                                      "id" : user.id,
+                                      "name":user.name,
+                                      "email":user.email
                                     }
                                 }];
                             }
@@ -2202,7 +2305,7 @@ exports.eYantraWebhook = (req, res) => {
                     break;
                     case "device" :  {
                         let name = queryResult.parameters.name;
-                        let deviceId;
+                        let device;
                         sendRequest(options,null,function(reply,statusCode){
 
                             for(let i = 0;i<reply.length;i++) {
@@ -2211,7 +2314,7 @@ exports.eYantraWebhook = (req, res) => {
                                     if(reply[i].storageEnabled == true)
                                         storageEnabled = "and storage enabled.";
                                     responseText.payload.google.systemIntent.data.listSelect.items.push({"optionInfo": {"key": ""+objectType+": "+reply[i].id+reply[i].name},"title": ""+reply[i].name+" (ID:"+reply[i].id+"): ","description":reply[i].description});
-                                    deviceId = reply[i].id;
+                                    device = reply[i];
                                 }
                             }
                             if(responseText.payload.google.systemIntent.data.listSelect.items.length == 1) {
@@ -2227,7 +2330,9 @@ exports.eYantraWebhook = (req, res) => {
                                     "lifespanCount": 5,
                                     "parameters": {
                                       "object" : "device",
-                                      "id" : deviceId
+                                      "id" : device.id,
+                                      "name":device.name,
+                                      "deviceAttributes":device.deviceAttributes
                                     }
                                 }];
                             }
@@ -2241,13 +2346,13 @@ exports.eYantraWebhook = (req, res) => {
                     break;
                     case "cron" :  {
                         let name = queryResult.parameters.name;
-                        let cronId;
+                        let cron;
                         sendRequest(options,null,function(reply,statusCode){
 
                             for(let i = 0;i<reply.length;i++) {
                                 if(reply[i].cronName.toUpperCase() == name.toUpperCase()) {
                                     responseText.payload.google.systemIntent.data.listSelect.items.push({"optionInfo": {"key": ""+objectType+": "+reply[i].id+reply[i].name},"title": ""+reply[i].cronName+" (ID:"+reply[i].id+"): ","cronExpression":reply[i].cronExpression});
-                                    cronId = reply[i].id;
+                                    cron = reply[i];
                                 }
                             }
                             if(responseText.payload.google.systemIntent.data.listSelect.items.length == 1) {
@@ -2263,7 +2368,11 @@ exports.eYantraWebhook = (req, res) => {
                                     "lifespanCount": 5,
                                     "parameters": {
                                       "object" : "device",
-                                      "id" : cronId
+                                      "id" : cron.id,
+                                      "cronName":cron.cronName,
+                                      "cronExpression":cron.cronExpression,
+                                      "desiredState":cron.desiredState,
+                                      "cloudwatchResource":cron.cloudwatchResource
                                     }
                                 }];
                             }
@@ -2278,153 +2387,8 @@ exports.eYantraWebhook = (req, res) => {
             }
             break;
 
-            /*Done*/
-            case "object.set-param" : {
-                switch (objectType) {
-                    case "thing": {
-                        let param = findKey("param",queryResult.parameters);
-                        let newValue = findKey("newValue",queryResult.parameters);
-                        let id = findKey("id",queryResult.outputContexts);
-                        let apiInput = fulfillment[intent][objectType]["apiInput"];
-                        apiInput[param] = newValue;
-                        options.path += ""+id;
-                        sendRequest(options,apiInput,function(reply,statusCode) {
-                            responseText = Object.assign({},fulfillment["basic_response"]);
-                            if(statusCode == "405")
-                                responseText.fulfillmentText = "not authenticated !";
-                            else if(statusCode == "404")
-                                responseText.fulfillmentText = "Looks like something is not right... May be the "+objectType+" you want to update does not exsists!";
-                            else if(statusCode == "200")
-                                responseText.fulfillmentText = "Updated the "+param+" to "+newValue;
-                            else
-                                responseText.fulfillmentText = "Sorry! I failed to do that... Please try again";
-                            res.status(200).send(JSON.stringify(responseText));
-                        });
-                    }
-                    break;
-                    case "unit": {
-                        let param = findKey("param",queryResult.parameters);
-                        if(param == "name")
-                            param = "unitName";
-                        let newValue = findKey("newValue",queryResult.parameters);
-                        let id = findKey("id",queryResult.outputContexts);
-                        let apiInput = fulfillment[intent][objectType]["apiInput"];
-                        apiInput[param] = newValue;
-                        options.path += ""+id;
-                        sendRequest(options,apiInput,function(reply,statusCode) {
-                            responseText = Object.assign({},fulfillment["basic_response"]);
-                            if(statusCode == "405")
-                                responseText.fulfillmentText = "not authenticated !";
-                            else if(statusCode == "404")
-                                responseText.fulfillmentText = "Looks like something is not right... May be the "+objectType+" you want to update does not exsists!";
-                            else if(statusCode == "200")
-                                responseText.fulfillmentText = "Updated the "+param+" to "+newValue;
-                            else
-                                responseText.fulfillmentText = "Sorry! I failed to do that... Please try again";
-                            res.status(200).send(JSON.stringify(responseText));
-                        });
-                    }
-                    break;
-                    case "device": {
-                        let param = findKey("param",queryResult.parameters);
-                        let newValue = findKey("newValue",queryResult.parameters);
-                        let id = findKey("id",queryResult.outputContexts);
-                        let apiInput = fulfillment[intent][objectType]["apiInput"];
-                        apiInput[param] = newValue;
-                        options.path += ""+id;
-                        sendRequest(options,apiInput,function(reply,statusCode) {
-                            responseText = Object.assign({},fulfillment["basic_response"]);
-                            if(statusCode == "405")
-                                responseText.fulfillmentText = "not authenticated !";
-                            else if(statusCode == "404")
-                                responseText.fulfillmentText = "Looks like something is not right... May be the "+objectType+" you want to update does not exsists!";
-                            else if(statusCode == "200")
-                                responseText.fulfillmentText = "Updated the "+param+" to "+newValue;
-                            else
-                                responseText.fulfillmentText = "Sorry! I failed to do that... Please try again";
-                            res.status(200).send(JSON.stringify(responseText));
-                        });
-                    }
-                    break;
-                    default:
-                    break;
-                }
-            }
-            break;
-
-            /*Done*/
-            case "object.rem-param" : {
-                switch (objectType) {
-                    case "thing": {
-                        let param = findKey("param",queryResult.parameters);
-                        let id = findKey("id",queryResult.outputContexts);
-                        let apiInput = fulfillment[intent][objectType]["apiInput"];
-                        apiInput[param] = "";
-                        options.path += ""+id;
-                        sendRequest(options,apiInput,function(reply,statusCode) {
-                            responseText = Object.assign({},fulfillment["basic_response"]);
-                            if(statusCode == "405")
-                                responseText.fulfillmentText = "not authenticated !";
-                            else if(statusCode == "404")
-                                responseText.fulfillmentText = "Looks like something is not right... May be the "+objectType+" does not exsists or "+param+" can't be removed!";
-                            else if(statusCode == "200")
-                                responseText.fulfillmentText = "Removed the "+param;
-                            else
-                                responseText.fulfillmentText = "Sorry! I failed to do that... Please try again";
-                            res.status(200).send(JSON.stringify(responseText));
-                        });
-                    }
-                    break;
-                    case "unit": {
-                        let param = findKey("param",queryResult.parameters);
-                        if(param == "name")
-                            param = "unitName";
-                        let id = findKey("id",queryResult.outputContexts);
-                        let apiInput = fulfillment[intent][objectType]["apiInput"];
-                        apiInput[param] = "";
-                        options.path += ""+id;
-                        sendRequest(options,apiInput,function(reply,statusCode) {
-                            responseText = Object.assign({},fulfillment["basic_response"]);
-                            if(statusCode == "405")
-                                responseText.fulfillmentText = "not authenticated !";
-                            else if(statusCode == "404")
-                                responseText.fulfillmentText = "Looks like something is not right... May be the "+objectType+" does not exsists or "+param+" can't be removed!";
-                            else if(statusCode == "200")
-                                responseText.fulfillmentText = "Removed the "+param;
-                            else
-                                responseText.fulfillmentText = "Sorry! I failed to do that... Please try again";
-                            res.status(200).send(JSON.stringify(responseText));
-                        });
-                    }
-                    break;
-                    case "device": {
-                        let param = findKey("param",queryResult.parameters);
-                        let id = findKey("id",queryResult.outputContexts);
-                        let apiInput = fulfillment[intent][objectType]["apiInput"];
-                        apiInput[param] = "";
-                        options.path += ""+id;
-                        sendRequest(options,apiInput,function(reply,statusCode) {
-                            responseText = Object.assign({},fulfillment["basic_response"]);
-                            if(statusCode == "405")
-                                responseText.fulfillmentText = "not authenticated !";
-                            else if(statusCode == "404")
-                                responseText.fulfillmentText = "Looks like something is not right... May be the "+objectType+" does not exsists or "+param+" can't be removed!";
-                            else if(statusCode == "200")
-                                responseText.fulfillmentText = "Removed the "+param;
-                            else
-                                responseText.fulfillmentText = "Sorry! I failed to do that... Please try again";
-                            res.status(200).send(JSON.stringify(responseText));
-                        });
-                    }
-                    break;
-                    default:
-                    break;
-                }
-            }
-            break;
-
-            /*Done*/
-            case "object.get-param" : {
+            /*Pending*/
+            case "object.get-it" : {
                 switch (objectType) {
                     case "thing": {
                         let param = findKey("param",queryResult.parameters);
@@ -2449,6 +2413,10 @@ exports.eYantraWebhook = (req, res) => {
                     break;
                     case "unit": {
                         let param = findKey("param",queryResult.parameters);
+                        // changing common name to unitName
+                        if(param == "name"){
+                            param = "unitName";
+                        }
                         let id = findKey("id",queryResult.outputContexts);
                         options.path += ""+id;
                         sendRequest(options,null,function(reply,statusCode) {
@@ -2504,6 +2472,334 @@ exports.eYantraWebhook = (req, res) => {
                             }
                             else
                                 responseText.fulfillmentText = "Sorry! I failed to do that... Please try again";
+                            res.status(200).send(JSON.stringify(responseText));
+                        });
+                    }
+                    break;
+                    default:
+                    break;
+                }
+            }
+            break;
+            /*Done*/
+            case "object.param-change-it-to" :
+            /*Done*/
+            case "object.set-param" : {
+                switch (objectType) {
+                    case "thing": {
+                        let param = queryResult.parameters.param;
+                        let newValue = queryResult.parameters.newValue;
+                        let id = fromOutputContext(queryResult.outputContexts,'object','id');
+                        let apiInput = fulfillment[intent][objectType]["apiInput"];
+                        apiInput['name'] = fromOutputContext(queryResult.outputContexts,'object','name');
+                        apiInput['description'] = fromOutputContext(queryResult.outputContexts,'object','description');
+                        apiInput[param] = newValue;
+                        options.path += ""+id;
+                        sendRequest(options,apiInput,function(reply,statusCode) {
+                            responseText = Object.assign({},fulfillment["basic_response"]);
+                            if(statusCode == "405")
+                                responseText.fulfillmentText = "not authenticated !";
+                            else if(statusCode == "404")
+                                responseText.fulfillmentText = "Looks like something is not right... May be the "+objectType+" you want to update does not exsists!";
+                            else if(statusCode == "200")
+                                responseText.fulfillmentText = "Updated the "+param+" to "+newValue;
+                            else
+                                responseText.fulfillmentText = "Sorry! I failed to do that... Please try again";
+                            responseText.outputContexts = [{
+                                "name": "projects/"+fulfillment.project.projectID+"/agent/sessions/"+conversationId+"/contexts/param",
+                                "lifespanCount": 1,
+                                "parameters": {
+                                  "object" : "thing",
+                                  "param" : param
+                                }
+                            }];
+                            res.status(200).send(JSON.stringify(responseText));
+                        });
+                    }
+                    break;
+                    case "unit": {
+                        let param = queryResult.parameters.param;
+                        if(param == "name") {
+                            param = "unitName";
+                        }
+                        let newValue = findKey("newValue",queryResult.parameters);
+                        let id = fromOutputContext(queryResult.outputContexts,'object','id');
+                        let apiInput = fulfillment[intent][objectType]["apiInput"];
+                        apiInput['unitName'] = fromOutputContext(queryResult.outputContexts,'object','name');
+                        apiInput['description'] = fromOutputContext(queryResult.outputContexts,'object','description');
+                        apiInput[param] = newValue;
+                        options.path += ""+id;
+                        sendRequest(options,apiInput,function(reply,statusCode) {
+                            responseText = Object.assign({},fulfillment["basic_response"]);
+                            if(statusCode == "405")
+                                responseText.fulfillmentText = "not authenticated !";
+                            else if(statusCode == "404")
+                                responseText.fulfillmentText = "Looks like something is not right... May be the "+objectType+" you want to update does not exsists!";
+                            else if(statusCode == "200")
+                                responseText.fulfillmentText = "Updated the "+param+" to "+newValue;
+                            else
+                                responseText.fulfillmentText = "Sorry! I failed to do that... Please try again";
+                            responseText.outputContexts = [{
+                                "name": "projects/"+fulfillment.project.projectID+"/agent/sessions/"+conversationId+"/contexts/param",
+                                "lifespanCount": 1,
+                                "parameters": {
+                                  "object" : "unit",
+                                  "param" : param
+                                }
+                            }];
+                            res.status(200).send(JSON.stringify(responseText));
+                        });
+                    }
+                    break;
+                    case "device": {
+                        let param = queryResult.parameters.param;
+                        let newValue = queryResult.parameters.newValue;
+                        let id = fromOutputContext(queryResult.outputContexts,'object','id');
+                        let apiInput = fulfillment[intent][objectType]["apiInput"];
+                        apiInput['name'] = fromOutputContext(queryResult.outputContexts,'object','name');
+                        apiInput['description'] = fromOutputContext(queryResult.outputContexts,'object','description');
+                        apiInput[param] = newValue;
+                        options.path += ""+id;
+                        sendRequest(options,apiInput,function(reply,statusCode) {
+                            responseText = Object.assign({},fulfillment["basic_response"]);
+                            if(statusCode == "405")
+                                responseText.fulfillmentText = "not authenticated !";
+                            else if(statusCode == "404")
+                                responseText.fulfillmentText = "Looks like something is not right... May be the "+objectType+" you want to update does not exsists!";
+                            else if(statusCode == "200")
+                                responseText.fulfillmentText = "Updated the "+param+" to "+newValue;
+                            else
+                                responseText.fulfillmentText = "Sorry! I failed to do that... Please try again";
+                            responseText.outputContexts = [{
+                                "name": "projects/"+fulfillment.project.projectID+"/agent/sessions/"+conversationId+"/contexts/param",
+                                "lifespanCount": 1,
+                                "parameters": {
+                                  "object" : "device",
+                                  "param" : param
+                                }
+                            }];
+                            res.status(200).send(JSON.stringify(responseText));
+                        });
+                    }
+                    break;
+                    default:
+                    break;
+                }
+            }
+            break;
+
+            /*Done*/
+            case "object.rem-param" : {
+                switch (objectType) {
+                    case "thing": {
+                        let param = findKey("param",queryResult.parameters);
+                        let id = findKey("id",queryResult.outputContexts);
+                        let apiInput = fulfillment[intent][objectType]["apiInput"];
+                        apiInput[param] = "";
+                        options.path += ""+id;
+                        sendRequest(options,apiInput,function(reply,statusCode) {
+                            responseText = Object.assign({},fulfillment["basic_response"]);
+                            if(statusCode == "405")
+                                responseText.fulfillmentText = "not authenticated !";
+                            else if(statusCode == "404")
+                                responseText.fulfillmentText = "Looks like something is not right... May be the "+objectType+" does not exsists or "+param+" can't be removed!";
+                            else if(statusCode == "200")
+                                responseText.fulfillmentText = "Removed the "+param;
+                            else
+                                responseText.fulfillmentText = "Sorry! I failed to do that... Please try again";
+                            responseText.outputContexts = [{
+                                "name": "projects/"+fulfillment.project.projectID+"/agent/sessions/"+conversationId+"/contexts/param",
+                                "lifespanCount": 1,
+                                "parameters": {
+                                  "object" : "thing",
+                                  "param" : param
+                                }
+                            }];
+                            res.status(200).send(JSON.stringify(responseText));
+                        });
+                    }
+                    break;
+                    case "unit": {
+                        let param = findKey("param",queryResult.parameters);
+                        if(param == "name")
+                            param = "unitName";
+                        let id = findKey("id",queryResult.outputContexts);
+                        let apiInput = fulfillment[intent][objectType]["apiInput"];
+                        apiInput[param] = "";
+                        options.path += ""+id;
+                        sendRequest(options,apiInput,function(reply,statusCode) {
+                            responseText = Object.assign({},fulfillment["basic_response"]);
+                            if(statusCode == "405")
+                                responseText.fulfillmentText = "not authenticated !";
+                            else if(statusCode == "404")
+                                responseText.fulfillmentText = "Looks like something is not right... May be the "+objectType+" does not exsists or "+param+" can't be removed!";
+                            else if(statusCode == "200")
+                                responseText.fulfillmentText = "Removed the "+param;
+                            else
+                                responseText.fulfillmentText = "Sorry! I failed to do that... Please try again";
+                            responseText.outputContexts = [{
+                                "name": "projects/"+fulfillment.project.projectID+"/agent/sessions/"+conversationId+"/contexts/param",
+                                "lifespanCount": 1,
+                                "parameters": {
+                                  "object" : "unit",
+                                  "param" : param
+                                }
+                            }];
+                            res.status(200).send(JSON.stringify(responseText));
+                        });
+                    }
+                    break;
+                    case "device": {
+                        let param = findKey("param",queryResult.parameters);
+                        let id = findKey("id",queryResult.outputContexts);
+                        let apiInput = fulfillment[intent][objectType]["apiInput"];
+                        apiInput[param] = "";
+                        options.path += ""+id;
+                        sendRequest(options,apiInput,function(reply,statusCode) {
+                            responseText = Object.assign({},fulfillment["basic_response"]);
+                            if(statusCode == "405")
+                                responseText.fulfillmentText = "not authenticated !";
+                            else if(statusCode == "404")
+                                responseText.fulfillmentText = "Looks like something is not right... May be the "+objectType+" does not exsists or "+param+" can't be removed!";
+                            else if(statusCode == "200")
+                                responseText.fulfillmentText = "Removed the "+param;
+                            else
+                                responseText.fulfillmentText = "Sorry! I failed to do that... Please try again";
+                            responseText.outputContexts = [{
+                                "name": "projects/"+fulfillment.project.projectID+"/agent/sessions/"+conversationId+"/contexts/param",
+                                "lifespanCount": 1,
+                                "parameters": {
+                                  "object" : "device",
+                                  "param" : param
+                                }
+                            }];
+                            res.status(200).send(JSON.stringify(responseText));
+                        });
+                    }
+                    break;
+                    default:
+                    break;
+                }
+            }
+            break;
+
+            /*Done*/
+            case "object.get-param" : {
+                switch (objectType) {
+                    case "thing": {
+                        let param = findKey("param",queryResult.parameters);
+                        let id = findKey("id",queryResult.outputContexts);
+                        options.path += ""+id;
+                        console.log(param + " "+id + " " + options.path);
+                        sendRequest(options,null,function(reply,statusCode) {
+                            responseText = Object.assign({},fulfillment["basic_response"]);
+                            if(statusCode == "405")
+                                responseText.fulfillmentText = "not authenticated !";
+                            else if(statusCode == "404")
+                                responseText.fulfillmentText = "Looks like something is not right... May be the "+objectType+" does not exsist!";
+                            else if(statusCode == "200") {
+                                responseText.fulfillmentText = ""+param+" of the "+objectType+" is: "+reply[param];
+                                if(reply[param] == "")
+                                    responseText.fulfillmentText = ""+param+" of the "+objectType+" is not set";
+                            } else
+                                responseText.fulfillmentText = "Sorry! I failed to do that... Please try again";
+                            responseText.outputContexts = [{
+                                "name": "projects/"+fulfillment.project.projectID+"/agent/sessions/"+conversationId+"/contexts/param",
+                                "lifespanCount": 1,
+                                "parameters": {
+                                  "object" : "thing",
+                                  "param" : param
+                                }
+                            }];
+                            res.status(200).send(JSON.stringify(responseText));
+                        });
+                    }
+                    break;
+                    case "unit": {
+                        let param = findKey("param",queryResult.parameters);
+                        // changing common name to unitName
+                        if(param == "name"){
+                            param = "unitName";
+                        }
+                        let id = findKey("id",queryResult.outputContexts);
+                        options.path += ""+id;
+                        sendRequest(options,null,function(reply,statusCode) {
+                            responseText = Object.assign({},fulfillment["basic_response"]);
+                            if(statusCode == "405")
+                                responseText.fulfillmentText = "not authenticated !";
+                            else if(statusCode == "404")
+                                responseText.fulfillmentText = "Looks like something is not right... May be the "+objectType+" does not exsist!";
+                            else if(statusCode == "200") {
+                                responseText.fulfillmentText = ""+param+" of the "+objectType+" is: "+reply[param];
+                                if(reply[param] == "")
+                                    responseText.fulfillmentText = ""+param+" of the "+objectType+" is not set";
+                            } else
+                                responseText.fulfillmentText = "Sorry! I failed to do that... Please try again";
+                            responseText.outputContexts = [{
+                                "name": "projects/"+fulfillment.project.projectID+"/agent/sessions/"+conversationId+"/contexts/param",
+                                "lifespanCount": 1,
+                                "parameters": {
+                                    "object" : "unit",
+                                    "param" : param
+                                }
+                            }];
+                            res.status(200).send(JSON.stringify(responseText));
+                        });
+                    }
+                    break;
+                    case "device": {
+                        let param = findKey("param",queryResult.parameters);
+                        let id = findKey("id",queryResult.outputContexts);
+                        options.path += ""+id;
+                        sendRequest(options,null,function(reply,statusCode) {
+                            responseText = Object.assign({},fulfillment["basic_response"]);
+                            if(statusCode == "405")
+                                responseText.fulfillmentText = "not authenticated !";
+                            else if(statusCode == "404")
+                                responseText.fulfillmentText = "Looks like something is not right... May be the "+objectType+" does not exsist!";
+                            else if(statusCode == "200") {
+                                responseText.fulfillmentText = ""+param+" of the "+objectType+" is: "+reply[param];
+                                if(reply[param] == "")
+                                    responseText.fulfillmentText = ""+param+" of the "+objectType+" is not set";
+                            } else
+                                responseText.fulfillmentText = "Sorry! I failed to do that... Please try again";
+                            responseText.outputContexts = [{
+                                "name": "projects/"+fulfillment.project.projectID+"/agent/sessions/"+conversationId+"/contexts/param",
+                                "lifespanCount": 1,
+                                "parameters": {
+                                    "object" : "device",
+                                    "param" : param
+                                }
+                            }];
+                            res.status(200).send(JSON.stringify(responseText));
+                        });
+                    }
+                    break;
+                    case "user": {
+                        let param = findKey("param",queryResult.parameters);
+                        let id = findKey("id",queryResult.outputContexts);
+                        options.path += ""+id;
+                        sendRequest(options,null,function(reply,statusCode) {
+                            responseText = Object.assign({},fulfillment["basic_response"]);
+                            if(statusCode == "405")
+                                responseText.fulfillmentText = "not authenticated !";
+                            else if(statusCode == "404")
+                                responseText.fulfillmentText = "Looks like something is not right... May be the "+objectType+" does not exsist!";
+                            else if(statusCode == "200") {
+                                responseText.fulfillmentText = ""+param+" of the "+objectType+" is: "+reply[param];
+                                if(reply[param] == "")
+                                    responseText.fulfillmentText = ""+param+" of the "+objectType+" is not set";
+                            }
+                            else
+                                responseText.fulfillmentText = "Sorry! I failed to do that... Please try again";
+                            responseText.outputContexts = [{
+                                "name": "projects/"+fulfillment.project.projectID+"/agent/sessions/"+conversationId+"/contexts/param",
+                                "lifespanCount": 1,
+                                "parameters": {
+                                    "object" : "user",
+                                    "param" : param
+                                }
+                            }];
                             res.status(200).send(JSON.stringify(responseText));
                         });
                     }
@@ -2662,11 +2958,18 @@ exports.eYantraWebhook = (req, res) => {
             }
             break;
 
+            default: {
+                responseText = Object.assign({},fulfillment["basic_response"]);
+                responseText.fulfillmentText = "fulfillment not defined";
+                res.status(200).send(JSON.stringify(responseText));
+            }
+
         }
     }
     //Bad request
     else {
         responseText.fulfillmentText = "";
+        console.log(JSON.stringify(req));
         res.status(200).send(JSON.stringify(responseText));
     }
 };
