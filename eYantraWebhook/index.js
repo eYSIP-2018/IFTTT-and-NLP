@@ -416,7 +416,7 @@ var fulfillment = {
     },
     "object.action-id-by-name": {
         "thing" : {
-            "endpoint" : "",
+            "endpoint" : "/thing/get/",
             "type" : "GET",
             "content_type" : "application/x-www-form-urlencoded",
             "response_type" : "application/json",
@@ -426,7 +426,7 @@ var fulfillment = {
             }
         },
         "unit" : {
-            "endpoint" : "",
+            "endpoint" : "/unit/get/",
             "type" : "GET",
             "content_type" : "application/x-www-form-urlencoded",
             "response_type" : "application/json",
@@ -444,7 +444,7 @@ var fulfillment = {
             "apiInput" : {}
         },
         "user" : {
-            "endpoint" : "",
+            "endpoint" : "/user/get/",
             "type" : "GET",
             "content_type" : "application/x-www-form-urlencoded",
             "response_type" : "application/json",
@@ -452,6 +452,14 @@ var fulfillment = {
             "apiInput" : {
                 "id" : ""
             }
+        },
+        "device" : {
+            "endpoint" : "/device/get/",
+            "type" : "GET",
+            "content_type" : "application/x-www-form-urlencoded",
+            "response_type" : "application/json",
+            "url_parameter" : true,
+            "apiInput" : {}
         },
         "cron" : {
             "endpoint" : "/thing/list/page/0",
@@ -600,6 +608,70 @@ var fulfillment = {
             "url_parameter" : true,
             "apiInput" : {
                 "id" : ""
+            }
+        }
+    },
+    "object.delete-it - yes": {
+        "thing" : {
+            "endpoint" : "/thing/get/",
+            "type" : "GET",
+            "content_type" : "application/x-www-form-urlencoded",
+            "response_type" : "application/json",
+            "url_parameter" : true,
+            "apiInput" : {
+                "id" : ""
+            }
+        },
+        "unit" : {
+            "endpoint" : "/unit/get/",
+            "type" : "GET",
+            "content_type" : "application/x-www-form-urlencoded",
+            "response_type" : "application/json",
+            "url_parameter" : true,
+            "apiInput" : {
+                "id" : ""
+            }
+        },
+        "user" : {
+            "endpoint" : "/user/get/",
+            "type" : "GET",
+            "content_type" : "application/x-www-form-urlencoded",
+            "response_type" : "application/json",
+            "url_parameter" : true,
+            "apiInput" : {
+                "id" : ""
+            }
+        },
+        "device" : {
+            "endpoint" : "/device/get/",
+            "type" : "GET",
+            "content_type" : "application/x-www-form-urlencoded",
+            "response_type" : "application/json",
+            "url_parameter" : true,
+            "apiInput" : {}
+        },
+        "cron" : {
+            "endpoint" : "/thing/list/page/0",
+            "type" : "GET",
+            "content_type" : "application/x-www-form-urlencoded",
+            "response_type" : "application/json",
+            "url_parameter" : true,
+            "apiInput" : {
+                "id" : ""
+            }
+        },
+        "attribute" : {
+            "endpoint" : "/attribute/create",
+            "type" : "POST",
+            "content_type" : "application/x-www-form-urlencoded",
+            "response_type" : "application/json",
+            "url_parameter" : false,
+            "apiInput" : {
+                "name" : "",
+                "type" : "",
+                "def" : "",
+                "parentDeviceId" : "",
+                "ownerUnitId" : ""
             }
         }
     },
@@ -1842,15 +1914,52 @@ exports.eYantraWebhook = (req, res) => {
             break;
 
             /*Done*/
+            case "object.delete-it - yes" :
             case "object.action-id-by-name" : {
                 //console.log("inside " + intent);
                 let id = findKey("id", queryResult.parameters);
-                let futureAction = findKey("futureAction",queryResult.outputContexts);
+                let futureAction;
+                if(intent == "object.delete-it - yes") {
+                    futureAction = "delete";
+                }
+                else {
+                    futureAction = findKey("futureAction",queryResult.outputContexts);
+                }
                 let objectName = findKey("objectName",queryResult.outputContexts);
                 objectType = findKey("object",queryResult.outputContexts);
                 switch(objectType) {
                     case "thing" : {
                         switch(futureAction) {
+                            case "show-details" : {
+                                console.log("details of id " + id);
+                                options.path += ""+id;
+                                console.log(options.path);
+                                sendRequest(options,null,function(reply,statusCode){
+                                    if(statusCode != "200") {
+                                        responseText = Object.assign({},fulfillment["basic_response"]);
+                                        responseText.fulfillmentText = "Failed to delete! Make sure you are authenticated or check if the "+objectType+" specified exsists or not";
+                                    }
+                                    else {
+                                        let tmp = {"payload": {"google": {"expectUserResponse": true,"richResponse": {"items": [{"simpleResponse": {"textToSpeech": ""}},{"simpleResponse": {"textToSpeech": ""}}]}}}};
+                                        tmp.payload.google.richResponse.items[0].simpleResponse.textToSpeech = "Thing ("+reply.id+")\t"+reply.name;
+                                        tmp.payload.google.richResponse.items[1].simpleResponse.textToSpeech = reply.description;
+                                        responseText.payload = tmp.payload;
+                                        responseText.outputContexts = [{
+                                            "name": "projects/"+fulfillment.project.projectID+"/agent/sessions/"+conversationId+"/contexts/object",
+                                            "lifespanCount": 5,
+                                            "parameters": {
+                                              "object" : "thing",
+                                              "id" : reply.id,
+                                              "name" : reply.name,
+                                              "description" : reply.description,
+                                              "photo" : reply.photo
+                                            }
+                                        }];
+                                    }
+                                    res.status(200).send(JSON.stringify(responseText));
+                                });
+                            }
+                            break;
                             case "delete" : {
                                 //console.log("deleting id " + id);
                                 options.path = fulfillment["object.delete"]["thing"]["endpoint"];
@@ -1896,6 +2005,36 @@ exports.eYantraWebhook = (req, res) => {
                     break;
                     case "unit" : {
                         switch(futureAction) {
+                            case "show-details" : {
+                                console.log("details of id " + id);
+                                options.path += ""+id;
+                                console.log(options.path);
+                                sendRequest(options,null,function(reply,statusCode){
+                                    if(statusCode != "200") {
+                                        responseText = Object.assign({},fulfillment["basic_response"]);
+                                        responseText.fulfillmentText = "Failed to delete! Make sure you are authenticated or check if the "+objectType+" specified exsists or not";
+                                    }
+                                    else {
+                                        let tmp = {"payload": {"google": {"expectUserResponse": true,"richResponse": {"items": [{"simpleResponse": {"textToSpeech": ""}},{"simpleResponse": {"textToSpeech": ""}}]}}}};
+                                        tmp.payload.google.richResponse.items[0].simpleResponse.textToSpeech = "Unit ("+reply.id+")\t"+reply.unitName;
+                                        tmp.payload.google.richResponse.items[1].simpleResponse.textToSpeech = reply.description;
+                                        responseText.payload = tmp.payload;
+                                        responseText.outputContexts = [{
+                                            "name": "projects/"+fulfillment.project.projectID+"/agent/sessions/"+conversationId+"/contexts/object",
+                                            "lifespanCount": 5,
+                                            "parameters": {
+                                              "object" : "unit",
+                                              "id" : reply.id,
+                                              "unitName" : reply.unitName,
+                                              "description" : reply.description,
+                                              "photo" : reply.photo
+                                            }
+                                        }];
+                                    }
+                                    res.status(200).send(JSON.stringify(responseText));
+                                });
+                            }
+                            break;
                             case "delete" : {
                                 //console.log("deleting id " + id);
                                 options.path = fulfillment["object.delete"]["unit"]["endpoint"];
@@ -1965,10 +2104,39 @@ exports.eYantraWebhook = (req, res) => {
                     break;
                     case "device" : {
                         switch(futureAction) {
+                            case "show-details" : {
+                                console.log("details of id " + id);
+                                options.path += ""+id;
+                                console.log(options.path);
+                                sendRequest(options,null,function(reply,statusCode){
+                                    if(statusCode != "200") {
+                                        responseText = Object.assign({},fulfillment["basic_response"]);
+                                        responseText.fulfillmentText = "Failed to delete! Make sure you are authenticated or check if the "+objectType+" specified exsists or not";
+                                    }
+                                    else {
+                                        let tmp = {"payload": {"google": {"expectUserResponse": true,"richResponse": {"items": [{"simpleResponse": {"textToSpeech": ""}},{"simpleResponse": {"textToSpeech": ""}}]}}}};
+                                        tmp.payload.google.richResponse.items[0].simpleResponse.textToSpeech = "Device ("+reply.id+")\t"+reply.name;
+                                        tmp.payload.google.richResponse.items[1].simpleResponse.textToSpeech = reply.description;
+                                        responseText.payload = tmp.payload;
+                                        responseText.outputContexts = [{
+                                            "name": "projects/"+fulfillment.project.projectID+"/agent/sessions/"+conversationId+"/contexts/object",
+                                            "lifespanCount": 5,
+                                            "parameters": {
+                                              "object" : "device",
+                                              "id" : reply.id,
+                                              "unitName" : reply.name,
+                                              "description" : reply.description
+                                            }
+                                        }];
+                                    }
+                                    res.status(200).send(JSON.stringify(responseText));
+                                });
+                            }
+                            break;
                             case "delete" : {
                                 //console.log("deleting id " + id);
-                                options.path = fulfillment["object.delete"]["thing"]["endpoint"];
-                                options.method = fulfillment["object.delete"]["thing"]["type"];
+                                options.path = fulfillment["object.delete"]["device"]["endpoint"];
+                                options.method = fulfillment["object.delete"]["device"]["type"];
                                 options.path += ""+id;
                                 console.log(options.path);
                                 //console.log(JSON.stringify(options));
@@ -2100,6 +2268,35 @@ exports.eYantraWebhook = (req, res) => {
                     break;
                     case "cron" : {
                         switch (futureAction) {
+                            case "show-details" : {
+                                console.log("details of id " + id);
+                                options.path += ""+id;
+                                console.log(options.path);
+                                sendRequest(options,null,function(reply,statusCode){
+                                    if(statusCode != "200") {
+                                        responseText = Object.assign({},fulfillment["basic_response"]);
+                                        responseText.fulfillmentText = "Failed to delete! Make sure you are authenticated or check if the "+objectType+" specified exsists or not";
+                                    }
+                                    else {
+                                        let tmp = {"payload": {"google": {"expectUserResponse": true,"richResponse": {"items": [{"simpleResponse": {"textToSpeech": ""}},{"simpleResponse": {"textToSpeech": ""}}]}}}};
+                                        tmp.payload.google.richResponse.items[0].simpleResponse.textToSpeech = "Cron ("+reply.id+")\t"+reply.name;
+                                        tmp.payload.google.richResponse.items[1].simpleResponse.textToSpeech = reply.cronExpression;
+                                        responseText.payload = tmp.payload;
+                                        responseText.outputContexts = [{
+                                            "name": "projects/"+fulfillment.project.projectID+"/agent/sessions/"+conversationId+"/contexts/object",
+                                            "lifespanCount": 5,
+                                            "parameters": {
+                                              "object" : "cron",
+                                              "id" : reply.id,
+                                              "name" : reply.name,
+                                              "cronExpression" : reply.cronExpression
+                                            }
+                                        }];
+                                    }
+                                    res.status(200).send(JSON.stringify(responseText));
+                                });
+                            }
+                            break;
                             case "createCron": {
                                 let deviceData = JSON.parse(findKey("deviceData",queryResult.outputContexts));
                                 let name = findKey("cronName",queryResult.outputContexts);
@@ -2153,6 +2350,40 @@ exports.eYantraWebhook = (req, res) => {
                     break;
                     case "attribute" : {
                         switch (futureAction) {
+                            case "show-details" : {
+                                console.log("details of id " + id);
+                                options.path += ""+id;
+                                console.log(options.path);
+                                sendRequest(options,null,function(reply,statusCode){
+                                    if(statusCode != "200") {
+                                        responseText = Object.assign({},fulfillment["basic_response"]);
+                                        responseText.fulfillmentText = "Failed to delete! Make sure you are authenticated or check if the "+objectType+" specified exsists or not";
+                                    }
+                                    else {
+                                        let tmp = {"payload": {"google": {"expectUserResponse": true,"richResponse": {"items": [{"simpleResponse": {"textToSpeech": ""}},{"simpleResponse": {"textToSpeech": ""}}]}}}};
+                                        tmp.payload.google.richResponse.items[0].simpleResponse.textToSpeech = "Cron ("+reply.id+")\t"+reply.name;
+                                        tmp.payload.google.richResponse.items[1].simpleResponse.textToSpeech = reply.cronExpression;
+                                        responseText.payload = tmp.payload;
+                                        if( ! reply.hasOwnProperty("def")) {
+                                            reply['def'] = '';
+                                        }
+                                        responseText.outputContexts = [{
+                                            "name": "projects/"+fulfillment.project.projectID+"/agent/sessions/"+conversationId+"/contexts/object",
+                                            "lifespanCount": 5,
+                                            "parameters": {
+                                              "object" : "attribute",
+                                              "id" : reply.id,
+                                              "name" : reply.name,
+                                              "type" : reply.type,
+                                              "actuator" : reply.actuator,
+                                              "def" : reply.def
+                                            }
+                                        }];
+                                    }
+                                    res.status(200).send(JSON.stringify(responseText));
+                                });
+                            }
+                            break;
                             case "createAttribute" : {
                                 let deviceDetails = JSON.parse(findKey("deviceDetails",queryResult.outputContexts));
                                 if(deviceDetails.hasOwnProperty(""+id)) {
@@ -2195,7 +2426,7 @@ exports.eYantraWebhook = (req, res) => {
 
             /*Done*/
             case "object.get-name" : {
-                responseText = {"payload": {"google": {"expectUserResponse": true,"richResponse": {"items": [{"simpleResponse": {"textToSpeech": "Here is the list:"}}]},"systemIntent": {"intent": "actions.intent.OPTION","data": {"@type": "type.googleapis.com/google.actions.v2.OptionValueSpec","listSelect": {"items": []}}}}}};
+                responseText = {"payload": {"google": {"expectUserResponse": true,"richResponse": {"items": [{"simpleResponse": {"textToSpeech": "Here is the list choose Id from list:"}}]},"systemIntent": {"intent": "actions.intent.OPTION","data": {"@type": "type.googleapis.com/google.actions.v2.OptionValueSpec","listSelect": {"items": []}}}}}};
                 switch(objectType) {
                     case "thing" : {
                         let name = queryResult.parameters.name;
@@ -2229,6 +2460,17 @@ exports.eYantraWebhook = (req, res) => {
                             else if(responseText.payload.google.systemIntent.data.listSelect.items.length == 0) {
                                 responseText = Object.assign({},fulfillment["basic_response"]);
                                 responseText.fulfillmentText = "No "+objectType+"s with name: "+name;
+                            }
+                            else {
+                                responseText.outputContexts = [{
+                                    "name": "projects/"+fulfillment.project.projectID+"/agent/sessions/"+conversationId+"/contexts/action-id-by-name",
+                                    "lifespanCount": 5,
+                                    "parameters": {
+                                      "object" : "thing",
+                                      "futureAction" : "show-details",
+                                      "objectName" : name
+                                    }
+                                }];
                             }
                             res.status(200).send(JSON.stringify(responseText));
                         });
@@ -2265,6 +2507,17 @@ exports.eYantraWebhook = (req, res) => {
                                 responseText = Object.assign({},fulfillment["basic_response"]);
                                 responseText.fulfillmentText = "No "+objectType+"s with name: "+name;
                             }
+                            else {
+                                responseText.outputContexts = [{
+                                    "name": "projects/"+fulfillment.project.projectID+"/agent/sessions/"+conversationId+"/contexts/action-id-by-name",
+                                    "lifespanCount": 5,
+                                    "parameters": {
+                                      "object" : "thing",
+                                      "futureAction" : "show-details",
+                                      "objectName" : name
+                                    }
+                                }];
+                            }
                             res.status(200).send(JSON.stringify(responseText));
                         });
                     }
@@ -2298,6 +2551,17 @@ exports.eYantraWebhook = (req, res) => {
                             else if(responseText.payload.google.systemIntent.data.listSelect.items.length == 0) {
                                 responseText = Object.assign({},fulfillment["basic_response"]);
                                 responseText.fulfillmentText = "No "+objectType+"s with name: "+name;
+                            }
+                            else {
+                                responseText.outputContexts = [{
+                                    "name": "projects/"+fulfillment.project.projectID+"/agent/sessions/"+conversationId+"/contexts/action-id-by-name",
+                                    "lifespanCount": 5,
+                                    "parameters": {
+                                      "object" : "unit",
+                                      "futureAction" : "show-details",
+                                      "objectName" : name
+                                    }
+                                }];
                             }
                             res.status(200).send(JSON.stringify(responseText));
                         });
@@ -2340,6 +2604,17 @@ exports.eYantraWebhook = (req, res) => {
                                 responseText = Object.assign({},fulfillment["basic_response"]);
                                 responseText.fulfillmentText = "No "+objectType+"s with name: "+name;
                             }
+                            else {
+                                responseText.outputContexts = [{
+                                    "name": "projects/"+fulfillment.project.projectID+"/agent/sessions/"+conversationId+"/contexts/action-id-by-name",
+                                    "lifespanCount": 5,
+                                    "parameters": {
+                                      "object" : "device",
+                                      "futureAction" : "show-details",
+                                      "objectName" : name
+                                    }
+                                }];
+                            }
                             res.status(200).send(JSON.stringify(responseText));
                         });
                     }
@@ -2379,6 +2654,17 @@ exports.eYantraWebhook = (req, res) => {
                             else if(responseText.payload.google.systemIntent.data.listSelect.items.length == 0) {
                                 responseText = Object.assign({},fulfillment["basic_response"]);
                                 responseText.fulfillmentText = "No "+objectType+"s with name: "+name;
+                            }
+                            else {
+                                responseText.outputContexts = [{
+                                    "name": "projects/"+fulfillment.project.projectID+"/agent/sessions/"+conversationId+"/contexts/action-id-by-name",
+                                    "lifespanCount": 5,
+                                    "parameters": {
+                                      "object" : "cron",
+                                      "futureAction" : "show-details",
+                                      "objectName" : name
+                                    }
+                                }];
                             }
                             res.status(200).send(JSON.stringify(responseText));
                         });
