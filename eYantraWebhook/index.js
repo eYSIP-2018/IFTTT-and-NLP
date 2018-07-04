@@ -1157,17 +1157,8 @@ exports.eYantraWebhook = (req, res) => {
                             res.status(200).send(JSON.stringify(responseText));
                         }
                         if(responseText.payload.google.systemIntent.data.listSelect.items.length == 1) {
-                            options = {
-                                "method": fulfillment["object.action-id-by-name"]["attribute"]["type"],
-                                "hostname": fulfillment["server"]["hostname"],
-                                "port": fulfillment["server"]["port"],
-                                "path":  fulfillment["object.action-id-by-name"]["attribute"]["endpoint"],
-                                "headers": {
-                                    "content-type": fulfillment["object.action-id-by-name"]["attribute"]["content_type"],
-                                    "cache-control": "no-cache",
-                                    "Cookie": "authorization=; authorization="+token
-                                }
-                            };
+                            options.method = fulfillment["object.action-id-by-name"]["attribute"]["type"];
+                            options.path = fulfillment["object.action-id-by-name"]["attribute"]["endpoint"];
                             let apiInput = Object.assign({},fulfillment["object.action-id-by-name"]["attribute"]["apiInput"]);
                             apiInput.name = name;
                             apiInput.type = type;
@@ -1175,8 +1166,8 @@ exports.eYantraWebhook = (req, res) => {
                             apiInput.parentDeviceId = parseInt(parentDeviceId);
                             console.log("device Details " + JSON.stringify(deviceDetails )+ " " + JSON.stringify(parentDeviceId));
                             apiInput.ownerUnitId = parseInt(deviceDetails[""+parentDeviceId].ownerUnitId);
-
-                            sendRequest(options,null,function(reply,statusCode){
+                            console.log(JSON.stringify(options));
+                            sendRequest(options,apiInput,function(reply,statusCode){
                                 responseText = Object.assign({},fulfillment["basic_response"]);
                                 if(statusCode!= "200") {
                                     responseText.fulfillmentText = "not authenticated !";
@@ -3212,7 +3203,6 @@ exports.eYantraWebhook = (req, res) => {
                     let apiInput = fulfillment[intent][objectType]["apiInput"];
                     apiInput.thingId = parseInt(thingId);
                     apiInput.name = cronName;
-
                     //Get cron expression
                     cronExpression = getCronString(cronExpression);
                     if(!cronExpression.includes('ERROR')) {
