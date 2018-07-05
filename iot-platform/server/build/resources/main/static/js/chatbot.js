@@ -159,7 +159,7 @@ function showHide() {
 }
 
 function startRecording() {
-    var webkitSpeechRecognition = SpeechRecognition || webkitSpeechRecognition
+    //var webkitSpeechRecognition = SpeechRecognition || webkitSpeechRecognition;
     if (!webkitSpeechRecognition) {
         alert("Please upgrade your browser to support speech to text");
     }
