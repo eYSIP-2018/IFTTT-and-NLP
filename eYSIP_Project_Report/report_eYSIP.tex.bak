@@ -1,0 +1,179 @@
+\documentclass[a4paper,12pt,oneside]{book}
+
+%-------------------------------Start of the Preable------------------------------------------------
+\usepackage[english]{babel}
+\usepackage{blindtext}
+%packagr for hyperlinks
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+}
+
+\urlstyle{same}
+%use of package fancy header
+\usepackage{fancyhdr}
+\setlength\headheight{26pt}
+\fancyhf{}
+%\rhead{\includegraphics[width=1cm]{logo}}
+\lhead{\rightmark}
+\rhead{\includegraphics[width=1cm]{logo}}
+\fancyfoot[RE, RO]{\thepage}
+\fancyfoot[CE, CO]{\href{http://www.e-yantra.org}{www.e-yantra.org}}
+
+\pagestyle{fancy}
+
+%use of package for section title formatting
+\usepackage{titlesec}
+\titleformat{\chapter}
+  {\Large\bfseries} % format
+  {}                % label
+  {0pt}             % sep
+  {\huge}           % before-code
+ 
+%use of package tcolorbox for colorful textbox
+\usepackage[most]{tcolorbox}
+\tcbset{colback=cyan!5!white,colframe=cyan!75!black,halign title = flush center}
+
+\newtcolorbox{mybox}[1]{colback=cyan!5!white,
+colframe=cyan!75!black,fonttitle=\bfseries,
+title=\textbf{\Large{#1}}}
+
+%use of package marginnote for notes in margin
+\usepackage{marginnote}
+
+%use of packgage watermark for pages
+%\usepackage{draftwatermark}
+%\SetWatermarkText{\includegraphics{logo}}
+\usepackage[scale=2,opacity=0.1,angle=0]{background}
+\backgroundsetup{
+contents={\includegraphics{logo}}
+}
+
+%use of newcommand for keywords color
+\usepackage{xcolor}
+\newcommand{\keyword}[1]{\textcolor{red}{\textbf{#1}}}
+
+%package for inserting pictures
+\usepackage{graphicx}
+
+%package for highlighting
+\usepackage{color,soul}
+
+%new command for table
+\newcommand{\head}[1]{\textnormal{\textbf{#1}}}
+
+
+%----------------------End of the Preamble---------------------------------------
+
+
+\begin{document}
+
+%---------------------Title Page------------------------------------------------
+\begin{titlepage}
+\raggedright
+{\Large eYSIP2017\\[1cm]}
+{\Huge\scshape Title of the Project \\[.1in]}
+\vfill
+\begin{flushright}
+{\large Intern 1 Name \\}
+{\large Intern 2 Name \\}
+{\large Mentor Name \\}
+{\large Duration of Internship: $ 22/05/2017-07/07/2017 $ \\}
+\end{flushright}
+
+{\itshape 2017, e-Yantra Publication}
+\end{titlepage}
+%-------------------------------------------------------------------------------
+
+\chapter[Project Tag]{Project Name}
+\section*{Abstract}
+Give the brief introduction and overview of the project
+
+\subsection*{Completion status}
+Give details for work/project completed successfully. If work is not
+complete, mention the details till which task is done.
+
+\section{Hardware parts}
+\begin{itemize}
+  \item List of hardware 
+  \item Detail of each hardware: \href[page=5]{./datasheet/MPU-9150.pdf}{Datasheet, page 5}, \href{http://www.amazon.in}{Vendor link}, 
+  \item Connection diagram
+\end{itemize}
+
+\section{Software used}
+\begin{itemize}
+  \item List of software used 
+  \item Detail of software: version, \href{http://www.amazon.com}{download link}, 
+  \item Installation steps
+\end{itemize}
+
+\section{Assembly of hardware}
+Circuit diagram and Steps of assembly of hardware with pictures for each step
+\subsection*{Circuit Diagram}
+Circuit schematic, simplified circuit diagram , block diagram of system
+\subsection*{Step 1}
+Steps for assembling part 1
+\subsection*{Step 2}
+Steps for assembling part 2
+\subsection*{Step 3}
+Steps for assembling part 3
+
+
+
+\section{Software and Code}
+Github Repository with code and documentation: \href{https://github.com/eYSIP-2018/IFTTT-and-NLP}{Link}
+\newline\\
+\textbf{Webhook(fulfillment) program:}
+\newline JavaScript program that recieves user query data from DialogFlow engine, calls corresponding rest APIs of iot-platform and returns the response to DialogFlow.
+\newline\\
+\textbf{natural-cron readableToCron.js:}
+\newline JavaScript Library to convert normal English phrases into "Cron expressions". Visit \href{https://github.com/darkeyedevelopers/natural-cron.js}{here} for more details.
+
+\section{Use and Demo}
+Final Setup Image
+
+\begin{enumerate}
+\item Connect the hardware device to power supply and make sure it is switched on.
+\item Verify that device has active internet connection.
+\item Make sure all the servers are started and working as explained in installation guide.
+\item Use the assistant(Web assistant on iot-platform, Google actions simulator, DialogFlow simulator or Google assistant on handheld devie) to fire queries.
+\end{enumerate}
+
+\href{http://www.youtube.com}{Youtube Link} of demonstration video 
+
+\section{Future Work}
+What can be done to take this work ahead in future as projects.
+
+\section{Bug report and Challenges}
+\textbf{Efficiency of Assistant:}
+\\Though efficiency of assistant has become quite good over the course of development, still the efficiency can be improved with more training.
+\\\newline\textbf{Efficiency of natural-cron.js:}
+\\Building a program that will convert english phrases to desired cron expressions was a major challenge. Efficiency of natural-cron.js library can be consistantly improved over the course of time to handle complex phrases.
+\\\newline\textbf{Challenges:}
+\begin{itemize}
+\item Implementing OAuth2 token based authentication for login via Google Assistant
+\item Making the assistant dynamic to handle all devices and sensors
+\item Improving accuracy of dialogflow agent
+\item Implementing save and restore for blockly blocks
+\end{itemize}
+
+\begin{thebibliography}{li}
+[1] Justin Jose,
+{\em Building Chatbots - A comparison of Rasa-NLU and Dialogflow},
+\href{https://www.linkedin.com/pulse/building-chatbots-comparison-rasa-nlu-dialogflow-justin-jose/}{https://www.linkedin.com/pulse/building-chatbots-comparison-rasa-nlu-dialogflow-justin-jose/}
+\\\newline
+[2] DialogFlow,
+{\em Reference documentation for Google's DialogFlow engine},
+\href{https://dialogflow.com/docs/getting-started}{https://dialogflow.com/docs/getting-started}
+\\\newline
+[3] Blockly,
+{\em Reference documentation for Google's Blockly library},
+\href{https://developers.google.com/blockly/reference/overview}{https://developers.google.com/blockly/reference/overview}
+\end{thebibliography}
+
+
+\end{document}
+
