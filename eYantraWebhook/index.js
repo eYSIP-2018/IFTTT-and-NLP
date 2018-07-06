@@ -1059,7 +1059,7 @@ exports.eYantraWebhook = (req, res) => {
 
         //Process intents seperately
         switch(intent) {
-            /*Done*/
+
             case "create.thing" : {
                 let apiInput = fulfillment[intent][objectType]["apiInput"];
                 apiInput.name = queryResult.parameters.name;
@@ -1096,7 +1096,6 @@ exports.eYantraWebhook = (req, res) => {
             }
             break;
 
-            /*Done*/
             case "create.unit" : {
                 let apiInput = fulfillment[intent][objectType]["apiInput"];
                 apiInput.unitName = queryResult.parameters.name;
@@ -1128,7 +1127,6 @@ exports.eYantraWebhook = (req, res) => {
             }
             break;
 
-            /*Done*/
             case "create.device" : {
                 let apiInput = fulfillment[intent][objectType]["apiInput"];
                 apiInput.name = queryResult.parameters.name;
@@ -1158,7 +1156,6 @@ exports.eYantraWebhook = (req, res) => {
             }
             break;
 
-            /*Done*/
             case "create.cron" : {
                 let name = queryResult.parameters.name;
                 let deviceName = queryResult.parameters.deviceName;
@@ -1239,7 +1236,6 @@ exports.eYantraWebhook = (req, res) => {
             }
             break;
 
-            /*Done*/
             case "create.attribute" : {
                 responseText = Object.assign({},fulfillment["basic_response"]);
 
@@ -1317,7 +1313,6 @@ exports.eYantraWebhook = (req, res) => {
             }
             break;
 
-            /*Done*/
             case "object.delete-all - yes" : {
                 switch(objectType) {
                     case "cron" :
@@ -1388,9 +1383,7 @@ exports.eYantraWebhook = (req, res) => {
             }
             break;
 
-            /*Done*/
             case "object.list-it":
-            /*Done*/
             case "object.list" : {
                 responseText = {"payload": {"google": {"expectUserResponse": true,"richResponse": {"items": [{"simpleResponse": {"textToSpeech": "Here is the list:"}}],"suggestions": []},"systemIntent": {"intent": "actions.intent.OPTION","data": {"@type": "type.googleapis.com/google.actions.v2.OptionValueSpec","listSelect": {"items": []}}}}}};
                 switch(objectType) {
@@ -1544,7 +1537,6 @@ exports.eYantraWebhook = (req, res) => {
             }
             break;
 
-            /*Done*/
             case "object.delete - yes" : {
                 console.log("inside " + intent);
                 let name = findKey("name.original", req.body);
@@ -1973,7 +1965,6 @@ exports.eYantraWebhook = (req, res) => {
             }
             break;
 
-            /*Done*/
             case "pubsub.get-shadow-by-context" :
             case "pubsub.get-shadow-by-name" : {
                 console.log("inside " + intent);
@@ -2053,7 +2044,6 @@ exports.eYantraWebhook = (req, res) => {
             }
             break;
 
-            /*Done*/
             case "pubsub.set-value-by-context" :
             case "pubsub.set-value-by-name" : {
                 console.log("inside " + intent);
@@ -2136,7 +2126,6 @@ exports.eYantraWebhook = (req, res) => {
             }
             break;
 
-            /*Done*/
             case "object.delete-it - yes" :
             case "object.action-id-by-name" : {
                 //console.log("inside " + intent);
@@ -2667,7 +2656,6 @@ exports.eYantraWebhook = (req, res) => {
             }
             break;
 
-            /*Done*/
             case "object.get-name" : {
                 responseText = {"payload": {"google": {"expectUserResponse": true,"richResponse": {"items": [{"simpleResponse": {"textToSpeech": "Here is the list choose Id from list:"}}]},"systemIntent": {"intent": "actions.intent.OPTION","data": {"@type": "type.googleapis.com/google.actions.v2.OptionValueSpec","listSelect": {"items": []}}}}}};
                 switch(objectType) {
@@ -2963,7 +2951,7 @@ exports.eYantraWebhook = (req, res) => {
             }
             break;
 
-            /*Pending*/
+            /*ToDo*/
             case "object.get-it" : {
                 switch (objectType) {
                     case "thing": {
@@ -3077,9 +3065,9 @@ exports.eYantraWebhook = (req, res) => {
                 }
             }
             break;
-            /*Done*/
+
             case "object.param-change-it-to" :
-            /*Done*/
+
             case "object.set-param" : {
                 switch (objectType) {
                     case "thing": {
@@ -3215,7 +3203,6 @@ exports.eYantraWebhook = (req, res) => {
             }
             break;
 
-            /*Done*/
             case "object.rem-param" : {
                 switch (objectType) {
                     case "thing": {
@@ -3338,7 +3325,6 @@ exports.eYantraWebhook = (req, res) => {
             }
             break;
 
-            /*Done*/
             case "object.get-param" : {
                 switch (objectType) {
                     case "thing": {
@@ -3493,7 +3479,6 @@ exports.eYantraWebhook = (req, res) => {
             }
             break;
 
-            /*Done*/
             case "unit.subunits" : {
                 let name = queryResult.parameters.name;
                 let conversationId = findKey("conversationId", req.body);
@@ -3578,7 +3563,6 @@ exports.eYantraWebhook = (req, res) => {
             }
             break;
 
-            /*Done*/
             case "create.cron-add-details" : {
                 let deviceId = queryResult.parameters.deviceId;
                 let cronName = queryResult.parameters.cronName;
@@ -3645,7 +3629,6 @@ exports.eYantraWebhook = (req, res) => {
                 responseText.fulfillmentText = "fulfillment not defined";
                 res.status(200).send(JSON.stringify(responseText));
             }
-
         }
     }
     //Bad request
