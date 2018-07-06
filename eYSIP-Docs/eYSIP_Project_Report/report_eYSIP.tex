@@ -1,0 +1,241 @@
+\documentclass[a4paper,12pt,oneside]{book}
+
+%-------------------------------Start of the Preable------------------------------------------------
+\usepackage[english]{babel}
+\usepackage{blindtext}
+%packagr for hyperlinks
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,
+    urlcolor=cyan,
+}
+
+\urlstyle{same}
+%use of package fancy header
+\usepackage{fancyhdr}
+\setlength\headheight{26pt}
+\fancyhf{}
+%\rhead{\includegraphics[width=1cm]{logo}}
+\lhead{\rightmark}
+\rhead{\includegraphics[width=1cm]{logo}}
+\fancyfoot[RE, RO]{\thepage}
+\fancyfoot[CE, CO]{\href{http://www.e-yantra.org}{www.e-yantra.org}}
+
+\pagestyle{fancy}
+
+%use of package for section title formatting
+\usepackage{titlesec}
+\titleformat{\chapter}
+  {\Large\bfseries} % format
+  {}                % label
+  {0pt}             % sep
+  {\huge}           % before-code
+
+%use of package tcolorbox for colorful textbox
+\usepackage[most]{tcolorbox}
+\tcbset{colback=cyan!5!white,colframe=cyan!75!black,halign title = flush center}
+
+\newtcolorbox{mybox}[1]{colback=cyan!5!white,
+colframe=cyan!75!black,fonttitle=\bfseries,
+title=\textbf{\Large{#1}}}
+
+%use of package marginnote for notes in margin
+\usepackage{marginnote}
+
+%use of packgage watermark for pages
+%\usepackage{draftwatermark}
+%\SetWatermarkText{\includegraphics{logo}}
+\usepackage[scale=2,opacity=0.1,angle=0]{background}
+\backgroundsetup{
+contents={\includegraphics{logo}}
+}
+
+%use of newcommand for keywords color
+\usepackage{xcolor}
+\newcommand{\keyword}[1]{\textcolor{red}{\textbf{#1}}}
+
+%package for inserting pictures
+\usepackage{graphicx}
+
+%package for highlighting
+\usepackage{color,soul}
+
+%new command for table
+\newcommand{\head}[1]{\textnormal{\textbf{#1}}}
+
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+  language=Java,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
+%----------------------End of the Preamble---------------------------------------
+
+
+\begin{document}
+
+%---------------------Title Page------------------------------------------------
+\begin{titlepage}
+\raggedright
+{\Large eYSIP2018\\[1cm]}
+{\Huge\scshape Eyantra IoT Smart Assistant \& IFTTT for IoT \\[.1in]}
+\vfill
+\begin{flushright}
+{\large Onkar J. Sathe \\}
+{\large Rohit G. Rathi \\}
+{\large Mentors : Omkar Manjrekar, Vikrant Fernandes, Deepa Avudiappan \\}
+{\large Duration of Internship: $ 21/05/2018-06/07/2018 $ \\}
+\end{flushright}
+
+{\itshape 2018, e-Yantra Publication}
+\end{titlepage}
+%-------------------------------------------------------------------------------
+
+\chapter[Project Tag]{eYantra IoT Smart Assistant \& IFTTT for IoT}
+\section*{Abstract}
+A web or an app interface for IoT may not always
+be easy for people to work with, especially if they
+aren’t used to such kinds of applications.
+But what if you could tell someone to do things
+on your behalf?
+eYantra IoT Smart Assistant ( eYISA ) is inspired
+from the goal to bring the magic of IoT to the
+fingertips of users and accessible over voice
+commands.
+In AWS IoT writing rules is hard and not
+that much intuitive you also need to know
+SQL (for AWS IoT Rule Engine).
+And it’s di
+fficult to select devices over which you
+want to write rules. A simple GUI needed to write
+rules to invoke the actions on devices.
+
+\subsection*{Completion status}
+The project is successfully completed, all deliverables are achieved. We have successfully created Smart Assistant using dialogflow engine which able to perform all the frequent
+queries that take place on IoT platform. \\
+And also we have devloped flexible block based GUI for IFTTT rules.
+
+\section{Hardware parts}
+\begin{itemize}
+  \item ESP DHT sensor
+  \item 5 day workshop kit
+  \item For connection diagram and setup refer this repository \href{https://github.com/sanamshakya/interfacing-AWS-IoT/}{Interfacing with AWS-IoT}
+\end{itemize}
+
+\section{Software used}
+\begin{itemize}
+  \item \href{dialogflow.com}{Dialogflow}
+  \item \href{https://mongoose-os.com/}{Mongoose OS}
+  \item \href{https://pagekite.net/}{PageKite} or \href{https://ngrok.com/}{ngrok}
+  \item \href{https://cloud.google.com/functions/docs/emulator}{Cloud Functions Local Emulator}
+  \item \href{https://developers.google.com/blockly/}{blockly}
+\end{itemize}
+
+\section{Assembly of hardware}
+For circuit diagram and steps of assembly of hardware check this repository  \href{https://github.com/sanamshakya/interfacing-AWS-IoT/}{Interfacing with AWS-IoT}
+\subsection*{Setup Guide}
+To start follow this instruction of to install iot-platform and setup for AWS-IoT
+\href{https://github.com/eYSIP-2018/IFTTT-and-NLP/wiki/Installation-Guide#setting-up-the-iot-platform}{Installation Guide}
+\subsection*{Step 1}
+After completing setup of \href{https://github.com/eYSIP-2018/IFTTT-and-NLP/tree/master/iot-platform}{iot-platform} and AWS-IoT then run server of iot-platform
+\subsection*{Step 2 - For Development Setup }
+Configure your PageKite account (its free of one month) then follow this \href{https://pagekite.net/support/quickstart/}{quickstart}.\\
+\\
+1. Tunnel iot-platform server to public ip using this command
+\begin{lstlisting}
+pagekite.py 8002 iotplatform-eyantra.pagekite.me
+\end{lstlisting}
+2. To deploy \href{https://github.com/eYSIP-2018/IFTTT-and-NLP/tree/master/eYantraWebhook}{webhook function} for fullfillment of dialogflow in Cloud Functions Local Emulator follow this \href{https://cloud.google.com/functions/docs/emulator}{guide} \\
+3. Tunnel webhook function deployed in Cloud Functions Local Emulator to public ip using this command
+\begin{lstlisting}
+pagekite.py 8010 webhook-eyantra.pagekite.me
+\end{lstlisting}
+4. To setup Dialogflow follow this \href{https://github.com/eYSIP-2018/IFTTT-and-NLP/wiki/Installation-Guide#setting-up-the-assistant-dialogflow--webhook}{guide} upto 4th instruction.\\
+5. Then after configuring all setting of dialogflow you will get Google Project Id in setting of your Agent.\\
+6. Then enter the fullfillment URL as
+\begin{lstlisting}
+https://webhook-eyantra.pagekite.me/<YOUR_PROJECT_ID>/<YOUR_REGION>/eYantraWebhook
+\end{lstlisting}
+\subsection*{Step 2 - For Production Setup }
+1. It is assumed that iot-platform server is hosted on cloud server like EC2(Amazon).\\
+2.To deploy \href{https://github.com/eYSIP-2018/IFTTT-and-NLP/tree/master/eYantraWebhook}{webhook function} for fullfillment of dialogflow in \href{https://cloud.google.com/functions/}{Google Cloud Functions} follow this \href{https://cloud.google.com/functions/docs/quickstart-console}{guide}
+3. Then enter the fullfillment URL as
+\begin{lstlisting}
+https://<YOUR_REGION>-<YOUR_PROJECT_ID>.cloudfunctions.net/eYantraWebhook
+\end{lstlisting}
+\section{Software and Code}
+Github Repository with code and documentation: \href{https://github.com/eYSIP-2018/IFTTT-and-NLP}{Link}
+\newline\\
+\textbf{Webhook(fulfillment) program:}
+\newline JavaScript program that recieves user query data from DialogFlow engine, calls corresponding rest APIs of iot-platform and returns the response to DialogFlow.
+\newline\\
+\textbf{natural-cron readableToCron.js:}
+\newline JavaScript Library to convert normal English phrases into "Cron expressions". Visit \href{https://github.com/darkeyedevelopers/natural-cron.js}{here} for more details.
+
+\section{Use and Demo}
+\begin{enumerate}
+\item Connect the hardware device to power supply and make sure it is switched on.
+\item Verify that device has active internet connection.
+\item Make sure all the servers are started and working as explained in installation guide.
+\item Use the assistant(Web assistant on iot-platform, Google actions simulator, DialogFlow simulator or Google assistant on handheld devie) to fire queries.
+\end{enumerate}
+
+\section{Future Work}
+\begin{itemize}
+\item After increasing the e
+fficiency of the assistant
+ through more training, especially working
+ with Hindi phrases then it can be used anywhere
+\item Assistants can be made dynamic enough
+ to adapt to other APIs, So APIs are accessible over
+ Natural Language of users even in form of text
+ or voice.
+\end{itemize}
+\section{Bug report and Challenges}
+\textbf{Efficiency of Assistant:}
+\\Though efficiency of assistant has become quite good over the course of development, still the efficiency can be improved with more training.
+\\\newline\textbf{Efficiency of natural-cron.js:}
+\\Building a program that will convert english phrases to desired cron expressions was a major challenge. Efficiency of natural-cron.js library can be consistantly improved over the course of time to handle complex phrases.
+\\\newline\textbf{Challenges:}
+\begin{itemize}
+\item Implementing OAuth2 token based authentication for login via Google Assistant
+\item Making the assistant dynamic to handle all devices and sensors
+\item Improving accuracy of dialogflow agent
+\item Implementing save and restore for blockly blocks
+\end{itemize}
+
+\begin{thebibliography}{li}
+[1] Justin Jose,
+{\em Building Chatbots - A comparison of Rasa-NLU and Dialogflow},
+\href{https://www.linkedin.com/pulse/building-chatbots-comparison-rasa-nlu-dialogflow-justin-jose/}{https://www.linkedin.com/pulse/building-chatbots-comparison-rasa-nlu-dialogflow-justin-jose/}
+\\\newline
+[2] DialogFlow,
+{\em Reference documentation for Google's DialogFlow engine},
+\href{https://dialogflow.com/docs/getting-started}{https://dialogflow.com/docs/getting-started}
+\\\newline
+[3] Blockly,
+{\em Reference documentation for Google's Blockly library},
+\href{https://developers.google.com/blockly/reference/overview}{https://developers.google.com/blockly/reference/overview}
+\end{thebibliography}
+
+
+\end{document}
