@@ -17,7 +17,7 @@ msgerForm.addEventListener("submit", function (event) {
   event.preventDefault();
 
   document.getElementById("audioButton").disabled = false;
-  if(typeof someUndefVar != 'undefined') {
+  if(typeof recognition != 'undefined') {
       recognition.stop();
   }
 
@@ -120,6 +120,7 @@ function botResponse(msgText) {
             }
             if ('speechSynthesis' in window) {
                 let msg = new SpeechSynthesisUtterance(speechText);
+                msg.voice = speechSynthesis.getVoices().filter(function(voice) { return voice.lang == "hi-IN"; })[0];
                 window.speechSynthesis.speak(msg);
             }
         }

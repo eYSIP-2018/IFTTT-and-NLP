@@ -148,6 +148,18 @@ var fulfillment = {
                 "name" : "",
                 "description" : "",
             }
+        },
+        "attribute" : {
+            "endpoint" : "/attribute/update/",
+            "type" : "PUT",
+            "content_type" : "application/x-www-form-urlencoded",
+            "response_type" : "application/json",
+            "url_parameter" : true,
+            "apiInput" : {
+                "name" : "",
+                "type" : "",
+                "def" : ""
+            }
         }
     },
     "object.param-change-it-to" :{
@@ -184,6 +196,18 @@ var fulfillment = {
             "apiInput" : {
                 "name" : "",
                 "description" : "",
+            }
+        },
+        "attribute" : {
+            "endpoint" : "/attribute/update/",
+            "type" : "PUT",
+            "content_type" : "application/x-www-form-urlencoded",
+            "response_type" : "application/json",
+            "url_parameter" : true,
+            "apiInput" : {
+                "name" : "",
+                "type" : "",
+                "def" : ""
             }
         }
     },
@@ -222,6 +246,18 @@ var fulfillment = {
                 "name" : "",
                 "description" : "",
             }
+        },
+        "attribute" : {
+            "endpoint" : "/attribute/update/",
+            "type" : "PUT",
+            "content_type" : "application/x-www-form-urlencoded",
+            "response_type" : "application/json",
+            "url_parameter" : true,
+            "apiInput" : {
+                "name" : "",
+                "type" : "",
+                "def" : ""
+            }
         }
     },
     "object.get-param" : {
@@ -251,6 +287,22 @@ var fulfillment = {
         },
         "user" : {
             "endpoint" : "/user/get/",
+            "type" : "GET",
+            "content_type" : "application/x-www-form-urlencoded",
+            "response_type" : "application/json",
+            "url_parameter" : true,
+            "apiInput" : {}
+        },
+        "attribute" : {
+            "endpoint" : "/attribute/get/",
+            "type" : "GET",
+            "content_type" : "application/x-www-form-urlencoded",
+            "response_type" : "application/json",
+            "url_parameter" : true,
+            "apiInput" : {}
+        },
+        "cron" : {
+            "endpoint" : "/cron/get/",
             "type" : "GET",
             "content_type" : "application/x-www-form-urlencoded",
             "response_type" : "application/json",
@@ -301,6 +353,16 @@ var fulfillment = {
         },
         "cron" : {
             "endpoint" : "/cron/list/page/0",
+            "type" : "GET",
+            "content_type" : "application/x-www-form-urlencoded",
+            "response_type" : "application/json",
+            "url_parameter" : true,
+            "apiInput" : {
+                "id" : ""
+            }
+        },
+        "attribute" : {
+            "endpoint" : "/attribute/list/page/0",
             "type" : "GET",
             "content_type" : "application/x-www-form-urlencoded",
             "response_type" : "application/json",
@@ -360,6 +422,16 @@ var fulfillment = {
             "apiInput" : {
                 "id" : ""
             }
+        },
+        "attribute" : {
+            "endpoint" : "/attribute/list/page/0",
+            "type" : "GET",
+            "content_type" : "application/x-www-form-urlencoded",
+            "response_type" : "application/json",
+            "url_parameter" : true,
+            "apiInput" : {
+                "id" : ""
+            }
         }
     },
     "object.list-it": {
@@ -405,6 +477,16 @@ var fulfillment = {
         },
         "cron" : {
             "endpoint" : "/cron/list/page/0",
+            "type" : "GET",
+            "content_type" : "application/x-www-form-urlencoded",
+            "response_type" : "application/json",
+            "url_parameter" : true,
+            "apiInput" : {
+                "id" : ""
+            }
+        },
+        "attribute" : {
+            "endpoint" : "/attribute/list/page/0",
             "type" : "GET",
             "content_type" : "application/x-www-form-urlencoded",
             "response_type" : "application/json",
@@ -472,8 +554,8 @@ var fulfillment = {
             }
         },
         "attribute" : {
-            "endpoint" : "/attribute/create",
-            "type" : "POST",
+            "endpoint" : "/attribute/get/",
+            "type" : "GET",
             "content_type" : "application/x-www-form-urlencoded",
             "response_type" : "application/json",
             "url_parameter" : false,
@@ -558,6 +640,16 @@ var fulfillment = {
                 "id" : ""
             }
         },
+        "attribute" : {
+            "endpoint" : "/attribute/list/page/0",
+            "type" : "GET",
+            "content_type" : "application/x-www-form-urlencoded",
+            "response_type" : "application/json",
+            "url_parameter" : true,
+            "apiInput" : {
+                "id" : ""
+            }
+        }
     },
     "object.delete-all - yes": {
         "thing" : {
@@ -602,6 +694,16 @@ var fulfillment = {
         },
         "cron" : {
             "endpoint" : "/cron/list/page/0",
+            "type" : "GET",
+            "content_type" : "application/x-www-form-urlencoded",
+            "response_type" : "application/json",
+            "url_parameter" : true,
+            "apiInput" : {
+                "id" : ""
+            }
+        },
+        "attribute" : {
+            "endpoint" : "/attribute/list/page/0",
             "type" : "GET",
             "content_type" : "application/x-www-form-urlencoded",
             "response_type" : "application/json",
@@ -725,6 +827,16 @@ var fulfillment = {
             "apiInput" : {
                 "id" : ""
             }
+        },
+        "attribute" : {
+            "endpoint" : "/attribute/delete/",
+            "type" : "DELETE",
+            "content_type" : "application/x-www-form-urlencoded",
+            "response_type" : "application/json",
+            "url_parameter" : true,
+            "apiInput" : {
+                "id" : ""
+            }
         }
     },
     "pubsub.get-shadow-by-name" : {
@@ -819,6 +931,22 @@ var fulfillment = {
         },
         "user" : {
             "endpoint" : "/user/get/",
+            "type" : "GET",
+            "content_type" : "application/x-www-form-urlencoded",
+            "response_type" : "application/json",
+            "url_parameter" : true,
+            "apiInput" : {}
+        },
+        "attribute" : {
+            "endpoint" : "/attribute/get/",
+            "type" : "GET",
+            "content_type" : "application/x-www-form-urlencoded",
+            "response_type" : "application/json",
+            "url_parameter" : true,
+            "apiInput" : {}
+        },
+        "cron" : {
+            "endpoint" : "/cron/get/",
             "type" : "GET",
             "content_type" : "application/x-www-form-urlencoded",
             "response_type" : "application/json",
@@ -1099,6 +1227,7 @@ exports.eYantraWebhook = (req, res) => {
                                   "deviceDetails" : JSON.stringify(deviceDetails)
                                 }
                             }];
+                            console.log(JSON.stringify(responseText));
                         }
                         else if(responseText.payload.google.systemIntent.data.listSelect.items.length == 0) {
                             responseText = Object.assign({},fulfillment["basic_response"]);
@@ -1110,7 +1239,7 @@ exports.eYantraWebhook = (req, res) => {
             }
             break;
 
-            /*Pending*/
+            /*Done*/
             case "create.attribute" : {
                 responseText = Object.assign({},fulfillment["basic_response"]);
 
@@ -1157,17 +1286,8 @@ exports.eYantraWebhook = (req, res) => {
                             res.status(200).send(JSON.stringify(responseText));
                         }
                         if(responseText.payload.google.systemIntent.data.listSelect.items.length == 1) {
-                            options = {
-                                "method": fulfillment["object.action-id-by-name"]["attribute"]["type"],
-                                "hostname": fulfillment["server"]["hostname"],
-                                "port": fulfillment["server"]["port"],
-                                "path":  fulfillment["object.action-id-by-name"]["attribute"]["endpoint"],
-                                "headers": {
-                                    "content-type": fulfillment["object.action-id-by-name"]["attribute"]["content_type"],
-                                    "cache-control": "no-cache",
-                                    "Cookie": "authorization=; authorization="+token
-                                }
-                            };
+                            options.method = fulfillment["object.action-id-by-name"]["attribute"]["type"];
+                            options.path = fulfillment["object.action-id-by-name"]["attribute"]["endpoint"];
                             let apiInput = Object.assign({},fulfillment["object.action-id-by-name"]["attribute"]["apiInput"]);
                             apiInput.name = name;
                             apiInput.type = type;
@@ -1175,8 +1295,8 @@ exports.eYantraWebhook = (req, res) => {
                             apiInput.parentDeviceId = parseInt(parentDeviceId);
                             console.log("device Details " + JSON.stringify(deviceDetails )+ " " + JSON.stringify(parentDeviceId));
                             apiInput.ownerUnitId = parseInt(deviceDetails[""+parentDeviceId].ownerUnitId);
-
-                            sendRequest(options,null,function(reply,statusCode){
+                            console.log(JSON.stringify(options));
+                            sendRequest(options,apiInput,function(reply,statusCode){
                                 responseText = Object.assign({},fulfillment["basic_response"]);
                                 if(statusCode!= "200") {
                                     responseText.fulfillmentText = "not authenticated !";
@@ -1204,6 +1324,7 @@ exports.eYantraWebhook = (req, res) => {
                     case "device":
                     case "thing" :
                     case "user" :
+                    case "attribute" :
                     case "unit" : {
                         var items = [];
                         sendRequest(options,null,function(reply,statusCode){
@@ -1349,7 +1470,16 @@ exports.eYantraWebhook = (req, res) => {
                             var response;
                             if(reply.length > 0) {
                                 for(var i = 0;i<reply.length;i++) {
-                                    responseText.payload.google.systemIntent.data.listSelect.items.push({"optionInfo": {"key": ""+objectType+": "+reply[i].id+reply[i].name},"description": ""+reply[i].email,"title": ""+objectType+" "+reply[i].id+" "+reply[i].name});
+                                    let deviceAttributes = "[ ";
+                                    for(let j=0;j<reply[i].deviceAttributes.length;j++) {
+                                        deviceAttributes+=reply[i].deviceAttributes[j].name+", ";
+                                    }
+                                    deviceAttributes = deviceAttributes.slice(0,-2);
+                                    if(deviceAttributes.length > 0) {
+                                        deviceAttributes+=" ]";
+                                        deviceAttributes = " Attributes: " + deviceAttributes;
+                                    }
+                                    responseText.payload.google.systemIntent.data.listSelect.items.push({"optionInfo": {"key": ""+objectType+": "+reply[i].id+reply[i].name},"description": " Description: "+reply[i].description +deviceAttributes,"title": ""+objectType+" "+reply[i].id+" "+reply[i].name});
                                 }
                                 if(responseText.payload.google.systemIntent.data.listSelect.items.length == 1) {
                                     let tmp = {"payload": {"google": {"expectUserResponse": true,"richResponse": {"items": [{"simpleResponse": {"textToSpeech": ""}},{"simpleResponse": {"textToSpeech": ""}}]}}}};
@@ -1372,6 +1502,28 @@ exports.eYantraWebhook = (req, res) => {
                             if(reply.length > 0) {
                                 for(var i = 0;i<reply.length;i++) {
                                     responseText.payload.google.systemIntent.data.listSelect.items.push({"optionInfo": {"key": ""+objectType+": "+reply[i].id+reply[i].cronName},"title": reply[i].id + " - " + reply[i].cronName + " "+reply[i].cronExpression});
+                                }
+                                if(responseText.payload.google.systemIntent.data.listSelect.items.length == 1) {
+                                    let tmp = {"payload": {"google": {"expectUserResponse": true,"richResponse": {"items": [{"simpleResponse": {"textToSpeech": ""}},{"simpleResponse": {"textToSpeech": ""}}]}}}};
+                                    tmp.payload.google.richResponse.items[1].simpleResponse.textToSpeech = responseText.payload.google.systemIntent.data.listSelect.items[0].title;
+                                    tmp.payload.google.richResponse.items[0].simpleResponse.textToSpeech = "found only one "+objectType +" : ";
+                                    responseText = tmp;
+                                }
+                            }
+                            else {
+                                responseText = Object.assign({},fulfillment["basic_response"]);
+                                responseText.fulfillmentText = "No "+objectType+"s found! Try adding some...";
+                            }
+                            res.status(200).send(JSON.stringify(responseText));
+                        });
+                    }
+                    break;
+                    case "attribute": {
+                        sendRequest(options,null,function(reply,statusCode){
+                            var response;
+                            if(reply.length > 0) {
+                                for(var i = 0;i<reply.length;i++) {
+                                    responseText.payload.google.systemIntent.data.listSelect.items.push({"optionInfo": {"key": ""+objectType+": "+reply[i].id+reply[i].cronName},"title": reply[i].id + " - " + reply[i].name,"description": "Type :"+reply[i].type+" Is Actuated :"+reply[i].actuator});
                                 }
                                 if(responseText.payload.google.systemIntent.data.listSelect.items.length == 1) {
                                     let tmp = {"payload": {"google": {"expectUserResponse": true,"richResponse": {"items": [{"simpleResponse": {"textToSpeech": ""}},{"simpleResponse": {"textToSpeech": ""}}]}}}};
@@ -1746,6 +1898,77 @@ exports.eYantraWebhook = (req, res) => {
                         });
                     }
                     break;
+                    case "attribute" : {
+                        sendRequest(options,null,function(reply,statusCode){
+                            if(statusCode!= "200") {
+                                responseText.fulfillmentText = "not authenticated !";
+                            }
+                            else {
+                                let tempIdList = [];
+                                for(let i=0;i<reply.length;i++) {
+                                    if(reply[i].name.toUpperCase() == name.toUpperCase())
+                                        tempIdList.push(reply[i].id);
+                                }
+                                console.log(tempIdList);
+                                if(tempIdList.length > 1) {
+                                    //console.log("list found for delete");
+                                    responseText.fulfillmentText = "Found multiple "+objectType+"s with name: "+name+"; [";
+                                    for(let i=0;i<tempIdList.length;i++) {
+                                        if(i==0)
+                                            responseText.fulfillmentText += ""+tempIdList[i];
+                                        else
+                                            responseText.fulfillmentText += ","+tempIdList[i];
+                                    }
+                                    responseText.fulfillmentText += "], please choose an ID to delete:";
+                                    responseText.outputContexts = [{
+                                        "name": "projects/"+fulfillment.project.projectID+"/agent/sessions/"+conversationId+"/contexts/action-id-by-name",
+                                        "lifespanCount": 5,
+                                        "parameters": {
+                                          "object" : "attribute",
+                                          "futureAction" : "delete",
+                                          "objectName" : name
+                                        }
+                                    }];
+                                    //console.log("in greater than 1 == "+responseText.fulfillmentText);
+                                    res.status(200).send(JSON.stringify(responseText));
+                                }
+                                else if(tempIdList.length == 1){
+                                    //console.log("list not found for delete");
+                                    options = {
+                                        "method": fulfillment["object.delete"][objectType]["type"],
+                                        "hostname": fulfillment["server"]["hostname"],
+                                        "port": fulfillment["server"]["port"],
+                                        "path": fulfillment["object.delete"][objectType]["endpoint"],
+                                        "headers": {
+                                            "content-type": fulfillment["object.delete"][objectType]["content_type"],
+                                            "cache-control": "no-cache",
+                                            "Cookie": "authorization=; authorization="+token
+                                        }
+                                    };
+                                    options.path += ""+tempIdList[0];
+                                    sendRequest(options,null,function(reply,statusCode){
+                                        if(statusCode != "200") {
+                                            responseText = Object.assign({},fulfillment["basic_response"]);
+                                            responseText.fulfillmentText = "Failed to delete! Make sure you are authenticated or check if the "+objectType+" specified exsists or not";
+                                        }
+                                        else {
+                                            responseText = Object.assign({},fulfillment["basic_response"]);
+                                            responseText.fulfillmentText = "Done! "+objectType+" deleted!";
+                                        }
+                                        //console.log("in 1 == "+responseText.fulfillmentText);
+                                        res.status(200).send(JSON.stringify(responseText));
+                                    });
+                                }
+                                else {
+                                    responseText = Object.assign({},fulfillment["basic_response"]);;
+                                    responseText.fulfillmentText = "No "+objectType+" found with name: "+name;
+                                    //console.log("in other == "+responseText.fulfillmentText);
+                                    res.status(200).send(JSON.stringify(responseText));
+                                }
+                            }
+                        });
+                    }
+                    break;
                 }
             }
             break;
@@ -1937,7 +2160,7 @@ exports.eYantraWebhook = (req, res) => {
                                 sendRequest(options,null,function(reply,statusCode){
                                     if(statusCode != "200") {
                                         responseText = Object.assign({},fulfillment["basic_response"]);
-                                        responseText.fulfillmentText = "Failed to delete! Make sure you are authenticated or check if the "+objectType+" specified exsists or not";
+                                        responseText.fulfillmentText = "Failed to retrive! Make sure you are authenticated or check if the "+objectType+" specified exsists or not";
                                     }
                                     else {
                                         let tmp = {"payload": {"google": {"expectUserResponse": true,"richResponse": {"items": [{"simpleResponse": {"textToSpeech": ""}},{"simpleResponse": {"textToSpeech": ""}}]}}}};
@@ -1970,7 +2193,7 @@ exports.eYantraWebhook = (req, res) => {
                                 sendRequest(options,null,function(reply,statusCode){
                                     if(statusCode != "200") {
                                         responseText = Object.assign({},fulfillment["basic_response"]);
-                                        responseText.fulfillmentText = "Failed to delete! Make sure you are authenticated or check if the "+objectType+" specified exsists or not";
+                                        responseText.fulfillmentText = "Failed to retrive! Make sure you are authenticated or check if the "+objectType+" specified exsists or not";
                                     }
                                     else {
                                         responseText = Object.assign({},fulfillment["basic_response"]);
@@ -1990,7 +2213,7 @@ exports.eYantraWebhook = (req, res) => {
                                 sendRequest(options,null,function(reply,statusCode){
                                     if(statusCode != "200") {
                                         responseText = Object.assign({},fulfillment["basic_response"]);
-                                        responseText.fulfillmentText = "Failed to delete! Make sure you are authenticated or check if the "+objectType+" specified exsists or not";
+                                        responseText.fulfillmentText = "Failed to retrive! Make sure you are authenticated or check if the "+objectType+" specified exsists or not";
                                     }
                                     else {
                                         responseText = Object.assign({},fulfillment["basic_response"]);
@@ -2012,7 +2235,7 @@ exports.eYantraWebhook = (req, res) => {
                                 sendRequest(options,null,function(reply,statusCode){
                                     if(statusCode != "200") {
                                         responseText = Object.assign({},fulfillment["basic_response"]);
-                                        responseText.fulfillmentText = "Failed to delete! Make sure you are authenticated or check if the "+objectType+" specified exsists or not";
+                                        responseText.fulfillmentText = "Failed to retrive! Make sure you are authenticated or check if the "+objectType+" specified exsists or not";
                                     }
                                     else {
                                         let tmp = {"payload": {"google": {"expectUserResponse": true,"richResponse": {"items": [{"simpleResponse": {"textToSpeech": ""}},{"simpleResponse": {"textToSpeech": ""}}]}}}};
@@ -2045,7 +2268,7 @@ exports.eYantraWebhook = (req, res) => {
                                 sendRequest(options,null,function(reply,statusCode){
                                     if(statusCode != "200") {
                                         responseText = Object.assign({},fulfillment["basic_response"]);
-                                        responseText.fulfillmentText = "Failed to delete! Make sure you are authenticated or check if the "+objectType+" specified exsists or not";
+                                        responseText.fulfillmentText = "Failed to retrive! Make sure you are authenticated or check if the "+objectType+" specified exsists or not";
                                     }
                                     else {
                                         responseText = Object.assign({},fulfillment["basic_response"]);
@@ -2111,7 +2334,7 @@ exports.eYantraWebhook = (req, res) => {
                                 sendRequest(options,null,function(reply,statusCode){
                                     if(statusCode != "200") {
                                         responseText = Object.assign({},fulfillment["basic_response"]);
-                                        responseText.fulfillmentText = "Failed to delete! Make sure you are authenticated or check if the "+objectType+" specified exsists or not";
+                                        responseText.fulfillmentText = "Failed to retrive! Make sure you are authenticated or check if the "+objectType+" specified exsists or not";
                                     }
                                     else {
                                         let tmp = {"payload": {"google": {"expectUserResponse": true,"richResponse": {"items": [{"simpleResponse": {"textToSpeech": ""}},{"simpleResponse": {"textToSpeech": ""}}]}}}};
@@ -2143,7 +2366,7 @@ exports.eYantraWebhook = (req, res) => {
                                 sendRequest(options,null,function(reply,statusCode){
                                     if(statusCode != "200") {
                                         responseText = Object.assign({},fulfillment["basic_response"]);
-                                        responseText.fulfillmentText = "Failed to delete! Make sure you are authenticated or check if the "+objectType+" specified exsists or not";
+                                        responseText.fulfillmentText = "Failed to retrive! Make sure you are authenticated or check if the "+objectType+" specified exsists or not";
                                     }
                                     else {
                                         responseText = Object.assign({},fulfillment["basic_response"]);
@@ -2275,7 +2498,7 @@ exports.eYantraWebhook = (req, res) => {
                                 sendRequest(options,null,function(reply,statusCode){
                                     if(statusCode != "200") {
                                         responseText = Object.assign({},fulfillment["basic_response"]);
-                                        responseText.fulfillmentText = "Failed to delete! Make sure you are authenticated or check if the "+objectType+" specified exsists or not";
+                                        responseText.fulfillmentText = "Failed to retrive! Make sure you are authenticated or check if the "+objectType+" specified exsists or not";
                                     }
                                     else {
                                         let tmp = {"payload": {"google": {"expectUserResponse": true,"richResponse": {"items": [{"simpleResponse": {"textToSpeech": ""}},{"simpleResponse": {"textToSpeech": ""}}]}}}};
@@ -2335,7 +2558,7 @@ exports.eYantraWebhook = (req, res) => {
                                 sendRequest(options,null,function(reply,statusCode){
                                     if(statusCode != "200") {
                                         responseText = Object.assign({},fulfillment["basic_response"]);
-                                        responseText.fulfillmentText = "Failed to delete! Make sure you are authenticated or check if the "+objectType+" specified exsists or not";
+                                        responseText.fulfillmentText = "Failed to retrive! Make sure you are authenticated or check if the "+objectType+" specified exsists or not";
                                     }
                                     else {
                                         responseText = Object.assign({},fulfillment["basic_response"]);
@@ -2357,11 +2580,11 @@ exports.eYantraWebhook = (req, res) => {
                                 sendRequest(options,null,function(reply,statusCode){
                                     if(statusCode != "200") {
                                         responseText = Object.assign({},fulfillment["basic_response"]);
-                                        responseText.fulfillmentText = "Failed to delete! Make sure you are authenticated or check if the "+objectType+" specified exsists or not";
+                                        responseText.fulfillmentText = "Failed to retrive! Make sure you are authenticated or check if the "+objectType+" specified exsists or not";
                                     }
                                     else {
                                         let tmp = {"payload": {"google": {"expectUserResponse": true,"richResponse": {"items": [{"simpleResponse": {"textToSpeech": ""}},{"simpleResponse": {"textToSpeech": ""}}]}}}};
-                                        tmp.payload.google.richResponse.items[0].simpleResponse.textToSpeech = "Cron ("+reply.id+")\t"+reply.name;
+                                        tmp.payload.google.richResponse.items[0].simpleResponse.textToSpeech = "Attr ("+reply.id+")\t"+reply.name;
                                         tmp.payload.google.richResponse.items[1].simpleResponse.textToSpeech = reply.cronExpression;
                                         responseText.payload = tmp.payload;
                                         if( ! reply.hasOwnProperty("def")) {
@@ -2415,6 +2638,26 @@ exports.eYantraWebhook = (req, res) => {
                                     responseText.fulfillmentText = "Sorry, that ID didn't match with specified device name!";
                                     res.status(200).send(JSON.stringify(responseText));
                                 }
+                            }
+                            break;
+                            case "delete" : {
+                                //console.log("deleting id " + id);
+                                options.path = fulfillment["object.delete"]["attribute"]["endpoint"];
+                                options.method = fulfillment["object.delete"]["attribute"]["type"];
+                                options.path += ""+id;
+                                console.log(options.path);
+                                //console.log(JSON.stringify(options));
+                                sendRequest(options,null,function(reply,statusCode){
+                                    if(statusCode != "200") {
+                                        responseText = Object.assign({},fulfillment["basic_response"]);
+                                        responseText.fulfillmentText = "Failed to retrive! Make sure you are authenticated or check if the "+objectType+" specified exsists or not";
+                                    }
+                                    else {
+                                        responseText = Object.assign({},fulfillment["basic_response"]);
+                                        responseText.fulfillmentText = "Done! "+objectType+" deleted!";
+                                    }
+                                    res.status(200).send(JSON.stringify(responseText));
+                                });
                             }
                             break;
                         }
@@ -2669,6 +2912,53 @@ exports.eYantraWebhook = (req, res) => {
                             res.status(200).send(JSON.stringify(responseText));
                         });
                     }
+                    break;
+                    case "attribute" : {
+                        let name = queryResult.parameters.name;
+                        let attribute;
+                        sendRequest(options,null,function(reply,statusCode){
+                            for(let i = 0;i<reply.length;i++) {
+                                if(reply[i].name.toUpperCase() == name.toUpperCase()) {
+                                    responseText.payload.google.systemIntent.data.listSelect.items.push({"optionInfo": {"key": ""+objectType+": "+reply[i].id+reply[i].name},"title": ""+reply[i].name+" (ID:"+reply[i].id+"): ","description": "Type: "+reply[i].type + " Is Actuated: "+reply[i].actuator });
+                                    attribute = reply[i];
+                                }
+                            }
+                            if(responseText.payload.google.systemIntent.data.listSelect.items.length == 1) {
+                                let tmp = {"payload": {"google": {"expectUserResponse": true,"richResponse": {"items": [{"simpleResponse": {"textToSpeech": ""}},{"simpleResponse": {"textToSpeech": ""}}]}}}};
+                                tmp.payload.google.richResponse.items[0].simpleResponse.textToSpeech = responseText.payload.google.systemIntent.data.listSelect.items[0].title;
+                                tmp.payload.google.richResponse.items[1].simpleResponse.textToSpeech = responseText.payload.google.systemIntent.data.listSelect.items[0].description;
+                                responseText.payload = tmp.payload;
+                                responseText.outputContexts = [{
+                                    "name": "projects/"+fulfillment.project.projectID+"/agent/sessions/"+conversationId+"/contexts/object",
+                                    "lifespanCount": 5,
+                                    "parameters": {
+                                      "object" : "attribute",
+                                      "id" : attribute.id,
+                                      "name": attribute.name,
+                                      "type":attribute.type,
+                                      "actuator": attribute.actuator
+                                    }
+                                }];
+                            }
+                            else if(responseText.payload.google.systemIntent.data.listSelect.items.length == 0) {
+                                responseText = Object.assign({},fulfillment["basic_response"]);
+                                responseText.fulfillmentText = "No "+objectType+"s with name: "+name;
+                            }
+                            else {
+                                responseText.outputContexts = [{
+                                    "name": "projects/"+fulfillment.project.projectID+"/agent/sessions/"+conversationId+"/contexts/action-id-by-name",
+                                    "lifespanCount": 5,
+                                    "parameters": {
+                                      "object" : "attribute",
+                                      "futureAction" : "show-details",
+                                      "objectName" : name
+                                    }
+                                }];
+                            }
+                            res.status(200).send(JSON.stringify(responseText));
+                        });
+                    }
+                    break;
                 }
             }
             break;
@@ -2757,6 +3047,26 @@ exports.eYantraWebhook = (req, res) => {
                                     responseText.fulfillmentText = ""+param+" of the "+objectType+" is not set";
                             }
                             else
+                                responseText.fulfillmentText = "Sorry! I failed to do that... Please try again";
+                            res.status(200).send(JSON.stringify(responseText));
+                        });
+                    }
+                    break;
+                    case "attribute": {
+                        let param = findKey("param",queryResult.parameters);
+                        let id = findKey("id",queryResult.outputContexts);
+                        options.path += ""+id;
+                        sendRequest(options,null,function(reply,statusCode) {
+                            responseText = Object.assign({},fulfillment["basic_response"]);
+                            if(statusCode == "405")
+                                responseText.fulfillmentText = "not authenticated !";
+                            else if(statusCode == "404")
+                                responseText.fulfillmentText = "Looks like something is not right... May be the "+objectType+" does not exsist!";
+                            else if(statusCode == "200") {
+                                responseText.fulfillmentText = ""+param+" of the "+objectType+" is: "+reply[param];
+                                if(reply[param] == "")
+                                    responseText.fulfillmentText = ""+param+" of the "+objectType+" is not set";
+                            } else
                                 responseText.fulfillmentText = "Sorry! I failed to do that... Please try again";
                             res.status(200).send(JSON.stringify(responseText));
                         });
@@ -2868,6 +3178,37 @@ exports.eYantraWebhook = (req, res) => {
                         });
                     }
                     break;
+                    case "attribute": {
+                        let param = queryResult.parameters.param;
+                        let newValue = queryResult.parameters.newValue;
+                        let id = fromOutputContext(queryResult.outputContexts,'object','id');
+                        let apiInput = fulfillment[intent][objectType]["apiInput"];
+                        apiInput['name'] = fromOutputContext(queryResult.outputContexts,'object','name');
+                        apiInput['description'] = fromOutputContext(queryResult.outputContexts,'object','description');
+                        apiInput[param] = newValue;
+                        options.path += ""+id;
+                        sendRequest(options,apiInput,function(reply,statusCode) {
+                            responseText = Object.assign({},fulfillment["basic_response"]);
+                            if(statusCode == "405")
+                                responseText.fulfillmentText = "not authenticated !";
+                            else if(statusCode == "404")
+                                responseText.fulfillmentText = "Looks like something is not right... May be the "+objectType+" you want to update does not exsists!";
+                            else if(statusCode == "200")
+                                responseText.fulfillmentText = "Updated the "+param+" to "+newValue;
+                            else
+                                responseText.fulfillmentText = "Sorry! I failed to do that... Please try again";
+                            responseText.outputContexts = [{
+                                "name": "projects/"+fulfillment.project.projectID+"/agent/sessions/"+conversationId+"/contexts/param",
+                                "lifespanCount": 1,
+                                "parameters": {
+                                  "object" : "attribute",
+                                  "param" : param
+                                }
+                            }];
+                            res.status(200).send(JSON.stringify(responseText));
+                        });
+                    }
+                    break;
                     default:
                     break;
                 }
@@ -2956,6 +3297,34 @@ exports.eYantraWebhook = (req, res) => {
                                 "lifespanCount": 1,
                                 "parameters": {
                                   "object" : "device",
+                                  "param" : param
+                                }
+                            }];
+                            res.status(200).send(JSON.stringify(responseText));
+                        });
+                    }
+                    break;
+                    case "attribute": {
+                        let param = findKey("param",queryResult.parameters);
+                        let id = findKey("id",queryResult.outputContexts);
+                        let apiInput = fulfillment[intent][objectType]["apiInput"];
+                        apiInput[param] = "";
+                        options.path += ""+id;
+                        sendRequest(options,apiInput,function(reply,statusCode) {
+                            responseText = Object.assign({},fulfillment["basic_response"]);
+                            if(statusCode == "405")
+                                responseText.fulfillmentText = "not authenticated !";
+                            else if(statusCode == "404")
+                                responseText.fulfillmentText = "Looks like something is not right... May be the "+objectType+" does not exsists or "+param+" can't be removed!";
+                            else if(statusCode == "200")
+                                responseText.fulfillmentText = "Removed the "+param;
+                            else
+                                responseText.fulfillmentText = "Sorry! I failed to do that... Please try again";
+                            responseText.outputContexts = [{
+                                "name": "projects/"+fulfillment.project.projectID+"/agent/sessions/"+conversationId+"/contexts/param",
+                                "lifespanCount": 1,
+                                "parameters": {
+                                  "object" : "attribute",
                                   "param" : param
                                 }
                             }];
@@ -3090,6 +3459,34 @@ exports.eYantraWebhook = (req, res) => {
                         });
                     }
                     break;
+                    case "attribute": {
+                        let param = findKey("param",queryResult.parameters);
+                        let id = findKey("id",queryResult.outputContexts);
+                        options.path += ""+id;
+                        sendRequest(options,null,function(reply,statusCode) {
+                            responseText = Object.assign({},fulfillment["basic_response"]);
+                            if(statusCode == "405")
+                                responseText.fulfillmentText = "not authenticated !";
+                            else if(statusCode == "404")
+                                responseText.fulfillmentText = "Looks like something is not right... May be the "+objectType+" does not exsist!";
+                            else if(statusCode == "200") {
+                                responseText.fulfillmentText = ""+param+" of the "+objectType+" is: "+reply[param];
+                                if(reply[param] == "")
+                                    responseText.fulfillmentText = ""+param+" of the "+objectType+" is not set";
+                            } else
+                                responseText.fulfillmentText = "Sorry! I failed to do that... Please try again";
+                            responseText.outputContexts = [{
+                                "name": "projects/"+fulfillment.project.projectID+"/agent/sessions/"+conversationId+"/contexts/param",
+                                "lifespanCount": 1,
+                                "parameters": {
+                                    "object" : "attribute",
+                                    "param" : param
+                                }
+                            }];
+                            res.status(200).send(JSON.stringify(responseText));
+                        });
+                    }
+                    break;
                     default:
                     break;
                 }
@@ -3172,7 +3569,7 @@ exports.eYantraWebhook = (req, res) => {
                             });
                         }
                         else {
-                            responseText = Object.assign({},fulfillment["basic_response"]);;
+                            responseText = Object.assign({},fulfillment["basic_response"]);
                             responseText.fulfillmentText = "No "+objectType+" found with name: "+name;
                             res.status(200).send(JSON.stringify(responseText));
                         }
@@ -3212,7 +3609,6 @@ exports.eYantraWebhook = (req, res) => {
                     let apiInput = fulfillment[intent][objectType]["apiInput"];
                     apiInput.thingId = parseInt(thingId);
                     apiInput.name = cronName;
-
                     //Get cron expression
                     cronExpression = getCronString(cronExpression);
                     if(!cronExpression.includes('ERROR')) {
