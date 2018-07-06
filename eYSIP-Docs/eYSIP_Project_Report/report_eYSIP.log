@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2018.6.6)  6 JUL 2018 13:12
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2018.4.17)  6 JUL 2018 14:36
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -183,7 +183,7 @@ Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 2
 )
 \Hy@SectionHShift=\skip43
 )
-Package hyperref Info: Option `colorlinks' set `true' on input line 13.
+Package hyperref Info: Option `colorlinks' set `true' on input line 12.
 
 (/usr/share/texlive/texmf-dist/tex/latex/fancyhdr/fancyhdr.sty
 \fancy@headwidth=\skip44
@@ -198,11 +198,11 @@ Package hyperref Info: Option `colorlinks' set `true' on input line 13.
 )
 
 Package Fancyhdr Warning: \fancyfoot's `E' option without twoside option is use
-less on input line 23.
+less on input line 22.
 
 
 Package Fancyhdr Warning: \fancyfoot's `E' option without twoside option is use
-less on input line 24.
+less on input line 23.
 
 (/usr/share/texlive/texmf-dist/tex/latex/titlesec/titlesec.sty
 Package: titlesec 2016/03/15 v2.10.1 Sectioning titles
@@ -856,22 +856,22 @@ File: lstlang1.sty 2015/06/04 1.6 listings language file
 (./report_eYSIP.aux)
 \openout1 = `report_eYSIP.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 94.
-LaTeX Font Info:    ... okay on input line 94.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 94.
-LaTeX Font Info:    ... okay on input line 94.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 94.
-LaTeX Font Info:    ... okay on input line 94.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 94.
-LaTeX Font Info:    ... okay on input line 94.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 94.
-LaTeX Font Info:    ... okay on input line 94.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 94.
-LaTeX Font Info:    ... okay on input line 94.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 94.
-LaTeX Font Info:    ... okay on input line 94.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 93.
+LaTeX Font Info:    ... okay on input line 93.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 93.
+LaTeX Font Info:    ... okay on input line 93.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 93.
+LaTeX Font Info:    ... okay on input line 93.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 93.
+LaTeX Font Info:    ... okay on input line 93.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 93.
+LaTeX Font Info:    ... okay on input line 93.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 93.
+LaTeX Font Info:    ... okay on input line 93.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 93.
+LaTeX Font Info:    ... okay on input line 93.
 \AtBeginShipoutBox=\box71
-Package hyperref Info: Link coloring ON on input line 94.
+Package hyperref Info: Link coloring ON on input line 93.
 
 (/usr/share/texlive/texmf-dist/tex/latex/hyperref/nameref.sty
 Package: nameref 2012/10/27 v2.43 Cross-referencing by name of section
@@ -881,9 +881,9 @@ Package: gettitlestring 2010/12/03 v1.4 Cleanup title references (HO)
 )
 \c@section@level=\count196
 )
-LaTeX Info: Redefining \ref on input line 94.
-LaTeX Info: Redefining \pageref on input line 94.
-LaTeX Info: Redefining \nameref on input line 94.
+LaTeX Info: Redefining \ref on input line 93.
+LaTeX Info: Redefining \pageref on input line 93.
+LaTeX Info: Redefining \nameref on input line 93.
 
 (./report_eYSIP.out) (./report_eYSIP.out)
 \@outlinefile=\write6
@@ -932,7 +932,7 @@ Package marginnote Info: \pdfoutput not 0 and \pdflastxpos available.
 <logo.png, id=39, 123.46124pt x 131.49126pt>
 File: logo.png Graphic file (type png)
  <use logo.png>
-Package pdftex.def Info: logo.png used on input line 110.
+Package pdftex.def Info: logo.png used on input line 109.
 (pdftex.def)             Requested size: 123.46092pt x 131.49092pt.
  [1
 
@@ -945,36 +945,36 @@ Missing character: There is no ™ in font cmr12!
 Missing character: There is no â in font cmr12!
 Missing character: There is no € in font cmr12!
 Missing character: There is no ™ in font cmr12!
-LaTeX Font Info:    Try loading font information for OMS+cmr on input line 139.
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 123.
 
 (/usr/share/texlive/texmf-dist/tex/latex/base/omscmr.fd
 File: omscmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <12> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 139.
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 123.
 File: logo.png Graphic file (type png)
  <use logo.png>
-Package pdftex.def Info: logo.png used on input line 147.
+Package pdftex.def Info: logo.png used on input line 131.
 (pdftex.def)             Requested size: 123.46092pt x 131.49092pt.
 pdfTeX warning (ext4): destination with the same identifier (name{page.1}) has 
 been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.147   \item \href
+l.131   \item \href
                    {https://mongoose-os.com/}{Mongoose OS} [1
 
 ]
-Underfull \hbox (badness 10000) in paragraph at lines 161--164
+Underfull \hbox (badness 10000) in paragraph at lines 145--148
 
  []
 
 File: logo.png Graphic file (type png)
 <use logo.png>
-Package pdftex.def Info: logo.png used on input line 175.
+Package pdftex.def Info: logo.png used on input line 159.
 (pdftex.def)             Requested size: 123.46092pt x 131.49092pt.
 File: logo.png Graphic file (type png)
  <use logo.png>
-Package pdftex.def Info: logo.png used on input line 175.
+Package pdftex.def Info: logo.png used on input line 159.
 (pdftex.def)             Requested size: 28.45274pt x 30.30254pt.
 
 
@@ -984,109 +984,109 @@ Package Fancyhdr Warning: \headheight is too small (26.0pt):
  This may cause the page layout to be inconsistent, however.
 
 [2]
-Overfull \hbox (81.3924pt too wide) in paragraph at lines 176--177
+Overfull \hbox (81.3924pt too wide) in paragraph at lines 160--161
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
 ][][][][][][][]  
  []
 
 
-Overfull \hbox (29.6542pt too wide) in paragraph at lines 183--184
+Overfull \hbox (29.6542pt too wide) in paragraph at lines 167--168
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][]  
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 186--193
+Underfull \hbox (badness 10000) in paragraph at lines 170--177
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 186--193
+Underfull \hbox (badness 10000) in paragraph at lines 170--177
 
  []
 
 File: logo.png Graphic file (type png)
 <use logo.png>
-Package pdftex.def Info: logo.png used on input line 200.
+Package pdftex.def Info: logo.png used on input line 184.
 (pdftex.def)             Requested size: 123.46092pt x 131.49092pt.
 File: logo.png Graphic file (type png)
  <use logo.png>
-Package pdftex.def Info: logo.png used on input line 200.
+Package pdftex.def Info: logo.png used on input line 184.
 (pdftex.def)             Requested size: 28.45274pt x 30.30254pt.
  [3]
-Underfull \hbox (badness 10000) in paragraph at lines 214--219
+Underfull \hbox (badness 10000) in paragraph at lines 198--203
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 214--219
+Underfull \hbox (badness 10000) in paragraph at lines 198--203
 
  []
 
 File: logo.png Graphic file (type png)
 <use logo.png>
-Package pdftex.def Info: logo.png used on input line 226.
+Package pdftex.def Info: logo.png used on input line 210.
 (pdftex.def)             Requested size: 123.46092pt x 131.49092pt.
 File: logo.png Graphic file (type png)
  <use logo.png>
-Package pdftex.def Info: logo.png used on input line 226.
+Package pdftex.def Info: logo.png used on input line 210.
 (pdftex.def)             Requested size: 28.45274pt x 30.30254pt.
  [4]
 
-LaTeX Warning: Empty `thebibliography' environment on input line 238.
+LaTeX Warning: Empty `thebibliography' environment on input line 222.
 
 
-Underfull \hbox (badness 1742) in paragraph at lines 227--238
+Underfull \hbox (badness 1742) in paragraph at lines 211--222
 \OT1/cmr/m/n/12 [1] Justin Jose, \OT1/cmr/m/it/12 Build-ing Chat-bots - A com-p
 ar-i-son of Rasa-NLU
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 227--238
+Underfull \hbox (badness 10000) in paragraph at lines 211--222
 \OT1/cmr/m/it/12 and Di-alogflow\OT1/cmr/m/n/12 , [][]https://www.linkedin.com/
 pulse/building-chatbots-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 227--238
+Underfull \hbox (badness 10000) in paragraph at lines 211--222
 
  []
 
 
-Underfull \hbox (badness 2903) in paragraph at lines 227--238
+Underfull \hbox (badness 2903) in paragraph at lines 211--222
 \OT1/cmr/m/n/12 [2] Di-alogFlow, \OT1/cmr/m/it/12 Ref-er-ence doc-u-men-ta-tion
  for Google's Di-alogFlow
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 227--238
+Underfull \hbox (badness 10000) in paragraph at lines 211--222
 
  []
 
 
-Underfull \hbox (badness 2020) in paragraph at lines 227--238
+Underfull \hbox (badness 2020) in paragraph at lines 211--222
 \OT1/cmr/m/n/12 [3] Blockly, \OT1/cmr/m/it/12 Ref-er-ence doc-u-men-ta-tion for
  Google's Blockly li-brary\OT1/cmr/m/n/12 ,
  []
 
 File: logo.png Graphic file (type png)
 <use logo.png>
-Package pdftex.def Info: logo.png used on input line 241.
+Package pdftex.def Info: logo.png used on input line 225.
 (pdftex.def)             Requested size: 123.46092pt x 131.49092pt.
  [5
 
 ]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 241.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 241.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 225.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 225.
  (./report_eYSIP.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 241.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 241.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 225.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 225.
 Package rerunfilecheck Info: File `report_eYSIP.out' has not changed.
 (rerunfilecheck)             Checksum: 4133A644625114D40B04AB9734943ABF;480.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 241.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 225.
  ) 
 Here is how much of TeX's memory you used:
  29476 strings out of 494910
- 586991 string characters out of 6179837
+ 586991 string characters out of 6179836
  689483 words of memory out of 5000000
  32348 multiletter control sequences out of 15000+600000
  8814 words of font info for 32 fonts, out of 8000000 for 9000
@@ -1100,7 +1100,7 @@ xmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/share/texlive/texmf-dis
 t/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/font
 s/type1/public/amsfonts/cm/cmti12.pfb></usr/share/texlive/texmf-dist/fonts/type
 1/public/amsfonts/cm/cmtt10.pfb>
-Output written on report_eYSIP.pdf (6 pages, 117623 bytes).
+Output written on report_eYSIP.pdf (6 pages, 117619 bytes).
 PDF statistics:
  149 PDF objects out of 1000 (max. 8388607)
  129 compressed objects within 2 object streams
