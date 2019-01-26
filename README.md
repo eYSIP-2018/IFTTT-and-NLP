@@ -1,6 +1,6 @@
-# NLP for eYantra IOT Platform
+# NLP for eYantra IoT Platform
 
-Building a NLP based chatbot to access eYantra IOT platform's API through text and voice control over the Web portal and through Google Assistant!
+Building a NLP based chatbot to access eYantra IoT platform's API through text and voice control over the Web portal and through Google Assistant!
 
 
 #### Architecture
