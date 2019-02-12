@@ -1,4 +1,4 @@
-# NLP for eYantra IoT Platform
+# NLP for [eYantra IoT Platform](https://github.com/E-yantra/iot-platform)
 
 Building a NLP based chatbot to access eYantra IoT platform's API through text and voice control over the Web portal and through Google Assistant!
 
